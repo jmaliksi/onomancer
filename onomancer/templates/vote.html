@@ -1,5 +1,8 @@
-<title>You must vote</title>
+{% extends "base.html" %}
+{% block header %}
 <h1>{{name}}</h1>
+{% endblock %}
+{% block content %}
 <div>
     <a href="/vote">Bad</a>
     <form method="post" action="/rate">
@@ -7,3 +10,4 @@
         <input type="submit" value="Rad" />
     </form>
 </div>
+{% endblock %}

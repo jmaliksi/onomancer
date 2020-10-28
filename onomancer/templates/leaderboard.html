@@ -1,5 +1,8 @@
-<title>Leaders</title>
+{% extends "base.html" %}
+{% block header %}
 <h1>Leaders</h1>
+{% endblock %}
+{% block content %}
 <div>
     <ol>
     {% for name in names %}
@@ -7,3 +10,4 @@
     {% endfor %}
     </ol>
 </div>
+{% endblock %}

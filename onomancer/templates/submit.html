@@ -1,7 +1,11 @@
-<title>You must name</title>
+{% extends "base.html" %}
+{% block header %}
 <h1>Submit a name</h1>
 <h2>Enter only one first/second name at a time</h2>
+{% endblock %}
+{% block content %}
 <form method="post" action="/submit">
     <input type="text" name="name" />
     <input type="submit" value="Egg" />
 </form>
+{% endblock %}

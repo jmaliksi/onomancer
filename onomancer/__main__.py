@@ -1,3 +1,5 @@
+import random
+
 from flask import Flask, make_response, render_template, request, jsonify
 from onomancer import database
 
@@ -11,8 +13,7 @@ def index():
 
 @app.route('/vote')
 def vote():
-    names = database.get_random_names(limit=2)
-    name = ' '.join(names)
+    name = database.get_random_name()
     return make_response(render_template('vote.html', name=name))
 
 

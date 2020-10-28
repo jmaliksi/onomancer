@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <title>Onomancer</title>
+</head>
+<body>
+    <div id="nav">
+        <ul>
+            <li><a href="/vote">Rate</a></li>
+            <li><a href="/leaderboard">Leaders</a></li>
+            <li><a href="/egg">Submit</a></li>
+        </ul>
+    </div>
+    <div id="header">{% block header %}{% endblock %}</div>
+    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="footer">
+        bluh
+    </div>
+</body>
+</html>
