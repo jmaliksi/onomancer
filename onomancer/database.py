@@ -2,18 +2,24 @@ import random
 import sqlite3
 import sys
 
-DB_NAME = 'onomancer.db'
+DB_NAME = 'data/onomancer.db'
 
 
 def bootstrap():
     conn = sqlite3.connect(DB_NAME)
     with conn:
-        conn.execute('CREATE TABLE names (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)')
-        conn.execute('CREATE UNIQUE INDEX idx_names_name ON names (name)')
+        try:
+            conn.execute('CREATE TABLE names (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)')
+            conn.execute('CREATE UNIQUE INDEX idx_names_name ON names (name)')
+        except Exception:
+            pass
 
-        conn.execute('CREATE TABLE leaders (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, votes INTEGER)')
-        conn.execute('CREATE INDEX idx_leaders_votes ON leaders (votes)')
-        conn.execute('CREATE UNIQUE INDEX idx_leaders_name ON leaders (name)')
+        try:
+            conn.execute('CREATE TABLE leaders (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, votes INTEGER)')
+            conn.execute('CREATE INDEX idx_leaders_votes ON leaders (votes)')
+            conn.execute('CREATE UNIQUE INDEX idx_leaders_name ON leaders (name)')
+        except Exception:
+            pass
 
 
 def clear():
@@ -70,7 +76,7 @@ def get_random_name():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     with conn:
-        if random.random() > .1:
+        if random.random() > .2:
             rows = conn.execute('SELECT name FROM names ORDER BY RANDOM() LIMIT 2')
             return ' '.join([row['name'] for row in rows])
         rows = conn.execute('SELECT name FROM leaders ORDER BY RANDOM() LIMIT 1')
@@ -110,10 +116,36 @@ def load():
         'Griffith',
         'Evelton',
         'McBlase',
+        'Elijah',
+        'Valenzuela',
+        'Karato',
+        'Bean',
+        'Keanu',
+        'Jacuzzi',
+        'Nice',
+        'Thank',
+        'Ladd',
+        'Basilio',
+        'Fig',
+        'Jessi',
+        'Wise',
+        'Fitzgerald',
+        'Massey',
+        'Sam',
+        'Solis',
+        'Hendricks',
+        'Rangel',
+        'Sebastian',
+        'Sunshine',
+        'Thomas',
+        'England',
     ]
     with conn:
         for name in names:
-            conn.execute('INSERT INTO names (name) VALUES (?)', (name,))
+            try:
+                conn.execute('INSERT INTO names (name) VALUES (?)', (name,))
+            except Exception:
+                pass
 
 
 if __name__ == '__main__':
