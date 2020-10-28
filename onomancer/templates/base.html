@@ -6,17 +6,20 @@
     <title>Onomancer</title>
 </head>
 <body>
-    <div class="nav">
-        <ul>
-            <li><a href="/vote">Appraise</a></li>
-            <li><a href="/leaderboard">Regard</a></li>
-            <li><a href="/egg">Offer</a></li>
-        </ul>
-    </div>
-    <div id="header">{% block header %}{% endblock %}</div>
-    <div id="content">{% block content %}{% endblock %}</div>
-    <div id="footer">
-        <a href="https://github.com/jmaliksi/onomancer">GitHub</a>
+    <div id="container">
+        <div class="nav">
+            <ul>
+                <li><a href="/vote">Appraise</a></li>
+                <li><a href="/leaderboard">Regard</a></li>
+                <li><a href="/egg">Offer</a></li>
+            </ul>
+        </div>
+        <div id="header">{% block header %}{% endblock %}</div>
+        <div id="content">{% block content %}{% endblock %}</div>
+        <div id="footer">
+            <a href="https://github.com/jmaliksi/onomancer">GitHub</a>
+            <a href="/about">what</a>
+        </div>
     </div>
 </body>
 </html>

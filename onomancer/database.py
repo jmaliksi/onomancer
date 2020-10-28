@@ -7,7 +7,6 @@ DB_NAME = 'onomancer.db'
 
 def bootstrap():
     conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
     with conn:
         conn.execute('CREATE TABLE names (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)')
         conn.execute('CREATE UNIQUE INDEX idx_names_name ON names (name)')
@@ -19,7 +18,6 @@ def bootstrap():
 
 def clear():
     conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
     with conn:
         try:
             conn.execute('DROP TABLE names')
@@ -33,17 +31,15 @@ def clear():
 
 def add_name(name):
     conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
     with conn:
         conn.execute("INSERT INTO names (name) VALUES (?)", (name,))
     return name
 
 
-def upvote_name(name):
+def upvote_name(name, thumbs=1):
     conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
     with conn:
-        conn.execute('INSERT INTO leaders (name, votes) VALUES (?, 1) ON CONFLICT (name) DO UPDATE SET votes = votes + 1', (name,))
+        conn.execute('INSERT INTO leaders (name, votes) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, thumbs))
 
 
 def get_leaders(top=20):

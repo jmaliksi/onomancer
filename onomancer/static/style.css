@@ -1,11 +1,39 @@
 body {
     font-family: 'Lora', serif;
     text-align: center;
+    height: 100vh;
+    width: 100vh;
+    background-color: black;
+    color: white;
+    margin: 0;
+}
+
+#container {
+    min-height: 100%;
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 h1 {
     font-weight: bold;
     font-variant: small-caps;
+}
+
+h1.name {
+    font-size: 75pt;
+    margin: 15px;
+}
+
+#content {
+    display: flex;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-grow: 1;
 }
 
 h2 {
@@ -22,8 +50,31 @@ p {
 
 .nav li {
     display: inline;
+    padding: 50px;
 }
 
-.nav a {
-    color: black;
+a {
+    color: white;
+}
+
+#judgeForm input {
+    font-size: 25px;
+    width: 100px;
+}
+
+.center {
+    width: 100%;
+    align-items: center;
+}
+
+#footer {
+    font-weight: 100;
+    font-size: 10pt;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+#footer a {
+    color: grey;
+    margin: 10px;
 }

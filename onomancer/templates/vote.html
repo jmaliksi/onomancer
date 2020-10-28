@@ -1,13 +1,17 @@
 {% extends "base.html" %}
 {% block header %}
-<h1>{{name}}</h1>
 {% endblock %}
 {% block content %}
-<div>
-    <a href="/vote">Bad</a>
-    <form method="post" action="/rate">
+<div class="center">
+    <span>Render judgement...</span>
+    <h1 class="name">{{name}}</h1>
+    <form id='judgeForm' method="post" action="/rate">
         <input type="hidden" name="name" value="{{name}}" />
-        <input type="submit" value="Rad" />
+        <input type="submit" alt="downvote" name="judgement" value="&#128148" />
+        <input type="submit" alt="skip" name="judgement" value="&#x1F44E" />
+        <input type="submit" alt="upvote" name="judgement" value="&#x1F44D" />
+        <input type="submit" alt="love" name="judgement" value="&#128154" />
     </form>
+    <a href="/vote">skip</a>
 </div>
 {% endblock %}

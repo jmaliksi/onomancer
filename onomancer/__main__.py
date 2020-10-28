@@ -49,7 +49,15 @@ def rate():
     Rate a name.
     """
     name = request.form['name']
-    database.upvote_name(name)
+    judgement = ord(request.form['judgement'])
+
+    if judgement == 128077:  # upvote
+        database.upvote_name(name)
+    elif judgement == 128154:  # love
+        database.upvote_name(name, thumbs=2)
+    elif judgement == 128148:  # thumbs down
+        database.upvote_name(name, thumbs=-1)
+
     return vote()
 
 
