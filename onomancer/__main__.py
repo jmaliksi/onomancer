@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, request
+from onomancer import database
 
 # why use many file when one file do
 app = Flask(__name__)
@@ -18,18 +19,19 @@ def pool():
 
 @app.route('/leaderboard')
 def leaderboard():
-    return 'leaderboard'
+    return database.get_leaders(top=20)
 
 
-@app.route('/submit')
+@app.route('/submit', methods=['POST'])
 def submit():
     """
     Submit one name.
     """
-    return 'name'
+    name = database.add_name(request.form['name'])
+    return name
 
 
-@app.route('/rate')
+@app.route('/rate', methods=['POST'])
 def rate():
     """
     Rate a name.

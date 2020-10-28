@@ -32,6 +32,7 @@ def clear():
 def add_name(name):
     with conn:
         conn.execute("INSERT INTO names (name) VALUES (?)", (name,))
+    return name
 
 
 def upvote_name(name):
@@ -56,6 +57,43 @@ def get_random_names(limit=2):
         return [row['name'] for row in rows]
 
 
+def load():
+    # TODO load from csv of existing blaseballers
+    names = [
+        'York',
+        'Silk',
+        'Fletcher',
+        'Yamamoto',
+        'Juice',
+        'Collins',
+        'Nagomi',
+        'McDaniel',
+        'Jacob',
+        'Winner',
+        'Spears',
+        'Taylor',
+        'Sutton',
+        'Dreamy',
+        'Alyssa',
+        'Harrell',
+        'Christian',
+        'Combs',
+        'Montogomery',
+        'Bullock',
+        'Stevenson',
+        'Heat',
+        'James',
+        'Mora',
+        'Gabriel',
+        'Griffith',
+        'Evelton',
+        'McBlase',
+    ]
+    with conn:
+        for name in names:
+            conn.execute('INSERT INTO names (name) VALUE (?)', (name,))
+
+
 if __name__ == '__main__':
     if 'test' in sys.argv:
         clear()
@@ -74,4 +112,4 @@ if __name__ == '__main__':
         if arg == 'bootstrap':
             bootstrap()
         if arg == 'load':
-            pass  # TODO
+            load()
