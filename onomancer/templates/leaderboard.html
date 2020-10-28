@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Leaders</h1>
-<div>
+<div class="leaderboard">
     <ol>
     {% for name in names %}
-    <li key="{{name['name']}}">{{name['name']}} - {{name['votes']}}</li>
+    <li class="leaderItem" key="{{name['name']}}">{{name['name']}} - {{name['votes']}}</li>
     {% endfor %}
     </ol>
 </div>

@@ -98,3 +98,7 @@ a {
     from {background: grey;}
     to {background: black;}
 }
+
+.leaderItem {
+    margin: 15px;
+}
