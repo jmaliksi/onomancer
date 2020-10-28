@@ -8,7 +8,12 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return vote()
+    return what()
+
+
+@app.route('/about')
+def what():
+    return make_response(render_template('what.html'))
 
 
 @app.route('/vote')

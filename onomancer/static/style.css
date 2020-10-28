@@ -46,6 +46,7 @@ h2 {
 
 p {
     font-style: italic;
+    color: grey;
 }
 
 .nav ul {
@@ -59,6 +60,7 @@ p {
 
 a {
     color: white;
+    margin: 10px;
 }
 
 #judgeForm {
