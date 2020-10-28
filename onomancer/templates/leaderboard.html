@@ -1,0 +1,9 @@
+<title>Leaders</title>
+<h1>Leaders</h1>
+<div>
+    <ol>
+    {% for name in names %}
+    <li key="{{name['name']}}">{{name['name']}} - {{name['votes']}}</li>
+    {% endfor %}
+    </ol>
+</div>

@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, make_response, render_template, request, jsonify
 from onomancer import database
 
 # why use many file when one file do
@@ -6,20 +6,25 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return 'Hello world!'
+    return vote()
 
 
-@app.route('/pool')
-def pool():
-    """
-    Return pool of all names
-    """
-    return []
+@app.route('/vote')
+def vote():
+    names = database.get_random_names(limit=2)
+    name = ' '.join(names)
+    return make_response(render_template('vote.html', name=name))
 
 
 @app.route('/leaderboard')
 def leaderboard():
-    return database.get_leaders(top=20)
+    names = database.get_leaders(top=20)
+    return make_response(render_template('leaderboard.html', names=names))
+
+
+@app.route('/egg')
+def egg():
+    return make_response(render_template('submit.html'))
 
 
 @app.route('/submit', methods=['POST'])
@@ -27,8 +32,10 @@ def submit():
     """
     Submit one name.
     """
+    # TODO validation
+    # TODO captcha
     name = database.add_name(request.form['name'])
-    return name
+    return egg()
 
 
 @app.route('/rate', methods=['POST'])
@@ -36,7 +43,9 @@ def rate():
     """
     Rate a name.
     """
-    return '+1'
+    name = request.form['name']
+    database.upvote_name(name)
+    return vote()
 
 
 if __name__ == '__main__':

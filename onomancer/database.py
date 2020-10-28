@@ -3,11 +3,10 @@ import sys
 
 DB_NAME = 'onomancer.db'
 
-conn = sqlite3.connect(DB_NAME)
-conn.row_factory = sqlite3.Row
-
 
 def bootstrap():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
     with conn:
         conn.execute('CREATE TABLE names (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)')
         conn.execute('CREATE UNIQUE INDEX idx_names_name ON names (name)')
@@ -18,6 +17,8 @@ def bootstrap():
 
 
 def clear():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
     with conn:
         try:
             conn.execute('DROP TABLE names')
@@ -30,17 +31,23 @@ def clear():
 
 
 def add_name(name):
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
     with conn:
         conn.execute("INSERT INTO names (name) VALUES (?)", (name,))
     return name
 
 
 def upvote_name(name):
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
     with conn:
         conn.execute('INSERT INTO leaders (name, votes) VALUES (?, 1) ON CONFLICT (name) DO UPDATE SET votes = votes + 1', (name,))
 
 
 def get_leaders(top=20):
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
     with conn:
         rows = conn.execute('SELECT * FROM leaders ORDER BY votes LIMIT ?', (top,))
         return [
@@ -52,12 +59,16 @@ def get_leaders(top=20):
 
 
 def get_random_names(limit=2):
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
     with conn:
         rows = conn.execute('SELECT name FROM names ORDER BY RANDOM() LIMIT ?', (limit,))
         return [row['name'] for row in rows]
 
 
 def load():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
     # TODO load from csv of existing blaseballers
     names = [
         'York',
@@ -91,7 +102,7 @@ def load():
     ]
     with conn:
         for name in names:
-            conn.execute('INSERT INTO names (name) VALUE (?)', (name,))
+            conn.execute('INSERT INTO names (name) VALUES (?)', (name,))
 
 
 if __name__ == '__main__':
@@ -104,7 +115,6 @@ if __name__ == '__main__':
         upvote_name('Bluh')
         print(get_leaders())
         clear()
-        return
 
     for arg in sys.argv:
         if arg == 'clear':
