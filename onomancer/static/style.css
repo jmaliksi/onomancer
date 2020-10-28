@@ -90,8 +90,11 @@ a {
 }
 
 .message {
-    @keyframes fadeOut {
-        0% {background-color: grey;}
-        100% {background-color: black;}
-    }
+    animation-duration: .7s;
+    animation-name: msg;
+}
+
+@keyframes msg {
+    from {background: grey;}
+    to {background: black;}
 }
