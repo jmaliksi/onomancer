@@ -88,3 +88,10 @@ a {
     color: grey;
     margin: 10px;
 }
+
+.message {
+    @keyframes fadeOut {
+        0% {background-color: grey;}
+        100% {background-color: black;}
+    }
+}

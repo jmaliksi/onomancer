@@ -11,5 +11,8 @@
         <input type="submit" alt="love" name="judgement" value="&#128154" />
     </form>
     <a href="/vote">skip</a>
+    {% if message %}
+    <p class="message">{{message}}</p>
+    {% endif %}
 </div>
 {% endblock %}

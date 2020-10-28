@@ -32,7 +32,10 @@ def clear():
 def add_name(name):
     conn = sqlite3.connect(DB_NAME)
     with conn:
-        conn.execute("INSERT INTO names (name) VALUES (?)", (name,))
+        try:
+            conn.execute("INSERT INTO names (name) VALUES (?)", (name,))
+        except sqlite3.IntegrityError:
+            pass  # fail silently if adding an existing name
     return name
 
 

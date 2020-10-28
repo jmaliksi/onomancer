@@ -1,6 +1,8 @@
 import random
+import sys
 
 from flask import Flask, make_response, render_template, request, jsonify
+from profanity import profanity
 from onomancer import database
 
 # why use many file when one file do
@@ -17,9 +19,9 @@ def what():
 
 
 @app.route('/vote')
-def vote():
+def vote(message=None):
     name = database.get_random_name()
-    return make_response(render_template('vote.html', name=name))
+    return make_response(render_template('vote.html', name=name, message=message))
 
 
 @app.route('/leaderboard')
@@ -29,8 +31,8 @@ def leaderboard():
 
 
 @app.route('/egg')
-def egg():
-    return make_response(render_template('submit.html'))
+def egg(message=None):
+    return make_response(render_template('submit.html', message=message))
 
 
 @app.route('/submit', methods=['POST'])
@@ -38,14 +40,30 @@ def submit():
     """
     Submit one name.
     """
-    # TODO validation
     # TODO captcha
-    if request.form.get('name'):
-        # egg
-        database.add_name(request.form['name'])
-    elif request.form.get('fullname'):
-        database.upvote_name(request.form['fullname'])
-    return egg()
+    try:
+        if request.form.get('name'):
+            # egg
+            name = _process_name(request.form.get('name'))
+            database.add_name(name)
+        elif request.form.get('fullname'):
+            name = _process_name(request.form.get('fullname'))
+            database.upvote_name(name)
+    except ValueError:
+        return egg(message='Naughty...')
+    return egg(message=f'{name} is witnessed.')
+
+
+def _process_name(name):
+    if not name:
+        raise ValueError()
+    profane = profanity.contains_profanity(name)
+    if profane:
+        raise ValueError()
+    if name.lower() == name:
+        # no capital letters, make some assumptions
+        return name.title()
+    return name
 
 
 @app.route('/rate', methods=['POST'])
@@ -56,15 +74,24 @@ def rate():
     name = request.form['name']
     judgement = ord(request.form['judgement'])
 
+    message = f'Your judgement is rendered.'
     if judgement == 128077:  # upvote
         database.upvote_name(name)
+        message += ' The Onomancer nods...'
     elif judgement == 128154:  # love
         database.upvote_name(name, thumbs=2)
+        message += ' The Onomancer smiles...'
     elif judgement == 128148:  # thumbs down
         database.upvote_name(name, thumbs=-1)
+        message += ' The Onomancer frowns...'
+    else:
+        message += ' The Onomancer stares...'
 
-    return vote()
+    return vote(message=message)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    debug = False
+    if 'test' in sys.argv:
+        debug = True
+    app.run(host='0.0.0.0', port=5001, debug=debug)

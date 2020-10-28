@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Offer Appellations</h1>
+{% if message %}
+<p class="message">{{message}}</p>
+{% endif %}
 <h2>Submit a full Blaseball name</h2>
 <p>Offer a whole name to Onomancer</p>
 <form method="post" action="/submit">
