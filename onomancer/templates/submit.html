@@ -1,17 +1,15 @@
 {% extends "base.html" %}
-{% block header %}
-<h1>Submit a name</h1>
-{% endblock %}
 {% block content %}
+<h1>Offer Appellations</h1>
 <h2>Submit a full Blaseball name</h2>
 <p>Offer a whole name to Onomancer</p>
 <form method="post" action="/submit">
     <input type="text" name="fullname" />
     <input type="submit" value="Full Name" />
 </form>
-
+<p>-or-</p>
 <h2>Submit an Egg name</h2>
-<p>Offer only a first or second name, and Onomancer will use those to conjure new names</p>
+<p>Offer only a first or second name. Onomancer will use those to conjure new names</p>
 <form method="post" action="/submit">
     <input type="text" name="name" />
     <input type="submit" value="Egg Name" />
