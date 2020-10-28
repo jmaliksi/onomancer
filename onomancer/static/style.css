@@ -1,0 +1,29 @@
+body {
+    font-family: 'Lora', serif;
+    text-align: center;
+}
+
+h1 {
+    font-weight: bold;
+    font-variant: small-caps;
+}
+
+h2 {
+    font-weight: normal;
+}
+
+p {
+    font-style: italic;
+}
+
+.nav ul {
+    padding: 0;
+}
+
+.nav li {
+    display: inline;
+}
+
+.nav a {
+    color: black;
+}

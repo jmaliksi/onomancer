@@ -35,7 +35,11 @@ def submit():
     """
     # TODO validation
     # TODO captcha
-    name = database.add_name(request.form['name'])
+    if request.form.get('name'):
+        # egg
+        database.add_name(request.form['name'])
+    elif request.form.get('fullname'):
+        database.upvote_name(request.form['fullname'])
     return egg()
 
 

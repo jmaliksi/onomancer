@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <title>Onomancer</title>
 </head>
 <body>
-    <div id="nav">
+    <div class="nav">
         <ul>
-            <li><a href="/vote">Rate</a></li>
-            <li><a href="/leaderboard">Leaders</a></li>
-            <li><a href="/egg">Submit</a></li>
+            <li><a href="/vote">Appraise</a></li>
+            <li><a href="/leaderboard">Regard</a></li>
+            <li><a href="/egg">Offer</a></li>
         </ul>
     </div>
     <div id="header">{% block header %}{% endblock %}</div>
     <div id="content">{% block content %}{% endblock %}</div>
     <div id="footer">
-        bluh
+        <a href="https://github.com/jmaliksi/onomancer">GitHub</a>
     </div>
 </body>
 </html>
