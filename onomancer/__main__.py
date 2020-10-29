@@ -92,6 +92,7 @@ def _process_name(name):
     profane = profanity.contains_profanity(name)
     if profane:
         raise ValueError()
+    name = name.strip()
     if name.lower() == name:
         # no capital letters, make some assumptions
         return name.title()
