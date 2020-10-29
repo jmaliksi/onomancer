@@ -27,10 +27,21 @@ def vote(message=None):
 
 
 @app.route('/leaderboard')
-def leaderboard():
+def leaderboard(message=None):
     names = database.get_leaders(top=20)
-    return make_response(render_template('leaderboard.html', names=names))
+    return make_response(render_template(
+        'leaderboard.html',
+        names=names,
+        message=message,
+    ))
 
+
+@app.route('/downLeader', methods=['POST'])
+def downLeader():
+    if not request.form.get('name'):
+        return leaderboard(message="Hmm?")
+    database.upvote_name(request.form['name'], thumbs=-1)
+    return leaderboard(message="Noted.")
 
 @app.route('/egg')
 def egg(message=None):

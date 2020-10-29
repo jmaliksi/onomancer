@@ -60,6 +60,12 @@ def upvote_name(name, thumbs=1):
     with conn:
         conn.execute('INSERT INTO leaders (name, votes) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, thumbs))
 
+        for egg in name.split(' ', 1):
+            if thumbs > 0:
+                conn.execute('UPDATE names SET upvotes = upvotes + ? WHERE name = ?', (thumbs, egg))
+            elif thumbs < 0:
+                conn.execute('UPDATE names SET downvotes = downvotes + ? WHERE name = ?', (thumbs, egg))
+
 
 def get_leaders(top=20):
     conn = sqlite3.connect(DB_NAME)

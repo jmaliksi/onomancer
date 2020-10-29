@@ -102,3 +102,22 @@ a {
 .leaderItem {
     margin: 15px;
 }
+
+.leaderItem button {
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: none;
+    font-size: 7pt;
+    cursor: pointer;
+}
+
+.leaderItem form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+.leaderboard {
+    width: 20em;
+}
