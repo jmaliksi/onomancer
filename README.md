@@ -27,6 +27,6 @@ python -m onomancer.database clean bootstrap load
 ## Run
 ensure virtualenv has been activated
 ```
-python -m onomancer -test
+python -m onomancer test
 ```
 Server will start up at 0.0.0.0:5001
