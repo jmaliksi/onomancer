@@ -8,6 +8,8 @@ from onomancer import database
 # why use many file when one file do
 app = Flask(__name__)
 
+profanity.load_words(['trump'])
+
 @app.route('/')
 def index():
     return what()
@@ -48,6 +50,10 @@ def submit():
             database.add_name(name)
         elif request.form.get('fullname'):
             name = _process_name(request.form.get('fullname'))
+            names = name.split(' ')
+            if len(names) == 2:
+                database.add_name(names[0])
+                database.add_name(names[1])
             database.upvote_name(name)
     except ValueError:
         return egg(message='Naughty...')
@@ -82,9 +88,10 @@ def rate():
         database.upvote_name(name, thumbs=2)
         message += ' The Onomancer smiles...'
     elif judgement == 128148:  # thumbs down
-        database.upvote_name(name, thumbs=-1)
+        database.upvote_name(name, thumbs=-2)
         message += ' The Onomancer frowns...'
-    else:
+    elif judgement == 128078:
+        database.upvote_name(name, thumbs=-1)
         message += ' The Onomancer stares...'
 
     return vote(message=message)

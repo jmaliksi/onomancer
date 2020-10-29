@@ -79,7 +79,7 @@ def get_random_name():
         if random.random() > .2:
             rows = conn.execute('SELECT name FROM names ORDER BY RANDOM() LIMIT 2')
             return ' '.join([row['name'] for row in rows])
-        rows = conn.execute('SELECT name FROM leaders ORDER BY RANDOM() LIMIT 1')
+        rows = conn.execute('SELECT name FROM leaders WHERE votes > -10 ORDER BY RANDOM() LIMIT 1')
         return rows.fetchone()['name']
 
 
