@@ -3,6 +3,7 @@ import sqlite3
 import sys
 
 DB_NAME = 'data/onomancer.db'
+VOTE_THRESHOLD = -10
 
 
 def bootstrap():
@@ -11,6 +12,8 @@ def bootstrap():
         try:
             conn.execute('CREATE TABLE names (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)')
             conn.execute('CREATE UNIQUE INDEX idx_names_name ON names (name)')
+            conn.execute('ALTER TABLE names ADD COLUMN upvotes INTEGER DEFAULT 0')
+            conn.execute('ALTER TABLE names ADD COLUMN downvotes INTEGER DEFAULT 0')
         except Exception:
             pass
 
@@ -35,6 +38,13 @@ def clear():
             pass
 
 
+def migrate():
+    conn = sqlite3.connect(DB_NAME)
+    with conn:
+        conn.execute('ALTER TABLE names ADD COLUMN upvotes INTEGER DEFAULT 0')
+        conn.execute('ALTER TABLE names ADD COLUMN downvotes INTEGER DEFAULT 0')
+
+
 def add_name(name):
     conn = sqlite3.connect(DB_NAME)
     with conn:
@@ -55,7 +65,7 @@ def get_leaders(top=20):
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     with conn:
-        rows = conn.execute('SELECT * FROM leaders ORDER BY votes DESC LIMIT ?', (top,))
+        rows = conn.execute(f'SELECT * FROM leaders WHERE votes > {VOTE_THRESHOLD} ORDER BY votes DESC LIMIT ?', (top,))
         return [
             {
                 'name': row['name'],
@@ -78,9 +88,39 @@ def get_random_name():
     with conn:
         if random.random() > .2:
             rows = conn.execute('SELECT name FROM names ORDER BY RANDOM() LIMIT 2')
-            return ' '.join([row['name'] for row in rows])
-        rows = conn.execute('SELECT name FROM leaders WHERE votes > -10 ORDER BY RANDOM() LIMIT 1')
+            name = ' '.join([row['name'] for row in rows])
+            votes = conn.execute(f'SELECT ? FROM leaders WHERE votes <= {VOTE_THRESHOLD} LIMIT 1', (name,))
+            if not votes.fetchone():
+                return name
+            # no good name gen, just pick something good from the leaderboard
+        rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {VOTE_THRESHOLD} ORDER BY RANDOM() LIMIT 1')
         return rows.fetchone()['name']
+
+
+def purge(name):
+    if not name:
+        return
+    conn = sqlite3.connect(DB_NAME)
+    with conn:
+        if isinstance(name, str):
+            conn.execute('DELETE FROM names WHERE name = ?', (name,))
+            conn.execute('DELETE FROM leaders WHERE name LIKE ?', (f'%{name}%',))
+        else:
+            conn.execute('DELETE FROM names WHERE id = ?', (name,))
+            conn.execute('DELETE FROM leaders WHERE id = ?', (name,))
+
+
+def pool():
+    """Get All"""
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    res = {}
+    with conn:
+        eggs = conn.execute('SELECT * FROM names ORDER BY name')
+        res['eggs'] = {e['id']: {'name': e['name'], 'up': e['upvotes'], 'down': e['downvotes']} for e in eggs}
+        leaders = conn.execute('SELECT * FROM leaders ORDER BY votes')
+        res['leaders'] = {l['name']: l['votes'] for l in leaders}
+    return res
 
 
 def load():
@@ -158,11 +198,15 @@ if __name__ == '__main__':
         upvote_name('Bluh')
         print(get_leaders())
         clear()
-
-    for arg in sys.argv:
-        if arg == 'clear':
-            clear()
-        if arg == 'bootstrap':
-            bootstrap()
-        if arg == 'load':
-            load()
+    elif len(sys.argv) == 3 and sys.argv[1] == 'purge':
+        purge(sys.argv[2])
+    else:
+        for arg in sys.argv:
+            if arg == 'clear':
+                clear()
+            if arg == 'bootstrap':
+                bootstrap()
+            if arg == 'load':
+                load()
+            if arg == 'migrate':
+                migrate()

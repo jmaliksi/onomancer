@@ -55,9 +55,16 @@ def submit():
                 database.add_name(names[0])
                 database.add_name(names[1])
             database.upvote_name(name)
+        else:
+            raise ValueError()
     except ValueError:
         return egg(message='Naughty...')
     return egg(message=f'{name} is witnessed.')
+
+
+@app.route('/pool', methods=['GET'])
+def pool():
+    return database.pool()
 
 
 def _process_name(name):
