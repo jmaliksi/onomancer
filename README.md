@@ -18,11 +18,11 @@ python -m onomancer.database clean bootstrap load
 ```
 
 ### Database CLI commands
-`clean` - drops all tables
-`bootstrap` - recreates tables
-`load` - loads in a hardcoded list of egg names to seed the DB
-`purge "$name"` - removes all records containing this name
-`migrate` - performs hardcoded DB migration
+* `clean` - drops all tables
+* `bootstrap` - recreates tables
+* `load` - loads in a hardcoded list of egg names to seed the DB
+* `purge "$name"` - removes all records containing this name
+* `migrate` - performs hardcoded DB migration
 
 ## Run
 ensure virtualenv has been activated
