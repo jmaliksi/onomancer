@@ -30,3 +30,6 @@ ensure virtualenv has been activated
 python -m onomancer test
 ```
 Server will start up at 0.0.0.0:5001
+
+Icons
+* https://game-icons.net/1x1/lorc/crystal-ball.html
