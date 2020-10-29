@@ -73,13 +73,21 @@ def submit():
     return egg(message=f'{name} is witnessed.')
 
 
+@app.route('/pool/json', methods=['GET'])
+def pool_json():
+    return database.pool()
+
+
 @app.route('/pool', methods=['GET'])
 def pool():
-    return database.pool()
+    names = database.random_pool()
+    return make_response(render_template('pool.html', names=names))
 
 
 def _process_name(name):
     if not name:
+        raise ValueError()
+    if len(name) > 25:
         raise ValueError()
     profane = profanity.contains_profanity(name)
     if profane:

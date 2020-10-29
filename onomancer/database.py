@@ -48,10 +48,7 @@ def migrate():
 def add_name(name):
     conn = sqlite3.connect(DB_NAME)
     with conn:
-        try:
-            conn.execute("INSERT INTO names (name) VALUES (?)", (name,))
-        except sqlite3.IntegrityError:
-            pass  # fail silently if adding an existing name
+        conn.execute('INSERT INTO names (name, upvotes, downvotes) VALUES (?, 0, 0) ON CONFLICT (name) DO UPDATE SET upvotes = upvotes + 1', (name,))
     return name
 
 
@@ -127,6 +124,15 @@ def pool():
         leaders = conn.execute('SELECT * FROM leaders ORDER BY votes')
         res['leaders'] = {l['name']: l['votes'] for l in leaders}
     return res
+
+
+def random_pool(count=100):
+    """Regard random pool of 100 names"""
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    with conn:
+        names = conn.execute('SELECT name FROM leaders WHERE votes > 0 ORDER BY RANDOM() LIMIT ?', (count,))
+        return [n['name'] for n in names]
 
 
 def load():

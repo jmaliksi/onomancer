@@ -1,11 +1,7 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Leaders</h1>
-<div class="leaderboard">
-    {% if message %}
-    <p class="message">{{message}}</p>
-    {% endif %}
-    <ol>
+{% extends "regard.html" %}
+{% block title %}Leaders{% endblock %}
+{% block names %}
+<ol>
     {% for name in names %}
     <li class="leaderItem" key="{{name['name']}}">
         <span>{{name['name']}} - {{name['votes']}} </span>
@@ -14,6 +10,5 @@
         </form>
     </li>
     {% endfor %}
-    </ol>
-</div>
+</ol>
 {% endblock %}

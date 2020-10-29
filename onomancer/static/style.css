@@ -49,13 +49,13 @@ p {
     color: grey;
 }
 
-.nav ul {
+ul {
     padding: 0;
 }
 
 .nav li {
     display: inline;
-    padding: 50px;
+    padding: 10vw;
 }
 
 a {
@@ -90,7 +90,7 @@ a {
 }
 
 .message {
-    animation-duration: .7s;
+    animation-duration: 1s;
     animation-name: msg;
 }
 
@@ -118,6 +118,11 @@ a {
     padding: 0;
 }
 
-.leaderboard {
-    width: 20em;
+.inline {
+    display: inline;
+    line-height: 2;
+}
+
+.pool {
+    width: 50vw;
 }

@@ -1,0 +1,13 @@
+{% extends "regard.html" %}
+{% block title %}Pool{% endblock%}
+{% block names %}
+<div class="pool">
+    <ul>
+        {% for name in names %}
+        <li class="leaderItem inline" key="{{name}}">
+            {{name}}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

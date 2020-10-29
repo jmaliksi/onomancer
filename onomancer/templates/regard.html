@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/pool">Pool</a>
+</div>
+<h1>{% block title %}{% endblock %}</h1>
+<div class="leaderboard">
+    {% if message %}
+    <p class="message">{{message}}</p>
+    {% endif %}
+    {% block names %}
+    {% endblock %}
+</div>
+{% endblock %}
