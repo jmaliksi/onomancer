@@ -7,6 +7,7 @@
 <h2>Submit a full Blaseball name</h2>
 <p>Offer a whole name to Onomancer</p>
 <form method="post" action="/submit">
+    {{ csrf_html(session['USER_CSRF'])|safe }}
     <input type="text" name="fullname" />
     <input type="submit" value="Full Name" />
 </form>
@@ -14,6 +15,7 @@
 <h2>Submit an Egg name</h2>
 <p>Offer only a first or second name. Onomancer will use those to conjure new names</p>
 <form method="post" action="/submit">
+    {{ csrf_html(session['USER_CSRF'])|safe }}
     <input type="text" name="name" />
     <input type="submit" value="Egg Name" />
 </form>

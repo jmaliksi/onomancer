@@ -4,6 +4,7 @@
     <span>Render judgement...</span>
     <h1 class="name">{{name}}</h1>
     <form id='judgeForm' method="post" action="/rate">
+        {{ csrf_html(session['USER_CSRF'])|safe }}
         <input type="hidden" name="name" value="{{name}}" />
         <input type="submit" alt="downvote" name="judgement" value="&#128148" />
         <input type="submit" alt="skip" name="judgement" value="&#x1F44E" />

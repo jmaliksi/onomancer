@@ -1,12 +1,37 @@
+import functools
 import random
 import sys
+import uuid
 
-from flask import Flask, make_response, render_template, request, jsonify
+from flask import (
+    Flask,
+    make_response,
+    render_template,
+    request,
+    jsonify,
+    session,
+    redirect,
+    url_for,
+)
+from flask_simple_csrf import CSRF
 from profanity import profanity
 from onomancer import database
 
 # why use many file when one file do
 app = Flask(__name__)
+with open('data/csrf.key', 'r') as f:
+    _key = f.read()
+    CSRF_CONFIG = {
+            'SECRET_CSRF_KEY': _key,
+    }
+    app.config['CSRF_CONFIG'] = CSRF_CONFIG
+
+with open('data/appsecret.key', 'r') as f:
+    _key = f.read()
+    app.secret_key = _key
+
+csrf = CSRF(config=CSRF_CONFIG)
+app = csrf.init_app(app)
 
 profanity.load_words([
     'trump',
@@ -18,6 +43,31 @@ profanity.load_words([
     ';--',
     'homestuck',
 ])
+
+
+@app.before_request
+def before_request():
+    if 'CSRF_TOKEN' not in session or 'USER_CSRF' not in session:
+        session['USER_CSRF'] = str(uuid.uuid4())
+        session['CSRF_TOKEN'] = csrf.create(session['USER_CSRF'])
+
+
+def require_csrf(f):
+    @functools.wraps(f)
+    def decorated(*args, **kwargs):
+        if request.method == 'POST':
+            user_csrf = request.form.get('simplecsrf')
+            if csrf.verify(user_csrf, session['CSRF_TOKEN']) is False:
+                session.pop('USER_CSRF', None)
+                session.pop('CSRF_TOKEN', None)
+                return redirect(url_for('what'))
+            session['USER_CSRF'] = str(uuid.uuid4())
+            session['CSRF_TOKEN'] = csrf.create(session['USER_CSRF'])
+            return f(*args, **kwargs)
+        else:
+            return f(*args, **kwargs)
+    return decorated
+
 
 @app.route('/')
 def index():
@@ -46,6 +96,7 @@ def leaderboard(message=None):
 
 
 @app.route('/downLeader', methods=['POST'])
+@require_csrf
 def downLeader():
     if not request.form.get('name'):
         return leaderboard(message="Hmm?")
@@ -58,6 +109,7 @@ def egg(message=None):
 
 
 @app.route('/submit', methods=['POST'])
+@require_csrf
 def submit():
     """
     Submit one name.
@@ -109,6 +161,7 @@ def _process_name(name):
 
 
 @app.route('/rate', methods=['POST'])
+@require_csrf
 def rate():
     """
     Rate a name.
