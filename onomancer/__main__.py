@@ -8,7 +8,7 @@ from onomancer import database
 # why use many file when one file do
 app = Flask(__name__)
 
-profanity.load_words(['trump'])
+profanity.load_words(['trump', 'pewdipie', 'rowling'])
 
 @app.route('/')
 def index():
