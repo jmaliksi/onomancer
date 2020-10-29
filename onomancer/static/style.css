@@ -118,9 +118,17 @@ a {
     padding: 0;
 }
 
-.inline {
+.poolItem {
     display: inline;
     line-height: 2;
+    animation-duration: 5s;
+    animation-name: poolFade;
+    color: black;
+}
+
+@keyframes poolFade {
+    from {color: white;}
+    to {color: black;}
 }
 
 .pool {
