@@ -60,7 +60,7 @@ def super_secret(a, b):
 
 
 def super_safe_encrypt(a, b):
-    return urllib.parse.quote(super_secret(a, b))
+    return urllib.parse.quote(super_secret(a, b), safe='')
 
 
 def super_safe_decrypt(a, b):
@@ -104,15 +104,16 @@ def what():
     return make_response(render_template('what.html'))
 
 
-@app.route('/vote')
-@app.route('/vote/<name>')
-def vote(name=None, message=''):
+@app.route('/vote', strict_slashes=False)
+def vote(message=''):
+    name = request.args.get('name', None)
     if not name:
         message = 'A card is drawn...'
         name = database.get_random_name()
     else:
         rotkey = request.cookies.get('rotkey')
-        name = super_safe_decrypt(name, rotkey)
+        if rotkey:
+            name = super_safe_decrypt(name, rotkey)
         if not message:
             message = 'The page turns...'
         names = name.split(' ')

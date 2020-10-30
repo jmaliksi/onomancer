@@ -11,7 +11,7 @@
         <input type="submit" alt="upvote" name="judgement" value="&#x1F44D" />
         <input type="submit" alt="love" name="judgement" value="&#128154" />
     </form>
-    <a href="/vote/{{super_secret(name, rotkey)}}?reverse=1">reverse</a>
+    <a href="/vote?name={{super_secret(name, rotkey)}}&reverse=1">reverse</a>
     <a href="/vote">skip</a>
     <p class="message">{{message}}</p>
 </div>
