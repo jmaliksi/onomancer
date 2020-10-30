@@ -19,19 +19,22 @@ from onomancer import database
 
 # why use many file when one file do
 app = Flask(__name__)
-with open('data/csrf.key', 'r') as f:
-    _key = f.read()
-    CSRF_CONFIG = {
-            'SECRET_CSRF_KEY': _key,
-    }
-    app.config['CSRF_CONFIG'] = CSRF_CONFIG
+try:
+    with open('data/csrf.key', 'r') as f:
+        _key = f.read()
+        CSRF_CONFIG = {
+                'SECRET_CSRF_KEY': _key,
+        }
+        app.config['CSRF_CONFIG'] = CSRF_CONFIG
 
-with open('data/appsecret.key', 'r') as f:
-    _key = f.read()
-    app.secret_key = _key
+    with open('data/appsecret.key', 'r') as f:
+        _key = f.read()
+        app.secret_key = _key
 
-with open('data/mod.key', 'r') as f:
-    app.config['MOD_KEY'] = f.read()
+    with open('data/mod.key', 'r') as f:
+        app.config['MOD_KEY'] = f.read()
+except Exception as e:
+    print(e)
 
 csrf = CSRF(config=CSRF_CONFIG)
 app = csrf.init_app(app)
