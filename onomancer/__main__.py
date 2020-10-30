@@ -140,7 +140,7 @@ def submit():
             if len(names) == 2:
                 database.add_name(names[0])
                 database.add_name(names[1])
-            database.upvote_name(name)
+            database.upvote_name(name, thumbs=0)
         else:
             raise ValueError()
     except ValueError:

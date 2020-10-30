@@ -14,6 +14,7 @@ def bootstrap():
             conn.execute('CREATE UNIQUE INDEX idx_names_name ON names (name)')
             conn.execute('ALTER TABLE names ADD COLUMN upvotes INTEGER DEFAULT 0')
             conn.execute('ALTER TABLE names ADD COLUMN downvotes INTEGER DEFAULT 0')
+            conn.execute('ALTER TABLE names ADD COLUMN naughty INTEGER DEFAULT 0')
         except Exception:
             pass
 
@@ -21,6 +22,7 @@ def bootstrap():
             conn.execute('CREATE TABLE leaders (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, votes INTEGER)')
             conn.execute('CREATE INDEX idx_leaders_votes ON leaders (votes)')
             conn.execute('CREATE UNIQUE INDEX idx_leaders_name ON leaders (name)')
+            conn.execute('ALTER TABLE leaders ADD COLUMN naughty INTEGER DEFAULT 0')
         except Exception:
             pass
 
@@ -41,8 +43,8 @@ def clear():
 def migrate():
     conn = sqlite3.connect(DB_NAME)
     with conn:
-        conn.execute('ALTER TABLE names ADD COLUMN upvotes INTEGER DEFAULT 0')
-        conn.execute('ALTER TABLE names ADD COLUMN downvotes INTEGER DEFAULT 0')
+        conn.execute('ALTER TABLE names ADD COLUMN naughty INTEGER DEFAULT 0')
+        conn.execute('ALTER TABLE leaders ADD COLUMN naughty INTEGER DEFAULT 0')
 
 
 def add_name(name):
