@@ -4,6 +4,7 @@ import sys
 
 DB_NAME = 'data/onomancer.db'
 VOTE_THRESHOLD = -10
+LEADER_THRESHOLD = -5
 
 
 def connect():
@@ -84,7 +85,7 @@ def upvote_name(name, thumbs=1):
 def get_leaders(top=20):
     conn = connect()
     with conn:
-        rows = conn.execute(f'SELECT * FROM leaders WHERE naughty = 0 AND votes > {VOTE_THRESHOLD} ORDER BY votes DESC LIMIT ?', (top,))
+        rows = conn.execute(f'SELECT * FROM leaders WHERE naughty = 0 AND votes > {LEADER_THRESHOLD} ORDER BY votes DESC LIMIT ?', (top,))
         return [
             {
                 'name': row['name'],
@@ -107,11 +108,11 @@ def get_random_name():
             rows = conn.execute(
                 f'SELECT name FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 2)) ORDER BY RANDOM() LIMIT 2')
             name = ' '.join([row['name'] for row in rows])
-            votes = conn.execute(f'SELECT ? FROM leaders WHERE votes <= {VOTE_THRESHOLD} LIMIT 1', (name,))
+            votes = conn.execute(f'SELECT ? FROM leaders WHERE votes <= {LEADER_THRESHOLD} LIMIT 1', (name,))
             if not votes.fetchone():
                 return name
             # no good name gen, just pick something good from the leaderboard
-        rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {VOTE_THRESHOLD} AND naughty = 0 ORDER BY RANDOM() LIMIT 1')
+        rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY RANDOM() LIMIT 1')
         return rows.fetchone()['name']
 
 
