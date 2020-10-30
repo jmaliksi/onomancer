@@ -243,6 +243,8 @@ def rate():
 @app.route('/moderate/<key>/<type_>', methods=['POST'])
 @require_csrf
 def moderate(key, type_=''):
+    if app.config['MOD_KEY'] != key:
+        return redirect(url_for('what'))
     if request.method == 'POST':
         mod_action = {
             id_: 0 if val == 'good' else -1
