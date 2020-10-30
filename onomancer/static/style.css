@@ -120,9 +120,24 @@ a {
 .poolItem {
     display: inline;
     line-height: 2;
+}
+
+.poolItem a {
+    text-decoration: none;
     animation-duration: 10s;
     animation-name: poolFade;
     color: black;
+}
+
+.poolItem a:hover {
+    animation-duration: 0.5s;
+    animation-name: poolIn;
+    color: white;
+}
+
+@keyframes poolIn {
+    from {color: black;}
+    to {color: white;}
 }
 
 @keyframes poolFade {

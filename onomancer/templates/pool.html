@@ -6,7 +6,7 @@
     <ul>
         {% for name in names %}
         <li class="leaderItem poolItem" key="{{name}}">
-            {{name}}
+            <a href="/vote/{{name}}">{{name}}</a>
         </li>
         {% endfor %}
     </ul>
