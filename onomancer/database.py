@@ -55,7 +55,10 @@ def add_name(name):
 def upvote_name(name, thumbs=1):
     conn = sqlite3.connect(DB_NAME)
     with conn:
-        conn.execute('INSERT INTO leaders (name, votes) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, thumbs))
+        mult = 1
+        if thumbs < 0 and check_egg_threshold(name):
+            mult = 2
+        conn.execute('INSERT INTO leaders (name, votes) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, thumbs * mult))
 
         for egg in name.split(' ', 1):
             if thumbs > 0:
@@ -90,7 +93,8 @@ def get_random_name():
     conn.row_factory = sqlite3.Row
     with conn:
         if random.random() > .2:
-            rows = conn.execute('SELECT name FROM names ORDER BY RANDOM() LIMIT 2')
+            rows = conn.execute(
+                f'SELECT name FROM names WHERE downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 2) ORDER BY RANDOM() LIMIT 2')
             name = ' '.join([row['name'] for row in rows])
             votes = conn.execute(f'SELECT ? FROM leaders WHERE votes <= {VOTE_THRESHOLD} LIMIT 1', (name,))
             if not votes.fetchone():
@@ -98,6 +102,17 @@ def get_random_name():
             # no good name gen, just pick something good from the leaderboard
         rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {VOTE_THRESHOLD} ORDER BY RANDOM() LIMIT 1')
         return rows.fetchone()['name']
+
+
+def check_egg_threshold(fullname, threshold=VOTE_THRESHOLD):
+    names = fullname.split(' ', 1)
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    with conn:
+        rows = conn.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND downvotes < -(upvotes * 2))', names)
+        if rows.fetchone():
+            return True
+    return False
 
 
 def purge(name):
