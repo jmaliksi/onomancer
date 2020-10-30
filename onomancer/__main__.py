@@ -1,5 +1,6 @@
 import functools
 import random
+import secrets
 import sys
 import uuid
 
@@ -36,6 +37,7 @@ try:
 except Exception as e:
     print(e)
 
+
 csrf = CSRF(config=CSRF_CONFIG)
 app = csrf.init_app(app)
 
@@ -49,6 +51,14 @@ profanity.load_words([
     ';--',
     'homestuck',
 ])
+
+
+def super_secret(a, b):
+    """shhhh"""
+    return ''.join([chr(ord(aa) ^ ord(bb)) for aa, bb in zip(a, b)])
+
+
+app.jinja_env.globals.update(super_secret=super_secret)
 
 
 @app.before_request
@@ -161,7 +171,10 @@ def submit():
 @app.route('/pool', methods=['GET'])
 def pool():
     names = database.random_pool()
-    return make_response(render_template('pool.html', names=names))
+    rotkey = secrets.token_urlsafe(100)
+    res.set_cookie('rotkey', value=rotkey)
+    res = make_response(render_template('pool.html', names=names, rotkey=rotkey))
+    return res
 
 
 def _process_name(name):
