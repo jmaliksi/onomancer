@@ -2,6 +2,7 @@ import functools
 import random
 import secrets
 import sys
+import urllib.parse
 import uuid
 
 from flask import (
@@ -58,7 +59,15 @@ def super_secret(a, b):
     return ''.join([chr(ord(aa) ^ ord(bb)) for aa, bb in zip(a, b)])
 
 
-app.jinja_env.globals.update(super_secret=super_secret)
+def super_safe_encrypt(a, b):
+    return urllib.parse.quote(super_secret(a, b))
+
+
+def super_safe_decrypt(a, b):
+    return urllib.parse.unquote(super_secret(a, b))
+
+
+app.jinja_env.globals.update(super_secret=super_safe_encrypt)
 
 
 @app.before_request
@@ -97,10 +106,13 @@ def what():
 
 @app.route('/vote')
 @app.route('/vote/<name>')
-def vote(name=None, message=None):
+def vote(name=None, message=''):
     if not name:
+        message = 'A card is drawn...'
         name = database.get_random_name()
     else:
+        rotkey = request.cookies.get('rotkey')
+        name = super_safe_decrypt(name, rotkey)
         if not message:
             message = 'The page turns...'
         names = name.split(' ')
@@ -112,7 +124,15 @@ def vote(name=None, message=None):
         if request.args.get('reverse'):
             # flip it turnwise
             name = ' '.join(names[::-1])
-    return make_response(render_template('vote.html', name=name, message=message))
+    rotkey = secrets.token_urlsafe(100)
+    res = make_response(render_template(
+        'vote.html',
+        name=name,
+        message=message,
+        rotkey=rotkey,
+    ))
+    res.set_cookie('rotkey', value=rotkey)
+    return res
 
 
 @app.route('/leaderboard')
@@ -172,8 +192,8 @@ def submit():
 def pool():
     names = database.random_pool()
     rotkey = secrets.token_urlsafe(100)
-    res.set_cookie('rotkey', value=rotkey)
     res = make_response(render_template('pool.html', names=names, rotkey=rotkey))
+    res.set_cookie('rotkey', value=rotkey)
     return res
 
 
