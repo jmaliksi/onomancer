@@ -87,10 +87,15 @@ def vote(name=None, message=None):
     else:
         if not message:
             message = 'The page turns...'
-    name = _process_name(name)
-    if request.args.get('reverse'):
-        # flip it turnwise
-        name = ' '.join(name.split(' ')[::-1])
+        names = name.split(' ')
+        try:
+            names = [_process_name(n) for n in names]
+        except ValueError:
+            name = database.get_random_name()
+            message = 'Naughty...'
+        if request.args.get('reverse'):
+            # flip it turnwise
+            name = ' '.join(names[::-1])
     return make_response(render_template('vote.html', name=name, message=message))
 
 
