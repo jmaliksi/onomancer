@@ -30,6 +30,9 @@ with open('data/appsecret.key', 'r') as f:
     _key = f.read()
     app.secret_key = _key
 
+with open('data/mod.key', 'r') as f:
+    app.config['MOD_KEY'] = f.read()
+
 csrf = CSRF(config=CSRF_CONFIG)
 app = csrf.init_app(app)
 
@@ -148,11 +151,6 @@ def submit():
     return egg(message=f'{name} is witnessed.')
 
 
-@app.route('/pool/json', methods=['GET'])
-def pool_json():
-    return database.pool()
-
-
 @app.route('/pool', methods=['GET'])
 def pool():
     names = database.random_pool()
@@ -185,7 +183,7 @@ def rate():
 
     message = f'Your judgement is rendered.'
     if judgement == 128077:  # upvote
-        database.upvote_name(name)
+        database.upvote_name(name, thumbs=1)
         message += ' The Onomancer nods...'
     elif judgement == 128154:  # love
         database.upvote_name(name, thumbs=2)
@@ -198,6 +196,24 @@ def rate():
         message += ' The Onomancer stares...'
 
     return vote(message=message)
+
+
+@app.route('/moderate/<key>', methods=['GET'])
+@app.route('/moderate/<key>/<type_>', methods=['POST'])
+@require_csrf
+def moderate(key, type_=''):
+    if request.method == 'POST':
+        mod_action = {
+            id_: 0 if val == 'good' else -1
+            for id_, val in request.form.items()
+        }
+        if type_ == 'names':
+            database.moderate(names=mod_action)
+        if type_ == 'eggs':
+            database.moderate(eggs=mod_action)
+
+    mod_list = database.get_mod_list()
+    return make_response(render_template('moderate.html', leaders=mod_list['names'], eggs=mod_list['eggs'], key=key))
 
 
 if __name__ == '__main__':

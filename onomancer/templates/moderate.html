@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<body>
+    <form action="/moderate/{{key}}/names" method="post">
+        {{ csrf_html(session['USER_CSRF'])|safe }}
+        {% for id_, name in leaders.items() %}
+        <p>{{name}}</p>
+        <input type="radio" id="good" name="{{id_}}" value="good" />
+        <label for="good">good</label>
+        <input type="radio" id="bad" name="{{id_}}" value="bad" />
+        <label for="bad">bad</label>
+        {% endfor %}
+        <p>approve full names</p>
+        <input type="submit" value="what" />
+    </form>
+    <form action="/moderate/{{key}}/eggs" method="post">
+        {{ csrf_html(session['USER_CSRF'])|safe }}
+        {% for id_, name in eggs.items() %}
+        <p>{{name}}</p>
+        <input type="radio" id="good" name="{{id_}}" value="good" />
+        <label for="good">good</label>
+        <input type="radio" id="bad" name="{{id_}}" value="bad" />
+        <label for="bad">bad</label>
+        {% endfor %}
+
+        <p>approve egg names</p>
+        <input type="submit" value="what" />
+    </form>
+</body>

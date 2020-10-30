@@ -6,8 +6,14 @@ DB_NAME = 'data/onomancer.db'
 VOTE_THRESHOLD = -10
 
 
-def bootstrap():
+def connect():
     conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def bootstrap():
+    conn = connect()
     with conn:
         try:
             conn.execute('CREATE TABLE names (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)')
@@ -28,7 +34,7 @@ def bootstrap():
 
 
 def clear():
-    conn = sqlite3.connect(DB_NAME)
+    conn = connect()
     with conn:
         try:
             conn.execute('DROP TABLE names')
@@ -41,26 +47,26 @@ def clear():
 
 
 def migrate():
-    conn = sqlite3.connect(DB_NAME)
+    conn = connect()
     with conn:
         conn.execute('ALTER TABLE names ADD COLUMN naughty INTEGER DEFAULT 0')
         conn.execute('ALTER TABLE leaders ADD COLUMN naughty INTEGER DEFAULT 0')
 
 
 def add_name(name):
-    conn = sqlite3.connect(DB_NAME)
+    conn = connect()
     with conn:
-        conn.execute('INSERT INTO names (name, upvotes, downvotes) VALUES (?, 0, 0) ON CONFLICT (name) DO UPDATE SET upvotes = upvotes', (name,))
+        conn.execute('INSERT INTO names (name, upvotes, downvotes, naughty) VALUES (?, 0, 0, 1) ON CONFLICT (name) DO UPDATE SET upvotes = upvotes', (name,))
     return name
 
 
-def upvote_name(name, thumbs=1):
-    conn = sqlite3.connect(DB_NAME)
+def upvote_name(name, thumbs=1, naughty=1):
+    conn = connect()
     with conn:
         mult = 1
         if thumbs < 0 and check_egg_threshold(name):
             mult = 2
-        conn.execute('INSERT INTO leaders (name, votes) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, thumbs * mult))
+        conn.execute('INSERT INTO leaders (name, votes, naughty) VALUES (?, ?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, naughty, thumbs * mult))
 
         for egg in name.split(' ', 1):
             if thumbs > 0:
@@ -70,10 +76,9 @@ def upvote_name(name, thumbs=1):
 
 
 def get_leaders(top=20):
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
+    conn = connect()
     with conn:
-        rows = conn.execute(f'SELECT * FROM leaders WHERE votes > {VOTE_THRESHOLD} ORDER BY votes DESC LIMIT ?', (top,))
+        rows = conn.execute(f'SELECT * FROM leaders WHERE naughty = 0 AND votes > {VOTE_THRESHOLD} ORDER BY votes DESC LIMIT ?', (top,))
         return [
             {
                 'name': row['name'],
@@ -83,33 +88,30 @@ def get_leaders(top=20):
 
 
 def get_random_names(limit=2):
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
+    conn = connect()
     with conn:
-        rows = conn.execute('SELECT name FROM names ORDER BY RANDOM() LIMIT ?', (limit,))
+        rows = conn.execute('SELECT name FROM names WHERE naughty = 0 ORDER BY RANDOM() LIMIT ?', (limit,))
         return [row['name'] for row in rows]
 
 
 def get_random_name():
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
+    conn = connect()
     with conn:
         if random.random() > .2:
             rows = conn.execute(
-                f'SELECT name FROM names WHERE downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 2) ORDER BY RANDOM() LIMIT 2')
+                f'SELECT name FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 2)) ORDER BY RANDOM() LIMIT 2')
             name = ' '.join([row['name'] for row in rows])
             votes = conn.execute(f'SELECT ? FROM leaders WHERE votes <= {VOTE_THRESHOLD} LIMIT 1', (name,))
             if not votes.fetchone():
                 return name
             # no good name gen, just pick something good from the leaderboard
-        rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {VOTE_THRESHOLD} ORDER BY RANDOM() LIMIT 1')
+        rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {VOTE_THRESHOLD} AND naughty = 0 ORDER BY RANDOM() LIMIT 1')
         return rows.fetchone()['name']
 
 
 def check_egg_threshold(fullname, threshold=VOTE_THRESHOLD):
     names = fullname.split(' ', 1)
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
+    conn = connect()
     with conn:
         rows = conn.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND downvotes < -(upvotes * 2))', names)
         if rows.fetchone():
@@ -117,10 +119,35 @@ def check_egg_threshold(fullname, threshold=VOTE_THRESHOLD):
     return False
 
 
+def get_mod_list():
+    conn = connect()
+    with conn:
+        return {
+            'names': {
+                r['id']: r['name'] for r in conn.execute('SELECT * FROM leaders WHERE naughty = 1')
+            },
+            'eggs': {
+                r['id']: r['name'] for r in conn.execute('SELECT * FROM names WHERE naughty = 1')
+            },
+        }
+
+
+def moderate(names=None, eggs=None):
+    names = names or {}
+    eggs = eggs or {}
+    conn = connect()
+    with conn:
+        for id_, naughty in names.items():
+            conn.execute('UPDATE leaders SET naughty = ? WHERE id = ?', (naughty, id_))
+        for id_, naughty in eggs.items():
+            conn.execute('UPDATE names SET naughty = ? WHERE id = ?', (naughty, id_))
+
+
+
 def purge(name):
     if not name:
         return
-    conn = sqlite3.connect(DB_NAME)
+    conn = connect()
     with conn:
         if isinstance(name, str):
             conn.execute('DELETE FROM names WHERE name = ?', (name,))
@@ -148,7 +175,7 @@ def random_pool(count=100):
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     with conn:
-        names = conn.execute('SELECT name FROM leaders WHERE votes > 0 ORDER BY RANDOM() LIMIT ?', (count,))
+        names = conn.execute('SELECT name FROM leaders WHERE votes > 0 AND naughty = 0 ORDER BY RANDOM() LIMIT ?', (count,))
         return [n['name'] for n in names]
 
 
