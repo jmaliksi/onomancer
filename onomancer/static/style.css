@@ -118,7 +118,7 @@ a {
 }
 
 .poolItem {
-    display: inline-block;
+    display: inline;
     line-height: 2;
 }
 
