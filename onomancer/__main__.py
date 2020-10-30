@@ -151,7 +151,11 @@ def submit():
             raise ValueError()
     except ValueError:
         return egg(message='Naughty...')
-    return egg(message=f'{name} is considered.')
+    return egg(message=random.choice([
+        'The scratching of ink to page...',
+        'The words soak...',
+        'That which is given, considered...',
+    ]))
 
 
 @app.route('/pool', methods=['GET'])
