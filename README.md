@@ -14,6 +14,7 @@ pip install -r requirements.txt
 ## Database setup
 ensure virtualenv has been activated
 ```
+mkdir data
 python -m onomancer.database clean bootstrap load
 ```
 
