@@ -148,7 +148,7 @@ def submit():
             raise ValueError()
     except ValueError:
         return egg(message='Naughty...')
-    return egg(message=f'{name} is witnessed.')
+    return egg(message=f'{name} is considered.')
 
 
 @app.route('/pool', methods=['GET'])
