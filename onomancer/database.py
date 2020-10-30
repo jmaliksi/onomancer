@@ -60,19 +60,25 @@ def add_name(name):
     return name
 
 
-def upvote_name(name, thumbs=1, naughty=1):
+def upvote_name(name, thumbs=1):
     conn = connect()
     with conn:
-        mult = 1
-        if thumbs < 0 and check_egg_threshold(name):
-            mult = 2
-        conn.execute('INSERT INTO leaders (name, votes, naughty) VALUES (?, ?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, naughty, thumbs * mult))
-
+        naughty = 0
         for egg in name.split(' ', 1):
             if thumbs > 0:
                 conn.execute('UPDATE names SET upvotes = upvotes + ? WHERE name = ?', (thumbs, egg))
             elif thumbs < 0:
                 conn.execute('UPDATE names SET downvotes = downvotes + ? WHERE name = ?', (thumbs, egg))
+
+            n = conn.execute('SELECT * FROM names WHERE name = ?', (egg,)).fetchone()
+            if not n or n['naughty'] != 0:
+                naughty = 1;
+
+        mult = 1
+        if thumbs < 0 and check_egg_threshold(name):
+            mult = 2
+
+        conn.execute('INSERT INTO leaders (name, votes, naughty) VALUES (?, ?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, naughty, thumbs * mult))
 
 
 def get_leaders(top=20):
