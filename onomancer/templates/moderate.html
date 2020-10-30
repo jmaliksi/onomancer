@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <body>
+    <a href="/moderate/{{key}}">Refresh</a>
     <form action="/moderate/{{key}}/names" method="post">
         {{ csrf_html(session['USER_CSRF'])|safe }}
         {% for id_, name in leaders.items() %}
