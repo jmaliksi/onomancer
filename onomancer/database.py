@@ -50,7 +50,7 @@ def migrate():
 def add_name(name):
     conn = sqlite3.connect(DB_NAME)
     with conn:
-        conn.execute('INSERT INTO names (name, upvotes, downvotes) VALUES (?, 0, 0) ON CONFLICT (name) DO UPDATE SET upvotes = upvotes + 1', (name,))
+        conn.execute('INSERT INTO names (name, upvotes, downvotes) VALUES (?, 0, 0) ON CONFLICT (name) DO UPDATE SET upvotes = upvotes', (name,))
     return name
 
 
