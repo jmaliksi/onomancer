@@ -80,8 +80,17 @@ def what():
 
 
 @app.route('/vote')
-def vote(message=None):
-    name = database.get_random_name()
+@app.route('/vote/<name>')
+def vote(name=None, message=None):
+    if not name:
+        name = database.get_random_name()
+    else:
+        if not message:
+            message = 'The page turns...'
+    name = _process_name(name)
+    if request.args.get('reverse'):
+        # flip it turnwise
+        name = ' '.join(name.split(' ')[::-1])
     return make_response(render_template('vote.html', name=name, message=message))
 
 
