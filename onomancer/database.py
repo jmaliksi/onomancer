@@ -108,7 +108,7 @@ def get_random_name():
             rows = conn.execute(
                 f'SELECT name FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 2)) ORDER BY RANDOM() LIMIT 2')
             name = ' '.join([row['name'] for row in rows])
-            votes = conn.execute(f'SELECT ? FROM leaders WHERE votes <= {LEADER_THRESHOLD} LIMIT 1', (name,))
+            votes = conn.execute(f'SELECT * FROM leaders WHERE name = ? AND votes <= {LEADER_THRESHOLD} LIMIT 1', (name,))
             if not votes.fetchone():
                 return name
             # no good name gen, just pick something good from the leaderboard
