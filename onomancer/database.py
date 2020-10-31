@@ -72,6 +72,8 @@ def upvote_name(name, thumbs=1):
                 conn.execute('UPDATE names SET downvotes = downvotes + ? WHERE name = ?', (thumbs, egg))
 
             n = conn.execute('SELECT * FROM names WHERE name = ?', (egg,)).fetchone()
+            if not n:
+                conn.execute('INSERT INTO names (name, upvotes, downvotes, naughty) VALUES (?, 0, 0, 1)', (egg,))
             if not n or n['naughty'] != 0:
                 naughty = 1;
 
