@@ -19,13 +19,14 @@ body {
 
 h1 {
     font-weight: bold; font-variant: small-caps;
-    font-size: 50pt;
+    font-size: 2em;
     margin: 15px;
 }
 
 h1.name {
-    font-size: 75pt;
+    font-size: 3em;
     margin: 15px;
+    line-height: 1em;
 }
 
 #content {
@@ -46,6 +47,7 @@ h2 {
 p {
     font-style: italic;
     color: grey;
+    margin: 1em;
 }
 
 ul {
@@ -54,7 +56,7 @@ ul {
 
 .nav li {
     display: inline;
-    padding: 10vw;
+    padding: 5vw;
 }
 
 a {
@@ -68,7 +70,8 @@ a {
 
 #judgeForm input {
     font-size: 25px;
-    width: 100px;
+    width: 20%;
+    max-width: 100px;
 }
 
 .center {
@@ -119,32 +122,57 @@ a {
 
 .poolItem {
     display: inline;
-    line-height: 2;
+    line-height: 2em;
 }
 
 .poolItem a {
     text-decoration: none;
-    animation-duration: 10s;
-    animation-name: poolFade;
-    color: black;
-}
-
-.poolItem a:hover {
-    animation-duration: 0.5s;
-    animation-name: poolIn;
-    color: white;
-}
-
-@keyframes poolIn {
-    from {color: black;}
-    to {color: white;}
-}
-
-@keyframes poolFade {
-    from {color: white;}
-    to {color: black;}
 }
 
 .pool {
-    width: 50vw;
+    max-width: 700px;
+    margin: 1em;
+}
+
+@media (hover: hover) {
+    /* fleeting effects */
+
+    .poolItem a {
+        animation-duration: 10s;
+        animation-name: poolFade;
+        color: black;
+    }
+
+    .poolItem a:hover {
+        animation-duration: 0.5s;
+        animation-name: poolIn;
+        color: white;
+    }
+
+    @keyframes poolIn {
+        from {color: black;}
+        to {color: white;}
+    }
+
+    @keyframes poolFade {
+        from {color: white;}
+        to {color: black;}
+    }
+}
+
+
+@media only screen and (max-width: 350px) {
+    .nav li {
+        padding: 3vw;
+    }
+}
+
+@media only screen and (min-width: 500px) {
+    h1 {
+        font-size: 3em;
+    }
+
+    h1.name {
+        font-size: 5em;
+    }
 }
