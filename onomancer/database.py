@@ -119,13 +119,6 @@ def get_leaders(top=20):
         ]
 
 
-def get_random_names(limit=2):
-    conn = connect()
-    with conn:
-        rows = conn.execute('SELECT name FROM names WHERE naughty = 0 ORDER BY RANDOM() LIMIT ?', (limit,))
-        return [row['name'] for row in rows]
-
-
 def get_random_name():
     conn = connect()
     with conn:
@@ -189,17 +182,42 @@ def purge(name):
             conn.execute('DELETE FROM leaders WHERE id = ?', (name,))
 
 
-def pool():
-    """Get All"""
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
-    res = {}
+def lookup(name):
+    conn = connect()
     with conn:
-        eggs = conn.execute('SELECT * FROM names ORDER BY name')
-        res['eggs'] = {e['id']: {'name': e['name'], 'up': e['upvotes'], 'down': e['downvotes']} for e in eggs}
-        leaders = conn.execute('SELECT * FROM leaders ORDER BY votes')
-        res['leaders'] = {l['name']: l['votes'] for l in leaders}
+        res = {
+            'eggs': [
+                dict(r) for r in conn.execute('SELECT * FROM names WHERE name LIKE ?', (f'%{name}%',))
+            ],
+            'names': [
+                dict(r) for r in conn.execute('SELECT * FROM leaders WHERE name LIKE ?', (f'%{name}%',))
+            ],
+        }
     return res
+
+
+def mark_naughty(id_, is_leader=True, naughty=-1):
+    with connect() as conn:
+        tbl = 'leaders' if is_leader else 'names'
+        conn.execute(f'UPDATE {tbl} SET naughty = ? WHERE id = ?', (naughty, id_))
+
+
+def admin_leaders():
+    conn = connect()
+    with conn:
+        return {
+            'naughty': [dict(r) for r in conn.execute('SELECT * FROM leaders WHERE naughty = -1')],
+            'bad': [dict(r) for r in conn.execute(f'SELECT * FROM leaders WHERE votes < {LEADER_THRESHOLD}')],
+        }
+
+
+def admin_eggs():
+    with connect() as conn:
+        return {
+            'naughty': [dict(r) for r in conn.execute('SELECT * FROM names WHERE naughty = -1')],
+            'threshold': [dict(r) for r in conn.execute(f'SELECT * from names WHERE downvotes <= {VOTE_THRESHOLD}')],
+            'measured': [dict(r) for r in conn.execute(f'SELECT * FROM names WHERE downvotes <= -(upvotes * 2)')],
+        }
 
 
 def random_pool(count=100):

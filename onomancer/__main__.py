@@ -273,6 +273,16 @@ def moderate(key, type_=''):
     return make_response(render_template('moderate.html', leaders=mod_list['names'], eggs=mod_list['eggs'], key=key))
 
 
+@app.route('/moderate/bad-eggs/<key>', methods=['GET'])
+def get_bad_eggs(key):
+    if app.config['MOD_KEY'] != key:
+        return redirect(url_for('what'))
+    return jsonify({
+        'leaders': database.admin_leaders(),
+        'eggs': database.admin_eggs(),
+    })
+
+
 if __name__ == '__main__':
     debug = False
     if 'test' in sys.argv:
