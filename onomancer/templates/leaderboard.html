@@ -7,7 +7,9 @@
         <span>{{name['name']}} - {{name['votes']}} </span>
         <form action="downLeader" method="post">
             {{ csrf_html(session['USER_CSRF'])|safe }}
+            {% if not patience %}
             <button type="submit" name="name" value="{{name['name']}}">&#128315</button>
+            {% endif %}
         </form>
     </li>
     {% endfor %}

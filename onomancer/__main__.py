@@ -2,6 +2,7 @@ import functools
 import random
 import secrets
 import sys
+import time
 import urllib.parse
 import uuid
 
@@ -137,13 +138,21 @@ def vote(message=''):
 
 
 @app.route('/leaderboard')
-def leaderboard(message=None):
+def leaderboard(message=None, patience=None):
     names = database.get_leaders(top=20)
-    return make_response(render_template(
+    res = make_response(render_template(
         'leaderboard.html',
         names=names,
         message=message,
+        patience=patience or request.cookies.get('patience'),
     ))
+    if patience:
+        res.set_cookie(
+            'patience',
+            value=str(patience),
+            max_age=patience,
+        )
+    return res
 
 
 @app.route('/downLeader', methods=['POST'])
@@ -152,7 +161,7 @@ def downLeader():
     if not request.form.get('name'):
         return leaderboard(message="Hmm?")
     database.upvote_name(request.form['name'], thumbs=-1)
-    return leaderboard(message="Noted.")
+    return leaderboard(message="Noted.", patience=10)
 
 @app.route('/egg')
 def egg(message=None):
