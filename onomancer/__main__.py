@@ -109,7 +109,8 @@ def what():
 def vote(message=''):
     name = request.args.get('name', None)
     if not name:
-        message = 'A card is drawn...'
+        if not message:
+            message = 'A card is drawn...'
         name = database.get_random_name()
     else:
         rotkey = request.cookies.get('rotkey')
