@@ -140,11 +140,14 @@ def vote(message=''):
 @app.route('/leaderboard')
 def leaderboard(message=None, patience=None):
     names = database.get_leaders(top=20)
+    patience_cookie = request.cookies.get('patience')
+    if not message and patience_cookie:
+        message = 'Them that descend still settle...'
     res = make_response(render_template(
         'leaderboard.html',
         names=names,
         message=message,
-        patience=patience or request.cookies.get('patience'),
+        patience=patience or patience_cookie,
     ))
     if patience:
         res.set_cookie(
@@ -161,7 +164,7 @@ def downLeader():
     if not request.form.get('name'):
         return leaderboard(message="Hmm?")
     database.upvote_name(request.form['name'], thumbs=-1)
-    return leaderboard(message="Noted.", patience=10)
+    return leaderboard(message="A judgement made, the Chosen shift...", patience=20)
 
 @app.route('/egg')
 def egg(message=None):
