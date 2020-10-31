@@ -70,7 +70,10 @@ a {
 
 #judgeForm input {
     font-size: 25px;
+    width: 15%;
     max-width: 100px;
+    border: 0;
+    cursor: pointer;
 }
 
 .center {
