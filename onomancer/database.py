@@ -64,24 +64,47 @@ def add_name(name):
 def upvote_name(name, thumbs=1):
     conn = connect()
     with conn:
+        eggs = name.split(' ', 1)
+
+        existing = conn.execute('SELECT * FROM leaders WHERE name = ?', (name,)).fetchone()
         naughty = 0
+        if existing:
+            if existing['naughty'] == -1:
+                # rejected, throw away everything
+                return
+            if existing['naughty'] == 1:
+                # has been validated
+                naughty = 1
+        else:
+            # doesn't exist, do insertions
+            for egg in eggs:
+                n = conn.execute('SELECT * FROM names WHERE name = ?', (egg,)).fetchone()
+                if not n:
+                    conn.execute('INSERT INTO names (name, upvotes, downvotes, naughty) VALUES (?, 0, 0, 1)', (egg,))
+                if not n or n['naughty'] != 0:
+                    naughty = 1
+
         for egg in name.split(' ', 1):
             if thumbs > 0:
                 conn.execute('UPDATE names SET upvotes = upvotes + ? WHERE name = ?', (thumbs, egg))
             elif thumbs < 0:
                 conn.execute('UPDATE names SET downvotes = downvotes + ? WHERE name = ?', (thumbs, egg))
 
-            n = conn.execute('SELECT * FROM names WHERE name = ?', (egg,)).fetchone()
-            if not n:
-                conn.execute('INSERT INTO names (name, upvotes, downvotes, naughty) VALUES (?, 0, 0, 1)', (egg,))
-            if not n or n['naughty'] != 0:
-                naughty = 1;
-
         mult = 1
         if thumbs < 0 and check_egg_threshold(name):
             mult = 2
 
         conn.execute('INSERT INTO leaders (name, votes, naughty) VALUES (?, ?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, naughty, thumbs * mult))
+
+
+def _verify_naughtiness(conn, name):
+    is_good = conn.execute('SELECT * FROM leaders WHERE name = ? AND naughty != 0').fetchone()
+    if is_good:
+        return True
+    eggs = name.split(' ')
+    if len(eggs) == 2:
+        # everything is fine
+        pass
 
 
 def get_leaders(top=20):
