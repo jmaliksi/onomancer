@@ -169,10 +169,10 @@ a {
 
 @media only screen and (min-width: 500px) {
     h1 {
-        font-size: 3em;
+        font-size: 50pt;
     }
 
     h1.name {
-        font-size: 5em;
+        font-size: 75pt;
     }
 }
