@@ -20,8 +20,17 @@ def generate_mod_key():
     print(sec)
 
 
+def generate_app_key():
+    with open('data/appsecret.key', 'w') as f:
+        sec = secrets.token_urlsafe(random.randint(40, 50))
+        f.write(sec)
+    print(sec)
+
+
 if __name__ == '__main__':
     if 'generate_csrf_key' in sys.argv:
         generate_csrf_key()
     if 'generate_mod_key' in sys.argv:
         generate_mod_key()
+    if 'generate_appsecret' in sys.argv:
+        generate_app_key()

@@ -25,6 +25,12 @@ python -m onomancer.database clean bootstrap load
 * `purge "$name"` - removes all records containing this name
 * `migrate` - performs hardcoded DB migration
 
+## Generate Secrets
+```
+mkdir data
+python -m onomancer.scripts generate_csrf_key generate_mod_key generate_appsecret
+```
+
 ## Run
 ensure virtualenv has been activated
 ```
