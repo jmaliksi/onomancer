@@ -72,7 +72,7 @@ a {
     font-size: 25px;
     width: 15%;
     max-width: 100px;
-    min-width: 2em;
+    min-width: 3em;
     border: 0;
     cursor: pointer;
 }
