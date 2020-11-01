@@ -26,7 +26,7 @@ try:
     with open('data/csrf.key', 'r') as f:
         _key = f.read()
         CSRF_CONFIG = {
-                'SECRET_CSRF_KEY': _key,
+            'SECRET_CSRF_KEY': _key,
         }
         app.config['CSRF_CONFIG'] = CSRF_CONFIG
 

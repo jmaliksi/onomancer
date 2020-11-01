@@ -55,6 +55,7 @@ def migrate():
 
 
 def add_name(name):
+    name = name.replace(' ', u"\u00A0")  # replace with nonbreaking space
     conn = connect()
     with conn:
         conn.execute('INSERT INTO names (name, upvotes, downvotes, naughty) VALUES (?, 0, 0, 1) ON CONFLICT (name) DO UPDATE SET upvotes = upvotes', (name,))
@@ -290,7 +291,7 @@ def load():
         'Sunshine',
         'Thomas',
         'England',
-    ]
+    ][:10]
     with conn:
         for name in names:
             try:
@@ -300,16 +301,7 @@ def load():
 
 
 if __name__ == '__main__':
-    if 'test' in sys.argv:
-        clear()
-        bootstrap()
-        add_name('Bluhs')
-        upvote_name('Bluh')
-        print(get_leaders())
-        upvote_name('Bluh')
-        print(get_leaders())
-        clear()
-    elif len(sys.argv) == 3 and sys.argv[1] == 'purge':
+    if len(sys.argv) == 3 and sys.argv[1] == 'purge':
         purge(sys.argv[2])
     else:
         for arg in sys.argv:

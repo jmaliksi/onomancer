@@ -20,10 +20,6 @@
         <p>approve full names</p>
         <input type="submit" value="what" />
     </form>
-    <p>Due to a bug, compound whole names or uncapitalized names get auto-submitted by up/downvoting, so mark those as naughty in addition to the actual bad words, but compound names and abbreviations are fine.</p>
-    <p>Probably not fine: "Cecil Cecily", "Jingle Heimer Schmidt", "de"</p>
-    <p>Fine: "MacMillan III", "J. Riley", "De", "St. Butte"</p>
-    <p>Just trying to prevent a combinatoric explosion since the name split and auto-submit is extremely naive.</p>
     <form action="/moderate/{{key}}/eggs" method="post">
         {{ csrf_html(session['USER_CSRF'])|safe }}
         {% for id_, name in eggs.items() %}

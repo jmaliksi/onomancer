@@ -11,6 +11,7 @@ def generate_csrf_key():
         for _ in range(length):
             key += random.choice(encoding)
         f.write(key)
+    print(key)
 
 
 def generate_mod_key():
