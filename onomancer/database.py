@@ -291,7 +291,11 @@ def load():
         'Sunshine',
         'Thomas',
         'England',
-    ][:10]
+        'Test test',
+        'The Hedgehog',
+        'J. Reily',
+        'de Vito',
+    ]
     with conn:
         for name in names:
             try:
@@ -300,9 +304,28 @@ def load():
                 pass
 
 
+def replace_whitespace(dry=True):
+    with connect() as c:
+        print('total rows')
+        print(dict(c.execute('SELECT count(*) FROM names').fetchone()))
+        print('rows found')
+        names = c.execute('SELECT * FROM names WHERE name LIKE "% %"').fetchall()
+        print(len(names))
+        print('replacing')
+        for name in names:
+            print('UPDATE names SET name=? WHERE name=?', (name['name'].replace(' ', u'\u00A0'), name['name']))
+            if dry:
+                continue
+            c.execute('UPDATE names SET name=? WHERE name=?', (name['name'].replace(' ', u'\u00A0'), name['name']))
+        if not dry:
+            c.execute('DELETE FROM leaders WHERE name LIKE "% % %"')
+
+
 if __name__ == '__main__':
     if len(sys.argv) == 3 and sys.argv[1] == 'purge':
         purge(sys.argv[2])
+    elif len(sys.argv) == 3 and sys.argv[1] == 'whitespace':
+        replace_whitespace(dry=sys.argv[2] != 'what')
     else:
         for arg in sys.argv:
             if arg == 'clear':
