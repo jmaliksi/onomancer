@@ -18,6 +18,10 @@ from flask import (
 )
 from flask_simple_csrf import CSRF
 from profanity import profanity
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from pylru import lrucache
+
 from onomancer import database
 
 # why use many file when one file do
@@ -43,6 +47,12 @@ except Exception as e:
 csrf = CSRF(config=CSRF_CONFIG)
 app = csrf.init_app(app)
 
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=['5/second'],
+)
+
 profanity.load_words([
     'trump',
     'pewdipie',
@@ -53,6 +63,8 @@ profanity.load_words([
     ';--',
     'homestuck',
 ])
+
+nonsense = lrucache(10000)
 
 
 def super_secret(a, b):
@@ -74,7 +86,8 @@ app.jinja_env.globals.update(super_secret=super_safe_encrypt)
 @app.before_request
 def before_request():
     if 'CSRF_TOKEN' not in session or 'USER_CSRF' not in session:
-        session['USER_CSRF'] = str(uuid.uuid4())
+        nonce = str(uuid.uuid4())
+        session['USER_CSRF'] = nonce
         session['CSRF_TOKEN'] = csrf.create(session['USER_CSRF'])
 
 
@@ -83,6 +96,12 @@ def require_csrf(f):
     def decorated(*args, **kwargs):
         if request.method == 'POST':
             user_csrf = request.form.get('simplecsrf')
+
+            if user_csrf in nonsense:
+                nonsense[user_csrf] = True
+                return redirect(url_for('what'))
+            nonsense[user_csrf] = True
+
             if csrf.verify(user_csrf, session['CSRF_TOKEN']) is False:
                 session.pop('USER_CSRF', None)
                 session.pop('CSRF_TOKEN', None)
@@ -161,6 +180,7 @@ def leaderboard(message=None, patience=None):
 
 @app.route('/downLeader', methods=['POST'])
 @require_csrf
+@limiter.limit('3/minute')
 def downLeader():
     if not request.form.get('name'):
         return leaderboard(message="Hmm?")

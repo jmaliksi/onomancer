@@ -1,8 +1,12 @@
 click==7.1.2
 Flask==1.1.2
+Flask-Limiter==1.4
 flask-simple-csrf==1.2.0
 itsdangerous==1.1.0
 Jinja2==2.11.2
+limits==1.5.1
 MarkupSafe==1.1.1
 profanity==1.1
+pylru==1.2.0
+six==1.15.0
 Werkzeug==0.16.0
