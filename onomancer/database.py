@@ -202,6 +202,11 @@ def mark_naughty(id_, is_leader=True, naughty=-1):
         conn.execute(f'UPDATE {tbl} SET naughty = ? WHERE id = ?', (naughty, id_))
 
 
+def reset_egg(id_):
+    with connect() as conn:
+        conn.execute(f'UPDATE names SET upvotes=0, downvotes=0 WHERE id = ?', (id_, ))
+
+
 def admin_leaders():
     conn = connect()
     with conn:

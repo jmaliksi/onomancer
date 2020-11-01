@@ -5,28 +5,34 @@
 </head>
 <body>
     <a href="/moderate/{{key}}">Refresh</a>
+    <a href="/moderate/bad-eggs/{{key}}">View Bad Eggs</a>
+    <a href="/moderate/admin-eggs/{{key}}">Lookup Eggs</a>
+    <p>Allow most things, including len != 2, unicode, emoji. Just filter out offensive stuff.</p>
     <form action="/moderate/{{key}}/names" method="post">
         {{ csrf_html(session['USER_CSRF'])|safe }}
         {% for id_, name in leaders.items() %}
         <p>{{name}}</p>
-        <input type="radio" id="good" name="{{id_}}" value="good" />
-        <label for="good">good</label>
-        <input type="radio" id="bad" name="{{id_}}" value="bad" />
-        <label for="bad">bad</label>
+        <input type="radio" id="good{{id_}}" name="{{id_}}" value="good" />
+        <label for="good{{id_}}">good</label>
+        <input type="radio" id="bad{{id_}}" name="{{id_}}" value="bad" />
+        <label for="bad{{id_}}">bad</label>
         {% endfor %}
         <p>approve full names</p>
         <input type="submit" value="what" />
     </form>
+    <p>Due to a bug, compound whole names or uncapitalized names get auto-submitted by up/downvoting, so mark those as naughty in addition to the actual bad words, but compound names and abbreviations are fine.</p>
+    <p>Probably not fine: "Cecil Cecily", "Jingle Heimer Schmidt", "de"</p>
+    <p>Fine: "MacMillan III", "J. Riley", "De", "St. Butte"</p>
+    <p>Just trying to prevent a combinatoric explosion since the name split and auto-submit is extremely naive.</p>
     <form action="/moderate/{{key}}/eggs" method="post">
         {{ csrf_html(session['USER_CSRF'])|safe }}
         {% for id_, name in eggs.items() %}
         <p>{{name}}</p>
-        <input type="radio" id="good" name="{{id_}}" value="good" />
-        <label for="good">good</label>
-        <input type="radio" id="bad" name="{{id_}}" value="bad" />
-        <label for="bad">bad</label>
+        <input type="radio" id="good{{id_}}" name="{{id_}}" value="good" />
+        <label for="good{{id_}}">good</label>
+        <input type="radio" id="bad{{id_}}" name="{{id_}}" value="bad" />
+        <label for="bad{{id_}}">bad</label>
         {% endfor %}
-
         <p>approve egg names</p>
         <input type="submit" value="what" />
     </form>

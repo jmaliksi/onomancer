@@ -168,7 +168,7 @@ def downLeader():
     return leaderboard(message="A judgement made, the Chosen shift...", patience=20)
 
 @app.route('/egg')
-def egg(message=None):
+def egg(message='The Onomancer waits...'):
     return make_response(render_template('submit.html', message=message))
 
 
@@ -190,7 +190,11 @@ def submit():
             if len(names) == 2:
                 database.add_name(names[0])
                 database.add_name(names[1])
-            database.upvote_name(name, thumbs=0)
+            if len(names) == 1:
+                # maybe accidental one name submission
+                database.add_name(name)
+            else:
+                database.upvote_name(name, thumbs=0)
         else:
             raise ValueError()
     except ValueError:
@@ -281,6 +285,45 @@ def get_bad_eggs(key):
         'leaders': database.admin_leaders(),
         'eggs': database.admin_eggs(),
     })
+
+
+@app.route('/moderate/admin-eggs/<key>', methods=['GET', 'POST'], strict_slashes=False)
+@require_csrf
+def admin_eggs(key):
+    if app.config['MOD_KEY'] != key:
+        return redirect(url_for('what'))
+
+
+    if request.method == 'POST':
+        id_ = request.form.get('id_')
+        database.mark_naughty(
+            int(id_),
+            is_leader=request.form.get('type_') == 'fullname',
+            naughty={
+                'good': 0,
+                'bad': -1,
+                'back to moderate queue': 1,
+            }.get(request.form.get(id_), 1),
+        )
+
+    lookup = {
+        'names': [],
+        'eggs': [],
+    }
+    token = request.args.get('lookup') or request.form.get('token')
+    if token:
+        lookup = database.lookup(token)
+    return make_response(render_template(
+        'admin_egg.html',
+        lookup=lookup,
+        key=key,
+        naughty_map={
+            -1: 'bad',
+            0: 'good',
+            1: 'pending moderation',
+        }.get,
+        token=token,
+    ))
 
 
 if __name__ == '__main__':

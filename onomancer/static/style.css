@@ -72,6 +72,7 @@ a {
     font-size: 25px;
     width: 15%;
     max-width: 100px;
+    min-width: 2em;
     border: 0;
     cursor: pointer;
 }
@@ -140,7 +141,7 @@ a {
     /* fleeting effects */
 
     .poolItem a {
-        animation-duration: 10s;
+        animation-duration: 15s;
         animation-name: poolFade;
         color: black;
     }

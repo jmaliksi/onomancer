@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <a href="/moderate/{{key}}">Moderate</a>
+    <form action="/moderate/admin-eggs/{{key}}" method="get">
+        <input type="text" name="lookup" />
+        <input type="submit" value="Lookup" />
+    </form>
+    {% if lookup['names'] or lookup['eggs'] %}
+    <h1>Names</h1>
+
+    {% for name in lookup['names'] %}
+    <h3>{{name['name']}}</h3>
+    <p>Votes: {{name['votes']}}</p>
+    <p>Naughty: {{naughty_map(name['naughty'])}}</p>
+    <form action="/moderate/admin-eggs/{{key}}" method="post">
+        {{ csrf_html(session['USER_CSRF'])|safe }}
+        <input type="hidden" name="token" value="{{token}}" />
+        <input type="hidden" name="type_" value="fullname" />
+        <input type="hidden" name="id_" value="{{name['id']}}"/>
+        <input type="radio" id="bad{{name['id']}}" name="{{name['id']}}" value="bad" />
+        <label for="bad{{name['id']}}">bad</label>
+        <input type="radio" id="ok{{name['id']}}" name="{{name['id']}}" value="good" />
+        <label for="ok{{name['id']}}">good</label>
+        <input type="radio" id="maybe{{name['id']}}" name="{{name['id']}}" value="back to moderate queue" />
+        <label for="maybe{{name['id']}}">back to moderate queue</label>
+        <input type="submit" value="what" />
+    </form>
+    {% endfor %}
+
+    <h1>Eggs</h1>
+    {% for name in lookup['eggs'] %}
+    <h3>{{name['name']}}</h3>
+    <p>Upvotes: {{name['upvotes']}}</p>
+    <p>Downvotes: {{name['downvotes']}}</p>
+    <p>Naughty: {{naughty_map(name['naughty'])}}</p>
+    <form action="/moderate/admin-eggs/{{key}}" method="post">
+        {{ csrf_html(session['USER_CSRF'])|safe }}
+        <input type="hidden" name="token" value="{{token}}" />
+        <input type="hidden" name="type_" value="egg" />
+        <input type="hidden" name="id_" value="{{name['id']}}"/>
+        <input type="radio" id="bad{{name['id']}}" name="{{name['id']}}" value="bad" />
+        <label for="bad{{name['id']}}">bad</label>
+        <input type="radio" id="ok{{name['id']}}" name="{{name['id']}}" value="good" />
+        <label for="ok{{name['id']}}">good</label>
+        <input type="radio" id="maybe{{name['id']}}" name="{{name['id']}}" value="back to moderate queue" />
+        <label for="maybe{{name['id']}}">back to moderate queue</label>
+        <input type="submit" value="what" />
+    </form>
+    {% endfor %}
+
+    {% endif %}
+</body>
