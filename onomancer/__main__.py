@@ -19,7 +19,7 @@ from flask import (
 from flask_simple_csrf import CSRF
 from profanity import profanity
 from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+from flask_limiter.util import get_ipaddr
 from pylru import lrucache
 
 from onomancer import database
@@ -49,7 +49,7 @@ app = csrf.init_app(app)
 
 limiter = Limiter(
     app,
-    key_func=get_remote_address,
+    key_func=get_ipaddr,
     default_limits=['5/second'],
 )
 
