@@ -6,27 +6,37 @@
 <body>
     <a href="/moderate/{{key}}">Moderate</a>
     <form action="/moderate/admin-eggs/{{key}}" method="get">
+        <input type="checkbox" id="onlyGood" name="onlyGood" value="onlyGood" {% if only_good %}checked{% endif %}/>
+        <label for="onlyGood">Only Good Eggs</label>
         <input type="text" name="lookup" />
-        <input type="submit" value="Lookup" />
+        <input type="submit" value="what" />
     </form>
     {% if lookup['names'] or lookup['eggs'] %}
     <h1>Names</h1>
 
     {% for name in lookup['names'] %}
     <h3>{{name['name']}}</h3>
-    <p>Votes: {{name['votes']}}</p>
-    <p>Naughty: {{naughty_map(name['naughty'])}}</p>
+    <ul>
+        <li>ID: {{name['id']}}</li>
+        <li>Votes: {{name['votes']}}</li>
+        <li>Naughty: {{naughty_map(name['naughty'])}}</li>
+    </ul>
     <form action="/moderate/admin-eggs/{{key}}" method="post">
         {{ csrf_html(session['USER_CSRF'])|safe }}
         <input type="hidden" name="token" value="{{token}}" />
         <input type="hidden" name="type_" value="fullname" />
         <input type="hidden" name="id_" value="{{name['id']}}"/>
+        <input type="hidden" name="onlyGood" value="{{only_good}}"/>
         <input type="radio" id="bad{{name['id']}}" name="{{name['id']}}" value="bad" />
         <label for="bad{{name['id']}}">bad</label>
         <input type="radio" id="ok{{name['id']}}" name="{{name['id']}}" value="good" />
         <label for="ok{{name['id']}}">good</label>
         <input type="radio" id="maybe{{name['id']}}" name="{{name['id']}}" value="back to moderate queue" />
         <label for="maybe{{name['id']}}">back to moderate queue</label>
+        <input type="radio" id="delete{{name['id']}}" name="{{name['id']}}" value="delete" />
+        <label for="delete{{name['id']}}">delete</label>
+        <input type="radio" id="reset{{name['id']}}" name="{{name['id']}}" value="reset" />
+        <label for="reset{{name['id']}}">reset votes</label>
         <input type="submit" value="what" />
     </form>
     {% endfor %}
@@ -34,20 +44,28 @@
     <h1>Eggs</h1>
     {% for name in lookup['eggs'] %}
     <h3>{{name['name']}}</h3>
-    <p>Upvotes: {{name['upvotes']}}</p>
-    <p>Downvotes: {{name['downvotes']}}</p>
-    <p>Naughty: {{naughty_map(name['naughty'])}}</p>
+    <ul>
+        <li>ID: {{name['id']}}</li>
+        <li>Upvotes: {{name['upvotes']}}</li>
+        <li>Downvotes: {{name['downvotes']}}</li>
+        <li>Naughty: {{naughty_map(name['naughty'])}}</li>
+    </ul>
     <form action="/moderate/admin-eggs/{{key}}" method="post">
         {{ csrf_html(session['USER_CSRF'])|safe }}
         <input type="hidden" name="token" value="{{token}}" />
         <input type="hidden" name="type_" value="egg" />
         <input type="hidden" name="id_" value="{{name['id']}}"/>
+        <input type="hidden" name="onlyGood" value="{{only_good}}"/>
         <input type="radio" id="bad{{name['id']}}" name="{{name['id']}}" value="bad" />
         <label for="bad{{name['id']}}">bad</label>
         <input type="radio" id="ok{{name['id']}}" name="{{name['id']}}" value="good" />
         <label for="ok{{name['id']}}">good</label>
         <input type="radio" id="maybe{{name['id']}}" name="{{name['id']}}" value="back to moderate queue" />
         <label for="maybe{{name['id']}}">back to moderate queue</label>
+        <input type="radio" id="delete{{name['id']}}" name="{{name['id']}}" value="delete" />
+        <label for="delete{{name['id']}}">delete</label>
+        <input type="radio" id="reset{{name['id']}}" name="{{name['id']}}" value="reset" />
+        <label for="reset{{name['id']}}">reset votes</label>
         <input type="submit" value="what" />
     </form>
     {% endfor %}

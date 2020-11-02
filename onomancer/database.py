@@ -185,15 +185,20 @@ def purge(name):
             conn.execute('DELETE FROM leaders WHERE id = ?', (name,))
 
 
-def lookup(name):
+def lookup(name, only_good=False):
     conn = connect()
     with conn:
+        egg_query = 'SELECT * FROM names WHERE name LIKE ?'
+        name_query = 'SELECT * FROM leaders WHERE name LIKE ?'
+        if only_good:
+            egg_query += ' AND naughty = 0'
+            name_query += ' AND naughty = 0'
         res = {
             'eggs': [
-                dict(r) for r in conn.execute('SELECT * FROM names WHERE name LIKE ?', (f'%{name}%',))
+                dict(r) for r in conn.execute(egg_query, (f'%{name}%',))
             ],
             'names': [
-                dict(r) for r in conn.execute('SELECT * FROM leaders WHERE name LIKE ?', (f'%{name}%',))
+                dict(r) for r in conn.execute(name_query, (f'%{name}%',))
             ],
         }
     return res
@@ -207,7 +212,13 @@ def mark_naughty(id_, is_leader=True, naughty=-1):
 
 def reset_egg(id_):
     with connect() as conn:
-        conn.execute(f'UPDATE names SET upvotes=0, downvotes=0 WHERE id = ?', (id_, ))
+        conn.execute('UPDATE names SET upvotes=0, downvotes=0 WHERE id = ?', (id_, ))
+
+
+def reset_leader(id_):
+    with connect() as conn:
+        conn.execute('UPDATE leaders SET votes=1 WHERE id=?', (id_,))
+
 
 
 def admin_leaders():
@@ -219,11 +230,20 @@ def admin_leaders():
         }
 
 
+def delete_egg(id_):
+    with connect() as conn:
+        conn.execute('DELETE FROM names WHERE id=?', (id_, ))
+
+
+def delete_leader(id_):
+    with connect() as conn:
+        conn.execute('DELETE FROM leaders WHERE id=?', (id_, ))
+
+
 def admin_eggs():
     with connect() as conn:
         return {
             'naughty': [dict(r) for r in conn.execute('SELECT * FROM names WHERE naughty = -1')],
-            'threshold': [dict(r) for r in conn.execute(f'SELECT * from names WHERE downvotes <= {VOTE_THRESHOLD}')],
             'measured': [dict(r) for r in conn.execute(f'SELECT * FROM names WHERE downvotes <= -(upvotes * 3) AND downvotes <= {VOTE_THRESHOLD}')],
         }
 

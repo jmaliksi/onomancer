@@ -158,7 +158,6 @@ def vote(message=''):
         rotkey=session['USER_CSRF'] + rotkey,
     ))
     session['rotkey'] = rotkey
-    print(session['USER_CSRF'] + rotkey)
     return res
 
 
@@ -261,7 +260,6 @@ def rate():
     """
     name = request.form['name']
     rotkey = session['rotkey']
-    print(session['PREV_NONCE'] + rotkey)
     name = super_safe_decrypt(urllib.parse.unquote(name), session['PREV_NONCE'] + rotkey)
     judgement = ord(request.form['judgement'])
 
@@ -318,26 +316,39 @@ def admin_eggs(key):
     if app.config['MOD_KEY'] != key:
         return redirect(url_for('what'))
 
-
     if request.method == 'POST':
         id_ = request.form.get('id_')
-        database.mark_naughty(
-            int(id_),
-            is_leader=request.form.get('type_') == 'fullname',
-            naughty={
-                'good': 0,
-                'bad': -1,
-                'back to moderate queue': 1,
-            }.get(request.form.get(id_), 1),
-        )
+        command = request.form.get(id_)
+        is_leader = request.form.get('type_') == 'fullname'
+        if command == 'reset':
+            if is_leader:
+                database.reset_leader(id_)
+            else:
+                database.reset_egg(id_)
+        elif command == 'delete':
+            if is_leader:
+                database.delete_leader(id_)
+            else:
+                database.delete_egg(id_)
+        else:
+            database.mark_naughty(
+                int(id_),
+                is_leader=is_leader,
+                naughty={
+                    'good': 0,
+                    'bad': -1,
+                    'back to moderate queue': 1,
+                }.get(request.form.get(id_), 1),
+            )
 
     lookup = {
         'names': [],
         'eggs': [],
     }
     token = request.args.get('lookup') or request.form.get('token')
+    only_good = request.args.get('onlyGood') or request.form.get('onlyGood')
     if token:
-        lookup = database.lookup(token)
+        lookup = database.lookup(token, only_good=only_good)
     return make_response(render_template(
         'admin_egg.html',
         lookup=lookup,
@@ -348,6 +359,7 @@ def admin_eggs(key):
             1: 'pending moderation',
         }.get,
         token=token,
+        only_good=only_good or '',
     ))
 
 
