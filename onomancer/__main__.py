@@ -185,7 +185,7 @@ def downLeader():
     if not request.form.get('name'):
         return leaderboard(message="Hmm?")
     database.upvote_name(request.form['name'], thumbs=-1)
-    return leaderboard(message="A judgement made, the Chosen shift...", patience=20)
+    return leaderboard(message="A judgement made, the Chosen shift...", patience=30)
 
 @app.route('/egg')
 def egg(message='The Onomancer waits...'):
@@ -259,15 +259,15 @@ def rate():
 
     message = f'Your judgement is rendered.'
     if judgement == 128077:  # upvote
-        database.upvote_name(name, thumbs=1)
+        database.upvote_name(name, thumbs=2)
         message += ' The Onomancer nods...'
     elif judgement == 128154:  # love
-        database.upvote_name(name, thumbs=2)
+        database.upvote_name(name, thumbs=3)
         message += ' The Onomancer smiles...'
-    elif judgement == 128148:  # thumbs down
+    elif judgement == 128148:  # hate
         database.upvote_name(name, thumbs=-2)
         message += ' The Onomancer frowns...'
-    elif judgement == 128078:
+    elif judgement == 128078:  # thumbs down
         database.upvote_name(name, thumbs=-1)
         message += ' The Onomancer stares...'
 
