@@ -184,7 +184,7 @@ def leaderboard(message=None, patience=None):
 def downLeader():
     if not request.form.get('name'):
         return leaderboard(message="Hmm?")
-    database.upvote_name(request.form['name'], thumbs=-2)
+    database.upvote_name(request.form['name'], thumbs=-1)
     return leaderboard(message="A judgement made, the Chosen shift...", patience=20)
 
 @app.route('/egg')
