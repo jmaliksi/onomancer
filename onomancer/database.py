@@ -113,7 +113,7 @@ def _verify_naughtiness(conn, name):
 def get_leaders(top=20):
     conn = connect()
     with conn:
-        rows = conn.execute(f'SELECT * FROM leaders WHERE naughty = 0 AND votes > {LEADER_THRESHOLD} ORDER BY votes DESC LIMIT ?', (top,))
+        rows = conn.execute(f'SELECT * FROM leaders WHERE naughty = 0 AND votes > {LEADER_THRESHOLD} ORDER BY votes DESC, RANDOM() LIMIT ?', (top,))
         return [
             {
                 'name': row['name'],
