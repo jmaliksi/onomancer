@@ -206,10 +206,7 @@ def submit():
             database.add_name(name)
         elif request.form.get('fullname'):
             name = _process_name(request.form.get('fullname'))
-            names = name.split(' ')
-            if len(names) == 2:
-                database.add_name(names[0])
-                database.add_name(names[1])
+            names = name.split(' ', 1)
             if len(names) == 1:
                 # maybe accidental one name submission
                 database.add_name(name)

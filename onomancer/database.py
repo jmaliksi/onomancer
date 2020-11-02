@@ -65,7 +65,9 @@ def add_name(name):
 def upvote_name(name, thumbs=1):
     conn = connect()
     with conn:
-        eggs = name.split(' ', 1)
+        eggs = [e.replace(' ', u'\u00A0') for e in name.split(' ', 1)]
+        name = ' '.join(eggs)
+
 
         existing = conn.execute('SELECT * FROM leaders WHERE name = ?', (name,)).fetchone()
         naughty = 0
@@ -85,7 +87,7 @@ def upvote_name(name, thumbs=1):
                 if not n or n['naughty'] != 0:
                     naughty = 1
 
-        for egg in name.split(' ', 1):
+        for egg in eggs:
             if thumbs > 0:
                 conn.execute('UPDATE names SET upvotes = upvotes + ? WHERE name = ?', (thumbs, egg))
             elif thumbs < 0:
