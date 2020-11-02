@@ -3,8 +3,8 @@ import sqlite3
 import sys
 
 DB_NAME = 'data/onomancer.db'
-VOTE_THRESHOLD = -10
-LEADER_THRESHOLD = -5
+VOTE_THRESHOLD = -12
+LEADER_THRESHOLD = -6
 
 
 def connect():
@@ -127,7 +127,7 @@ def get_random_name():
     with conn:
         if random.random() > .2:
             rows = conn.execute(
-                f'SELECT name FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 2)) ORDER BY RANDOM() LIMIT 2')
+                f'SELECT name FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 3)) ORDER BY RANDOM() LIMIT 2')
             name = ' '.join([row['name'] for row in rows])
             votes = conn.execute(f'SELECT * FROM leaders WHERE name = ? AND votes <= {LEADER_THRESHOLD} LIMIT 1', (name,))
             if not votes.fetchone():
@@ -141,7 +141,7 @@ def check_egg_threshold(fullname, threshold=VOTE_THRESHOLD):
     names = fullname.split(' ', 1)
     conn = connect()
     with conn:
-        rows = conn.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND downvotes < -(upvotes * 2))', names)
+        rows = conn.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND downvotes < -(upvotes * 3))', names)
         if rows.fetchone():
             return True
     return False
@@ -224,7 +224,7 @@ def admin_eggs():
         return {
             'naughty': [dict(r) for r in conn.execute('SELECT * FROM names WHERE naughty = -1')],
             'threshold': [dict(r) for r in conn.execute(f'SELECT * from names WHERE downvotes <= {VOTE_THRESHOLD}')],
-            'measured': [dict(r) for r in conn.execute(f'SELECT * FROM names WHERE downvotes <= -(upvotes * 2)')],
+            'measured': [dict(r) for r in conn.execute(f'SELECT * FROM names WHERE downvotes <= -(upvotes * 3)')],
         }
 
 
