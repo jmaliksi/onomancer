@@ -1,3 +1,4 @@
+from collections import Counter
 import functools
 import random
 import secrets
@@ -108,6 +109,7 @@ def require_csrf(f):
                 session.pop('USER_CSRF', None)
                 session.pop('CSRF_TOKEN', None)
                 return redirect(url_for('what'))
+            session['PREV_NONCE'] = session['USER_CSRF']
             session['USER_CSRF'] = str(uuid.uuid4())
             session['CSRF_TOKEN'] = csrf.create(session['USER_CSRF'])
             return f(*args, **kwargs)
@@ -156,6 +158,7 @@ def vote(message=''):
         rotkey=session['USER_CSRF'] + rotkey,
     ))
     session['rotkey'] = rotkey
+    print(session['USER_CSRF'] + rotkey)
     return res
 
 
@@ -257,6 +260,9 @@ def rate():
     Rate a name.
     """
     name = request.form['name']
+    rotkey = session['rotkey']
+    print(session['PREV_NONCE'] + rotkey)
+    name = super_safe_decrypt(urllib.parse.unquote(name), session['PREV_NONCE'] + rotkey)
     judgement = ord(request.form['judgement'])
 
     message = f'Your judgement is rendered.'
