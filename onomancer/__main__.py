@@ -134,7 +134,7 @@ def vote(message=''):
     else:
         rotkey = request.cookies.get('rotkey')
         if rotkey:
-            name = super_safe_decrypt(name, rotkey)
+            name = super_safe_decrypt(name, session['USER_CSRF'] + rotkey)
         if not message:
             message = 'The page turns...'
         names = name.split(' ')
@@ -151,7 +151,7 @@ def vote(message=''):
         'vote.html',
         name=name,
         message=message,
-        rotkey=rotkey,
+        rotkey=session['USER_CSRF'] + rotkey,
     ))
     res.set_cookie('rotkey', value=rotkey)
     return res
@@ -228,7 +228,7 @@ def submit():
 def pool():
     names = database.random_pool()
     rotkey = secrets.token_urlsafe(100)
-    res = make_response(render_template('pool.html', names=names, rotkey=rotkey))
+    res = make_response(render_template('pool.html', names=names, rotkey=session['USER_CSRF'] + rotkey))
     res.set_cookie('rotkey', value=rotkey)
     return res
 
