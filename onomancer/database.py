@@ -4,7 +4,7 @@ import sys
 
 DB_NAME = 'data/onomancer.db'
 VOTE_THRESHOLD = -15
-LEADER_THRESHOLD = -6
+LEADER_THRESHOLD = -4
 
 
 def connect():

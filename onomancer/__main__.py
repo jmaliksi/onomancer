@@ -89,6 +89,8 @@ def before_request():
         nonce = str(uuid.uuid4())
         session['USER_CSRF'] = nonce
         session['CSRF_TOKEN'] = csrf.create(session['USER_CSRF'])
+    if 'rotkey' not in session:
+        session['rotkey'] = secrets.token_urlsafe(100)
 
 
 def require_csrf(f):
@@ -132,7 +134,7 @@ def vote(message=''):
             message = 'A card is drawn...'
         name = database.get_random_name()
     else:
-        rotkey = request.cookies.get('rotkey')
+        rotkey = session['rotkey']
         if rotkey:
             name = super_safe_decrypt(name, session['USER_CSRF'] + rotkey)
         if not message:
@@ -153,7 +155,7 @@ def vote(message=''):
         message=message,
         rotkey=session['USER_CSRF'] + rotkey,
     ))
-    res.set_cookie('rotkey', value=rotkey)
+    session['rotkey'] = rotkey
     return res
 
 
