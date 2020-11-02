@@ -3,7 +3,7 @@ import sqlite3
 import sys
 
 DB_NAME = 'data/onomancer.db'
-VOTE_THRESHOLD = -12
+VOTE_THRESHOLD = -15
 LEADER_THRESHOLD = -6
 
 
@@ -224,7 +224,7 @@ def admin_eggs():
         return {
             'naughty': [dict(r) for r in conn.execute('SELECT * FROM names WHERE naughty = -1')],
             'threshold': [dict(r) for r in conn.execute(f'SELECT * from names WHERE downvotes <= {VOTE_THRESHOLD}')],
-            'measured': [dict(r) for r in conn.execute(f'SELECT * FROM names WHERE downvotes <= -(upvotes * 3)')],
+            'measured': [dict(r) for r in conn.execute(f'SELECT * FROM names WHERE downvotes <= -(upvotes * 3) AND downvotes <= {VOTE_THRESHOLD}')],
         }
 
 
