@@ -30,6 +30,7 @@ def bootstrap():
             conn.execute('CREATE INDEX idx_leaders_votes ON leaders (votes)')
             conn.execute('CREATE UNIQUE INDEX idx_leaders_name ON leaders (name)')
             conn.execute('ALTER TABLE leaders ADD COLUMN naughty INTEGER DEFAULT 0')
+            conn.execute('ALTER TABLE leaders ADD COLUMN flag TEXT')
         except Exception:
             pass
 
@@ -50,8 +51,7 @@ def clear():
 def migrate():
     conn = connect()
     with conn:
-        conn.execute('ALTER TABLE names ADD COLUMN naughty INTEGER DEFAULT 0')
-        conn.execute('ALTER TABLE leaders ADD COLUMN naughty INTEGER DEFAULT 0')
+        conn.execute('ALTER TABLE leaders ADD COLUMN flag TEXT')
 
 
 def add_name(name):
@@ -167,7 +167,7 @@ def get_mod_list():
     with conn:
         return {
             'names': {
-                r['id']: r['name'] for r in conn.execute('SELECT * FROM leaders WHERE naughty = 1')
+                r['id']: r for r in conn.execute('SELECT * FROM leaders WHERE naughty = 1')
             },
             'eggs': {
                 r['id']: r['name'] for r in conn.execute('SELECT * FROM names WHERE naughty = 1')
@@ -270,6 +270,11 @@ def random_pool(count=100):
     with conn:
         names = conn.execute('SELECT name FROM leaders WHERE votes > 0 AND naughty = 0 ORDER BY RANDOM() LIMIT ?', (count,))
         return [n['name'] for n in names]
+
+
+def flag_name(name, reason):
+    with connect() as conn:
+        conn.execute('INSERT INTO leaders (name, votes, naughty, flag) VALUES (?, 0, 1, ?) ON CONFLICT (name) DO UPDATE SET flag=?, naughty=1', (name, reason, reason))
 
 
 def load():

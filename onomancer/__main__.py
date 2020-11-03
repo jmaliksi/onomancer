@@ -150,12 +150,16 @@ def vote(message=''):
         if request.args.get('reverse'):
             # flip it turnwise
             name = ' '.join(names[::-1])
+    flag = 'flagForm' in request.args
+    if flag:
+        message = 'What is your reason for flagging this name?'
     rotkey = secrets.token_urlsafe(100)
     res = make_response(render_template(
         'vote.html',
         name=name,
         message=message,
         rotkey=session['USER_CSRF'] + rotkey,
+        flag_form=flag,
     ))
     session['rotkey'] = rotkey
     return res
@@ -308,7 +312,12 @@ def moderate(key, type_=''):
             database.moderate(eggs=mod_action)
 
     mod_list = database.get_mod_list()
-    return make_response(render_template('moderate.html', leaders=mod_list['names'], eggs=mod_list['eggs'], key=key))
+    return make_response(render_template(
+        'moderate.html',
+        leaders=mod_list['names'],
+        eggs=mod_list['eggs'],
+        key=key,
+    ))
 
 
 @app.route('/moderate/bad-eggs/<key>', methods=['GET'])
@@ -319,6 +328,28 @@ def get_bad_eggs(key):
         'leaders': database.admin_leaders(),
         'eggs': database.admin_eggs(),
     })
+
+
+@app.route('/flag', methods=['POST'])
+@require_csrf
+def flag():
+    name = super_safe_decrypt(
+        urllib.parse.unquote(request.form['name']),
+        session['PREV_NONCE'] + session['rotkey'],
+    )
+    reason = request.form['reason'].strip()
+    if len(reason) <= 5:
+        rotkey = secrets.token_urlsafe(100)
+        session['rotkey'] = rotkey
+        return make_response(render_template(
+            'vote.html',
+            name=name,
+            message='Provide a reason.',
+            rotkey=session['USER_CSRF'] + rotkey,
+            flag_form=True,
+        ))
+    database.flag_name(name, reason)
+    return vote()
 
 
 @app.route('/moderate/admin-eggs/<key>', methods=['GET', 'POST'], strict_slashes=False)

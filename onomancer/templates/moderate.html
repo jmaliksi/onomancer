@@ -11,7 +11,10 @@
     <form action="/moderate/{{key}}/names" method="post">
         {{ csrf_html(session['USER_CSRF'])|safe }}
         {% for id_, name in leaders.items() %}
-        <p>{{name}}</p>
+        <p>{{name['name']}}</p>
+        {% if name['flag'] %}
+        <p><b>FLAGGED:</b> {{name['flag']}}</p>
+        {% endif %}
         <input type="radio" id="good{{id_}}" name="{{id_}}" value="good" />
         <label for="good{{id_}}">good</label>
         <input type="radio" id="bad{{id_}}" name="{{id_}}" value="bad" />

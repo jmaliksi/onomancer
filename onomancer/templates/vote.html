@@ -13,6 +13,16 @@
     </form>
     <a href="/vote?name={{super_secret(name, rotkey)}}&reverse=1">reverse</a>
     <a href="/vote">skip</a>
+    <a href="/vote?name={{super_secret(name, rotkey)}}&flagForm=1">flag</a>
+    {% if flag_form %}
+    <p>&nbsp;</p>
+    <form id="flagForm" method="post" action="/flag">
+        {{ csrf_html(session['USER_CSRF'])|safe }}
+        <input type="hidden" name="name" value="{{super_secret(name, rotkey)}}" />
+        <input type="text" name="reason" autofocus/>
+        <input type="submit" alt="flag" name="flag" value="Flag"/>
+    </form>
+    {% endif %}
     <p class="message">{{message}}</p>
 </div>
 {% endblock %}
