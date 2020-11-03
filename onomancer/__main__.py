@@ -349,6 +349,8 @@ def flag():
             flag_form=True,
         ))
     database.flag_name(name, reason)
+    rotkey = secrets.token_urlsafe(100)
+    session['rotkey'] = rotkey
     return vote()
 
 
