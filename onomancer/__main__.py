@@ -163,7 +163,7 @@ def vote(message=''):
 
 @app.route('/leaderboard')
 def leaderboard(message=None, patience=None):
-    names = database.get_leaders(top=20)
+    names = database.get_leaders(top=50)
     patience_cookie = request.cookies.get('patience')
     if not message and patience_cookie:
         message = 'Them that descend still settle...'
@@ -172,6 +172,7 @@ def leaderboard(message=None, patience=None):
         names=names,
         message=message,
         patience=patience or patience_cookie,
+        rotkey=session['USER_CSRF'] + session['rotkey'],
     ))
     if patience:
         res.set_cookie(
@@ -186,10 +187,20 @@ def leaderboard(message=None, patience=None):
 @require_csrf
 @limiter.limit('3/minute')
 def downLeader():
-    if not request.form.get('name'):
+    command = request.form.get('command')
+    if not command:
         return leaderboard(message="Hmm?")
-    database.upvote_name(request.form['name'], thumbs=-1)
-    return leaderboard(message="A judgement made, the Chosen shift...", patience=30)
+    rotkey = session['rotkey']
+    name = super_safe_decrypt(urllib.parse.unquote(request.form.get('name')), session['PREV_NONCE'] + rotkey)
+    if command == 'flip':
+        database.flip_leader(name)
+        message = "The pages thrum with feedback..."
+    elif command == 'down':
+        database.upvote_name(name, thumbs=-1)
+        message = "A judgement made, the Chosen shift..."
+    else:
+        message = "Hmm?"
+    return leaderboard(message=message, patience=30)
 
 @app.route('/egg')
 def egg(message='The Onomancer waits...'):

@@ -112,7 +112,7 @@ a {
     text-decoration: none;
     background: none;
     border: none;
-    padding: none;
+    padding: 0;
     font-size: 7pt;
     cursor: pointer;
 }

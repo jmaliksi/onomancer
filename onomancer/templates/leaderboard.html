@@ -8,7 +8,9 @@
         <form action="downLeader" method="post">
             {{ csrf_html(session['USER_CSRF'])|safe }}
             {% if not patience %}
-            <button type="submit" name="name" value="{{name['name']}}">&#128315</button>
+            <input type="hidden" name="name" value="{{super_secret(name['name'], rotkey)}}"/>
+            <button type="submit" name="command" value="flip">&#128257</button>
+            <button type="submit" name="command" value="down">&#128315</button>
             {% endif %}
         </form>
     </li>

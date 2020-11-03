@@ -100,6 +100,21 @@ def upvote_name(name, thumbs=1):
         conn.execute('INSERT INTO leaders (name, votes, naughty) VALUES (?, ?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, naughty, thumbs * mult))
 
 
+def flip_leader(name):
+    """Flip leaderboard name turnwise"""
+    with connect() as c:
+        me = c.execute('SELECT * FROM leaders WHERE name=?', (name,)).fetchone()
+        flipped = ' '.join(name.split(' ')[::-1])
+        sibling = c.execute('SELECT * FROM leaders WHERE name = ?', (flipped,)).fetchone()
+        if not sibling:
+            c.execute('INSERT INTO leaders (name, votes, naughty) VALUES (?, 0, 0)', (flipped,))
+            sibling_votes = 0
+        else:
+            sibling_votes = sibling['votes']
+        c.execute('UPDATE leaders SET votes=? WHERE name=?', (me['votes'], flipped))
+        c.execute('UPDATE leaders SET votes=? WHERE name=?', (sibling_votes, name))
+
+
 def _verify_naughtiness(conn, name):
     is_good = conn.execute('SELECT * FROM leaders WHERE name = ? AND naughty != 0').fetchone()
     if is_good:
