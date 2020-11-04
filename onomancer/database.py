@@ -299,21 +299,23 @@ def hash_dump():
         ]
 
 
-def get_names(threshold=0, limit=100, offset=0):
+def get_names(threshold=0, limit=100, offset=0, rand=0):
     with connect() as c:
+        order = 'RANDOM()' if rand else 'name'
         return [
             n['name'] for n in c.execute(
-                'SELECT * FROM leaders WHERE naughty=0 AND votes>=? ORDER BY name LIMIT ?,?',
+                f'SELECT * FROM leaders WHERE naughty=0 AND votes>=? ORDER BY {order} LIMIT ?,?',
                 (threshold, offset, limit),
             )
         ]
 
 
-def get_eggs(threshold=0, limit=100, offset=0):
+def get_eggs(threshold=0, limit=100, offset=0, rand=0):
     with connect() as c:
+        order = 'RANDOM()' if rand else 'name'
         return [
             n['name'] for n in c.execute(
-                'SELECT * FROM names WHERE naughty=0 AND upvotes+downvotes>=? ORDER BY name LIMIT ?,?',
+                f'SELECT * FROM names WHERE naughty=0 AND upvotes+downvotes>=? ORDER BY {order} LIMIT ?,?',
                 (threshold, offset, limit),
             )
         ]

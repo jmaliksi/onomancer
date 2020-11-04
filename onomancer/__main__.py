@@ -542,7 +542,8 @@ def get_names():
     threshold = request.args.get('threshold', 0)
     limit = request.args.get('limit', 100)
     offset = request.args.get('offset', 0)
-    return jsonify(database.get_names(threshold, limit, offset))
+    rand = request.args.get('random', 0)
+    return jsonify(database.get_names(threshold, limit, offset, rand))
 
 
 @app.route('/api/getEggs')
@@ -550,7 +551,8 @@ def get_eggs():
     threshold = request.args.get('threshold', 0)
     limit = request.args.get('limit', 100)
     offset = request.args.get('offset', 0)
-    return jsonify(database.get_eggs(threshold, limit, offset))
+    rand = request.args.get('random', 0)
+    return jsonify(database.get_eggs(threshold, limit, offset, rand))
 
 
 if __name__ == '__main__':

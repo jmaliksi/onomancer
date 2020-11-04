@@ -41,3 +41,43 @@ Server will start up at 0.0.0.0:5001
 Icons
 * https://game-icons.net/1x1/lorc/crystal-ball.html
 * https://game-icons.net/1x1/delapouite/aquarium.html
+
+# API
+Onomancer has a public API if you want to use these voted names in your own project.
+
+## Get Name
+
+`/api/getName`
+
+Gets a single name. Same algorithm that serves up names for rating, which is a chance to be a newly formed name or an existing name that's been upvoted.
+
+Rate limit: 10/s
+
+
+## Get Names
+
+`/api/getNames`
+
+Gets n fully formed names in alphabetical order.
+
+Rate limit: 5/s
+
+Parameters:
+* `threshold` - filter names with votes at or above this threshold, default 0
+* `limit` - page size, default 100
+* `offset` - page offset, default 0
+* `random` - returns in random order if set to true, default 0
+
+## Get Egs
+
+`/api/getEggs`
+
+Gets n individual eggs in alphabetical order.
+
+Rate limit: 5/s
+
+Parameters
+* `threshold` - filter names with votes at or above this threshold, default 0
+* `limit` - page size, default 100
+* `offset` - page offset, default 0
+* `random` - returns in random order if set to true, default 0
