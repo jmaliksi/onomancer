@@ -44,6 +44,10 @@ h2 {
     margin: 10px;
 }
 
+h3 {
+    font-weight: normal;
+}
+
 p {
     font-style: italic;
     color: grey;
@@ -108,7 +112,7 @@ a {
     margin: 15px;
 }
 
-.leaderItem button {
+.inlineForm button {
     text-decoration: none;
     background: none;
     border: none;
@@ -117,7 +121,7 @@ a {
     cursor: pointer;
 }
 
-.leaderItem form {
+.inlineForm {
     display: inline;
     margin: 0;
     padding: 0;
@@ -178,4 +182,36 @@ a {
     h1.name {
         font-size: 75pt;
     }
+}
+
+.navRegard a {
+    padding: 1em;
+    font-size: .9em;
+    text-decoration: overline;
+}
+
+.collectRow {
+    display: flex;
+    flex-direction: row;
+    padding: .1em;
+}
+
+.collectColumn {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    text-align: left;
+}
+
+.nameCol {
+    flex: 2;
+    display: inline;
+}
+
+.nameCol form {
+    display: inline;
+}
+
+.stars {
+    flex: 1;
 }

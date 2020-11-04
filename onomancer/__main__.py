@@ -1,5 +1,6 @@
 from collections import Counter
 import functools
+import json
 import random
 import secrets
 import sys
@@ -404,6 +405,68 @@ def admin_eggs(key):
         }.get,
         token=token,
         only_good=only_good or '',
+    ))
+
+
+@app.route('/collect', methods=['GET', 'POST'])
+def collect():
+    if request.method == 'POST':
+        token = request.form['token']
+        collection = [
+            super_safe_decrypt(urllib.parse.unquote(name), token * 10)
+            for name in json.loads(request.form['collection'])
+        ]
+        command = request.form['command']
+        name_to_burn = super_safe_decrypt(
+            urllib.parse.unquote(request.form['name']),
+            token * 10,
+        )
+        if command == 'flip':
+            collection[collection.index(name_to_burn)] = ' '.join(name_to_burn.split(' ')[::-1])
+        elif command == 'fire':
+            collection[collection.index(name_to_burn)] = database.collect(1)[0]
+        return redirect(url_for(
+            'collect',
+            token=token[:8],
+            collection=[
+                super_safe_encrypt(name, token * 10)
+                for name in collection
+            ],
+        ))
+    token = request.args.get('token')
+    if not token:
+        token = secrets.token_hex(4)
+        return redirect(url_for(
+            'collect',
+            token=token,
+            collection=[
+                super_safe_encrypt(name, token * 10)
+                for name in database.collect()
+            ],
+        ))
+    collection = [
+        (
+            super_safe_decrypt(urllib.parse.unquote(name), token * 10),
+            range(hash(name) % 6),
+            bool(ord(name[0]) % 2),
+        )
+        for name in request.args.getlist('collection')
+    ]
+    return make_response(render_template(
+        'collect.html',
+        lineup=collection[:9],
+        rotation=collection[9:],
+        message=random.choice([
+            'A collection of chosen...',
+            'Your hand...',
+            'A drawing of pages...',
+            'What threads connect...',
+        ]),
+        token=token * 10,
+        collection=json.dumps([
+            super_safe_encrypt(name, token * 10)
+            for (name, _, _) in collection
+        ]),
     ))
 
 

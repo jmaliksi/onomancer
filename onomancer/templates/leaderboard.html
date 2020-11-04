@@ -5,7 +5,7 @@
     {% for name in names %}
     <li class="leaderItem" key="{{name['name']}}">
         <span>{{name['name']}} - {{name['votes']}} </span>
-        <form action="downLeader" method="post">
+        <form action="downLeader" method="post" class="inlineForm">
             {{ csrf_html(session['USER_CSRF'])|safe }}
             {% if not patience %}
             <input type="hidden" name="name" value="{{super_secret(name['name'], rotkey)}}"/>

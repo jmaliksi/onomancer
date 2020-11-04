@@ -277,6 +277,12 @@ def flag_name(name, reason):
         conn.execute('INSERT INTO leaders (name, votes, naughty, flag) VALUES (?, 0, 1, ?) ON CONFLICT (name) DO UPDATE SET flag=?, naughty=1', (name, reason, reason))
 
 
+def collect(friends=14, threshold=1):
+    with connect() as conn:
+        res = conn.execute('SELECT * FROM leaders WHERE naughty = 0 AND votes >= ? ORDER BY RANDOM () LIMIT ?', (threshold, friends))
+        return [r['name'] for r in res]
+
+
 def load():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
