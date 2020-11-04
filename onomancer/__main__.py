@@ -429,7 +429,7 @@ def collect():
             'collect',
             token=token[:8],
             collection=[
-                super_safe_encrypt(name, token * 10)
+                super_secret(name, token * 10)
                 for name in collection
             ],
         ))
@@ -440,13 +440,13 @@ def collect():
             'collect',
             token=token,
             collection=[
-                super_safe_encrypt(name, token * 10)
+                super_secret(name, token * 10)
                 for name in database.collect()
             ],
         ))
     collection = [
         (
-            super_safe_decrypt(urllib.parse.unquote(name), token * 10),
+            super_safe_decrypt(name, token * 10),
             range(hash(name) ** 12 % 6),
             bool(ord(name[0]) % 2),
         )
@@ -464,7 +464,7 @@ def collect():
         ]),
         token=token * 10,
         collection=json.dumps([
-            super_safe_encrypt(name, token * 10)
+            super_secret(name, token * 10)
             for (name, _, _) in collection
         ]),
     ))
