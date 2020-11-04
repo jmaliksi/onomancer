@@ -299,6 +299,27 @@ def hash_dump():
         ]
 
 
+def get_names(threshold=0, limit=100, offset=0):
+    with connect() as c:
+        return [
+            n['name'] for n in c.execute(
+                'SELECT * FROM leaders WHERE naughty=0 AND votes>=? ORDER BY name LIMIT ?,?',
+                (threshold, offset, limit),
+            )
+        ]
+
+
+def get_eggs(threshold=0, limit=100, offset=0):
+    with connect() as c:
+        return [
+            n['name'] for n in c.execute(
+                'SELECT * FROM names WHERE naughty=0 AND upvotes+downvotes>=? ORDER BY name LIMIT ?,?',
+                (threshold, offset, limit),
+            )
+        ]
+
+
+
 def load():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row

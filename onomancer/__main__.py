@@ -531,6 +531,28 @@ def mod_dump(key):
     return jsonify(database.hash_dump())
 
 
+@app.route('/api/getName')
+@limiter.limit('10/second')
+def get_name():
+    return jsonify(database.get_random_name())
+
+
+@app.route('/api/getNames')
+def get_names():
+    threshold = request.args.get('threshold', 0)
+    limit = request.args.get('limit', 100)
+    offset = request.args.get('offset', 0)
+    return jsonify(database.get_names(threshold, limit, offset))
+
+
+@app.route('/api/getEggs')
+def get_eggs():
+    threshold = request.args.get('threshold', 0)
+    limit = request.args.get('limit', 100)
+    offset = request.args.get('offset', 0)
+    return jsonify(database.get_eggs(threshold, limit, offset))
+
+
 if __name__ == '__main__':
     debug = False
     if 'test' in sys.argv:
