@@ -431,7 +431,7 @@ def collect():
         return redirect(url_for(
             'collect',
             token=token[:8],
-            collection=[
+            c=[
                 super_secret(name, token * 10)
                 for name in collection
             ],
@@ -442,7 +442,7 @@ def collect():
         return redirect(url_for(
             'collect',
             token=token,
-            collection=[
+            c=[
                 super_secret(name, token * 10)
                 for name in database.collect()
             ],
@@ -450,10 +450,10 @@ def collect():
     collection = [
         (
             super_safe_decrypt(name, token * 10),
-            range(_curse_name(name)),
-            bool(ord(name[0]) % 2),
+            range(_curse_name(name)[0]),
+            _curse_name(name)[1],
         )
-        for name in request.args.getlist('collection')
+        for name in (request.args.getlist('c') or request.args.getlist('collection'))
     ]
     return make_response(render_template(
         'collect.html',
@@ -474,10 +474,16 @@ def collect():
 
 
 def _curse_name(name):
-    mean = 2.5
-    range_ = 6
     h = hash(name)
-    return int(mean + math.sqrt((1.0 / range_) * math.log(h ** 2 * 2 * math.pi * (1.0 / range_))))
+    half_star = h < 0
+    try:
+        h = hash(name)
+        half_star = h < 0
+        h = str(int(abs(h)))
+        rating = round((float(h[1:7]) + float(h[7:13]) + float(h[13:])) / 599999.0)
+        return rating, half_star
+    except Exception:
+        return h % 6, half_star
 
 
 @app.route('/moderate/dump/<key>')
