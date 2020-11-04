@@ -1,4 +1,4 @@
-from collections import Counter
+import base64
 import functools
 import json
 import random
@@ -425,36 +425,44 @@ def collect():
             token * 10,
         )
         if command == 'flip':
-            collection[collection.index(name_to_burn)] = ' '.join(name_to_burn.split(' ')[::-1])
+            flipped = ' '.join(name_to_burn.split(' ')[::-1])
+            database.upvote_name(flipped, thumbs=0)
+            collection[collection.index(name_to_burn)] = flipped
         elif command == 'fire':
             collection[collection.index(name_to_burn)] = database.collect(1)[0]
         return redirect(url_for(
             'collect',
-            token=token[:8],
+            t=token[:8],
             c=[
                 super_secret(name, token * 10)
                 for name in collection
             ],
+            f=_curse_collection(collection),
         ))
-    token = request.args.get('token')
+    token = request.args.get('token') or request.args.get('t')
     if not token:
         token = secrets.token_hex(4)
         return redirect(url_for(
             'collect',
-            token=token,
-            c=[
-                super_secret(name, token * 10)
-                for name in database.collect()
-            ],
+            t=token,
+            f=_curse_collection(*database.collect()),
         ))
-    collection = [
-        (
-            super_safe_decrypt(name, token * 10),
-            range(_curse_name(name)[0]),
-            _curse_name(name)[1],
-        )
-        for name in (request.args.getlist('c') or request.args.getlist('collection'))
-    ]
+    # f is for friends
+    if not request.args.get('f'):
+        collection = [
+            (
+                super_safe_decrypt(name, token * 10),
+                range(_curse_name(name)[0]),
+                _curse_name(name)[1],
+            )
+            for name in (request.args.getlist('c') or request.args.getlist('collection'))
+        ]
+    else:
+        collection = [
+            (name, range(_curse_name(name)[0]), _curse_name(name)[1])
+            for name in _uncurse_collection(request.args['f'])
+        ]
+    short_code = _curse_collection(*[c[0] for c in collection])
     return make_response(render_template(
         'collect.html',
         lineup=collection[:9],
@@ -473,6 +481,7 @@ def collect():
     ))
 
 
+@functools.lru_cache()
 def _curse_name(name):
     h = hash(name)
     half_star = h < 0
@@ -484,6 +493,35 @@ def _curse_name(name):
         return rating, half_star
     except Exception:
         return h % 6, half_star
+
+
+@functools.lru_cache(100)
+def _curse_collection(*names):
+    name_ids = database.get_collection_ids(names)
+    bt = []
+    for name in names:
+        id_ = name_ids[name]
+        if not id_:
+            id_ = 0
+        tokens = str(id_)
+        for c in tokens:
+            bt.append(int(c))
+        bt.append(11)
+    return base64.urlsafe_b64encode(bytes(bt))
+
+
+@functools.lru_cache(100)
+def _uncurse_collection(code):
+    bt = base64.urlsafe_b64decode(code)
+    ids = []
+    while 11 in bt:
+        dex = bt.index(11)
+        chunk = bt[:dex]
+        bt = bt[dex + 1:]
+        ids.append(int(''.join([str(c) for c in chunk])))
+    if bt:
+        ids.append(int(''.join(bt)))
+    return database.get_names_from_ids(ids)
 
 
 @app.route('/moderate/dump/<key>')

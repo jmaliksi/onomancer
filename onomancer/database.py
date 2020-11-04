@@ -115,16 +115,6 @@ def flip_leader(name):
         c.execute('UPDATE leaders SET votes=? WHERE name=?', (sibling_votes, name))
 
 
-def _verify_naughtiness(conn, name):
-    is_good = conn.execute('SELECT * FROM leaders WHERE name = ? AND naughty != 0').fetchone()
-    if is_good:
-        return True
-    eggs = name.split(' ')
-    if len(eggs) == 2:
-        # everything is fine
-        pass
-
-
 def get_leaders(top=20):
     conn = connect()
     with conn:
@@ -281,6 +271,24 @@ def collect(friends=14, threshold=1):
     with connect() as conn:
         res = conn.execute('SELECT * FROM leaders WHERE naughty = 0 AND votes >= ? ORDER BY RANDOM () LIMIT ?', (threshold, friends))
         return [r['name'] for r in res]
+
+
+def get_collection_ids(names):
+    with connect() as conn:
+        rows = conn.execute(f'SELECT * FROM leaders WHERE name IN ({",".join(["?"] * len(names))})', names)
+        res = {r['name']: r['id'] for r in rows}
+        for name in names:
+            if name not in res:
+                res[name] = None
+        return res
+
+
+def get_names_from_ids(ids):
+    with connect() as conn:
+        print(ids)
+        rows = conn.execute(f'SELECT * FROM leaders WHERE id IN ({",".join(["?"] * len(ids))})', ids)
+        res = {r['id']: r['name'] for r in rows}
+        return [res[id_] if id_ in res else '-' for id_ in ids]
 
 
 def hash_dump():
