@@ -458,7 +458,6 @@ def collect():
             (name, range(_curse_name(name)[0]), _curse_name(name)[1])
             for name in _uncurse_collection(request.args['f'])
         ]
-    short_code = _curse_collection(*[c[0] for c in collection])
     return make_response(render_template(
         'collect.html',
         lineup=collection[:9],
