@@ -2,6 +2,7 @@ from collections import Counter
 import functools
 import json
 import random
+import math
 import secrets
 import sys
 import time
@@ -102,6 +103,8 @@ def require_csrf(f):
             user_csrf = request.form.get('simplecsrf')
 
             if user_csrf in nonsense:
+                session.pop('USER_CSRF', None)
+                session.pop('CSRF_TOKEN', None)
                 nonsense[user_csrf] = True
                 return redirect(url_for('what'))
             nonsense[user_csrf] = True
@@ -447,7 +450,7 @@ def collect():
     collection = [
         (
             super_safe_decrypt(name, token * 10),
-            range(hash(name) ** 12 % 6),
+            range(_curse_name(name)),
             bool(ord(name[0]) % 2),
         )
         for name in request.args.getlist('collection')
@@ -468,6 +471,13 @@ def collect():
             for (name, _, _) in collection
         ]),
     ))
+
+
+def _curse_name(name):
+    mean = 2.5
+    range_ = 6
+    h = hash(name)
+    return int(mean + math.sqrt((1.0 / range_) * math.log(h ** 2 * 2 * math.pi * (1.0 / range_))))
 
 
 @app.route('/moderate/dump/<key>')
