@@ -470,6 +470,13 @@ def collect():
     ))
 
 
+@app.route('/moderate/dump/<key>')
+def mod_dump(key):
+    if app.config['MOD_KEY'] != key:
+        return redirect(url_for('what'))
+    return jsonify(database.hash_dump())
+
+
 if __name__ == '__main__':
     debug = False
     if 'test' in sys.argv:

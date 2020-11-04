@@ -283,6 +283,14 @@ def collect(friends=14, threshold=1):
         return [r['name'] for r in res]
 
 
+def hash_dump():
+    with connect() as c:
+        return [
+            [name['name'], hash(name['name'])] for name in
+            c.execute('SELECT * FROM leaders WHERE naughty = 0')
+        ]
+
+
 def load():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
