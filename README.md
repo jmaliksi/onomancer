@@ -68,7 +68,7 @@ Parameters:
 * `offset` - page offset, default 0
 * `random` - returns in random order if set to true, default 0
 
-## Get Egs
+## Get Eggs
 
 `/api/getEggs`
 
