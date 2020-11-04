@@ -489,7 +489,7 @@ def _curse_name(name):
         h = hash(name)
         half_star = h < 0
         h = str(int(abs(h)))
-        rating = round((float(h[1:7]) + float(h[7:13]) + float(h[13:])) / 599999.0)
+        rating = round((float(h[1:7]) + float(h[7:13]) + float(h[13:])) / 500000.0) - ((int(h[0]) % 3) - 1)
         return rating, half_star
     except Exception:
         return h % 6, half_star
