@@ -447,7 +447,7 @@ def collect():
     collection = [
         (
             super_safe_decrypt(urllib.parse.unquote(name), token * 10),
-            range(hash(name) % 6),
+            range(hash(name) ** 12 % 6),
             bool(ord(name[0]) % 2),
         )
         for name in request.args.getlist('collection')
