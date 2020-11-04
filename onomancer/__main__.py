@@ -433,11 +433,7 @@ def collect():
         return redirect(url_for(
             'collect',
             t=token[:8],
-            c=[
-                super_secret(name, token * 10)
-                for name in collection
-            ],
-            f=_curse_collection(collection),
+            f=_curse_collection(*collection),
         ))
     token = request.args.get('token') or request.args.get('t')
     if not token:
