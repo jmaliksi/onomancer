@@ -127,6 +127,10 @@ a {
     padding: 0;
 }
 
+.toplineForm button {
+    font-size: 1em;
+}
+
 .poolItem {
     display: inline;
     line-height: 2em;

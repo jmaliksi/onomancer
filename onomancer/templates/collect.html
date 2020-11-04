@@ -1,12 +1,23 @@
 {% extends "regard.html" %}
 {% block title %}Collection{% endblock %}
 {% block names %}
+<span>
+    <form action="collect" method="post" class="inlineForm toplineForm">
+        {{ csrf_html(session['USER_CSRF'])|safe }}
+        <input type="hidden" name="collection" value="{{collection}}"/>
+        <input type="hidden" name="token" value="{{token}}"/>
+        <button type="button" value="back" onclick="history.back()">&#9194</button>
+        <button type="submit" name="command" value="reverb">&#127754</button>
+        <button type="submit" name="command" value="fireworks">&#129512</button>
+    </form>
+</span>
 <div class="collect">
     <h3>Lineup</h3>
     {% for (name, stars, halfstar) in lineup %}
     <div class="collectRow">
         <div class="collectColumn nameCol">
             <form action="collect" method="post" class="inlineForm">
+                {{ csrf_html(session['USER_CSRF'])|safe }}
                 <input type="hidden" name="name" value="{{super_secret(name, token)}}"/>
                 <input type="hidden" name="collection" value="{{collection}}"/>
                 <input type="hidden" name="token" value="{{token}}"/>
@@ -36,6 +47,7 @@
     <div class="collectRow">
         <div class="collectColumn nameCol">
             <form action="collect" method="post" class="inlineForm">
+                {{ csrf_html(session['USER_CSRF'])|safe }}
                 <input type="hidden" name="name" value="{{super_secret(name, token)}}"/>
                 <input type="hidden" name="collection" value="{{collection}}"/>
                 <input type="hidden" name="token" value="{{token}}"/>

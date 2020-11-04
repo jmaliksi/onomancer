@@ -412,6 +412,7 @@ def admin_eggs(key):
 
 
 @app.route('/collect', methods=['GET', 'POST'])
+@require_csrf
 def collect():
     if request.method == 'POST':
         token = request.form['token']
@@ -420,7 +421,7 @@ def collect():
             for name in json.loads(request.form['collection'])
         ]
         command = request.form['command']
-        name_to_burn = super_safe_decrypt(
+        name_to_burn = 'name' in request.form and super_safe_decrypt(
             urllib.parse.unquote(request.form['name']),
             token * 10,
         )
@@ -430,6 +431,10 @@ def collect():
             collection[collection.index(name_to_burn)] = flipped
         elif command == 'fire':
             collection[collection.index(name_to_burn)] = database.collect(1)[0]
+        elif command == 'reverb':
+            collection = sorted(collection, key=lambda _: random.random())
+        elif command == 'fireworks':
+            return redirect(url_for('collect'))
         return redirect(url_for(
             'collect',
             t=token[:8],
