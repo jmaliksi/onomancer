@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block content %}
-<div class="navRegard">
+{% block subNav %}
     <a href="/leaderboard">Leaderboard</a>
     <a href="/pool">Pool</a>
     <a href="/collect">Collect</a>
-</div>
+{% endblock %}
+{% block content %}
 <h1>{% block title %}{% endblock %}</h1>
 <div class="leaderboard">
     {% if message %}

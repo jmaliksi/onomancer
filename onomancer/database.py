@@ -22,6 +22,9 @@ def bootstrap():
             conn.execute('ALTER TABLE names ADD COLUMN upvotes INTEGER DEFAULT 0')
             conn.execute('ALTER TABLE names ADD COLUMN downvotes INTEGER DEFAULT 0')
             conn.execute('ALTER TABLE names ADD COLUMN naughty INTEGER DEFAULT 0')
+            conn.execute('ALTER TABLE names ADD COLUMN flag TEXT')
+            conn.execute('ALTER TABLE names ADD COLUMN first_votes INTEGER DEFAULT 0')
+            conn.execute('ALTER TABLE names ADD COLUMN second_votes INTEGER DEFAULT 0')
         except Exception:
             pass
 
@@ -51,7 +54,9 @@ def clear():
 def migrate():
     conn = connect()
     with conn:
-        conn.execute('ALTER TABLE leaders ADD COLUMN flag TEXT')
+        conn.execute('ALTER TABLE names ADD COLUMN flag TEXT')
+        conn.execute('ALTER TABLE names ADD COLUMN first_votes INTEGER DEFAULT 0')
+        conn.execute('ALTER TABLE names ADD COLUMN second_votes INTEGER DEFAULT 0')
 
 
 def add_name(name):
