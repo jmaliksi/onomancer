@@ -198,6 +198,7 @@ a {
     display: flex;
     flex-direction: row;
     padding: .1em;
+    min-width: 25em;
 }
 
 .collectColumn {
@@ -218,4 +219,35 @@ a {
 
 .stars {
     flex: 1;
+}
+
+.saveCol {
+    flex-direction: column;
+    display: flex;
+    flex: 1;
+}
+
+.save {
+    flex-direction: row;
+    display: flex;
+    width: 100%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.saveButton {
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: white;
+    font: inherit;
+    font-size: .8em;
+    margin: .1em;
+    overflow: visible;
+    text-decoration: overline;
+}
+
+.unsaved {
+    color: #444;
+    cursor: default;
 }

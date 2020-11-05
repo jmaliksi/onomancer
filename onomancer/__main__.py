@@ -448,8 +448,14 @@ def collect():
             t=token,
             f=_curse_collection(*database.collect()),
         ))
+    saves = {
+        'save1': request.cookies.get('save1'),
+        'save2': request.cookies.get('save2'),
+        'save3': request.cookies.get('save3'),
+    }
     # f is for friends
-    if not request.args.get('f'):
+    if request.args.get('collection') or request.args.get('c'):
+        # legacy
         collection = [
             (
                 super_safe_decrypt(name, token * 10),
@@ -458,12 +464,24 @@ def collect():
             )
             for name in (request.args.getlist('c') or request.args.getlist('collection'))
         ]
+    elif request.args.get('load'):
+        loaded = saves[request.args['load']]
+        collection = [
+            (name, range(_curse_name(name)[0]), _curse_name(name)[1])
+            for name in _uncurse_collection(loaded)
+        ]
     else:
         collection = [
             (name, range(_curse_name(name)[0]), _curse_name(name)[1])
             for name in _uncurse_collection(request.args['f'])
         ]
-    return make_response(render_template(
+    friends = [n[0] for n in collection]
+    friend_code = _curse_collection(*friends).decode()
+    if request.args.get('save'):
+        saves[request.args['save']] = friend_code
+    if request.args.get('clear'):
+        saves[request.args['clear']] = None
+    res = make_response(render_template(
         'collect.html',
         lineup=collection[:9],
         rotation=collection[9:],
@@ -471,15 +489,17 @@ def collect():
             'A collection of chosen...',
             'Your hand...',
             'A drawing of pages...',
-            'What threads connect...',
         ]),
         token=token * 10,
-        collection=json.dumps([
-            super_secret(name, token * 10)
-            for (name, _, _) in collection
-        ]),
+        collection=json.dumps([super_secret(n, token * 10) for n in friends]),
+        friends=friend_code,
+        saves=saves,
     ))
-
+    if request.args.get('save'):
+        res.set_cookie(request.args['save'], value=friend_code)
+    if request.args.get('clear'):
+        res.delete_cookie(request.args['clear'])
+    return res
 
 @functools.lru_cache()
 def _curse_name(name):

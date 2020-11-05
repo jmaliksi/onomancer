@@ -70,6 +70,17 @@
         </div>
     </div>
     {% endfor %}
-    <p>Bookmark this URL to save your collection.</p>
+</div>
+<div><p><small>Copy URL to share your Collection.</small></p></div>
+<div class="save">
+    {% for save_name, info in saves.items() %}
+    <form class="saveCol" action="collect" method="get">
+        <input type="hidden" name="t" value="{{token[:8]}}"/>
+        <input type="hidden" name="f" value="{{friends}}"/>
+        <button type="submit" name="save" value="{{save_name}}" class="saveButton">save</button>
+        <button type="submit" name="load" value="{{save_name}}" class="saveButton {% if not info %}unsaved{% endif %}" {% if not info %}disabled{% endif %}>load</button>
+        <button type="submit" name="clear" value="{{save_name}}" class="saveButton {% if not info %}unsaved{% endif %}" {% if not info %}disabled{% endif %}>clear</button>
+    </form>
+    {% endfor %}
 </div>
 {% endblock %}
