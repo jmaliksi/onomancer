@@ -6,7 +6,7 @@
 <body>
     <a href="/moderate/{{key}}">Moderate</a>
     <form action="/moderate/admin-eggs/{{key}}" method="get">
-        <input type="checkbox" id="onlyGood" name="onlyGood" value="onlyGood" {% if only_good %}checked{% endif %}/>
+        <input type="checkbox" id="onlyGood" name="onlyGood" value="onlyGood" checked/>
         <label for="onlyGood">Only Good Eggs</label>
         <input type="text" name="lookup" />
         <input type="submit" value="what" />
