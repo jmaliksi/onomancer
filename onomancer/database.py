@@ -357,8 +357,8 @@ def get_annotate_examples(egg, limit=5, rand=0):
     order = 'RANDOM()' if rand else 'votes DESC'
     with connect() as c:
         return {
-            'as_first': c.execute(f'SELECT * FROM leaders WHERE name LIKE ? AND votes > ? ORDER BY {order} LIMIT ?', (f'{egg} %', LEADER_THRESHOLD, limit)).fetchall(),
-            'as_second': c.execute(f'SELECT * FROM leaders WHERE name LIKE ? AND votes > ? ORDER BY {order} LIMIT ?', (f'% {egg}', LEADER_THRESHOLD, limit)).fetchall(),
+            'as_first': c.execute(f'SELECT * FROM leaders WHERE name LIKE ? AND votes > ? AND naughty=0 ORDER BY {order} LIMIT ?', (f'{egg} %', LEADER_THRESHOLD, limit)).fetchall(),
+            'as_second': c.execute(f'SELECT * FROM leaders WHERE name LIKE ? AND votes > ? AND naughty=0 ORDER BY {order} LIMIT ?', (f'% {egg}', LEADER_THRESHOLD, limit)).fetchall(),
         }
 
 
