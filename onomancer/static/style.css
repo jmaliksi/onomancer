@@ -92,11 +92,12 @@ a {
     width: 15%;
     font-size: .8em;
     color: #ccc;
+    hyphens: manual;
 }
 
 #judgeForm>label>input {
     width: 100%;
-    min-width: 1em;
+    min-width: 2em;
 }
 
 .center {

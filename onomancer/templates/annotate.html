@@ -1,5 +1,5 @@
 {% extends "judge.html" %}
-{% block cta %}Note onomastic positioning...{% endblock %}
+{% block cta %}Formuate onomastic bearings...{% endblock %}
 {% block console %}
 <form id="judgeForm" method="post" action="/annotate">
     {{ csrf_html(session['USER_CSRF'])|safe }}
@@ -14,7 +14,7 @@
     </label>
     <label>
         <input type="submit" name="judgement" value="&#128588"/>
-        Ambidextrous
+        Ambi&shy;dextrous
     </label>
     <label>
         <input type="submit" name="judgement" value="&#129335"/>
