@@ -356,10 +356,32 @@ def annotate_egg(egg, first=0, second=0):
 def get_annotate_examples(egg, limit=5, rand=0):
     order = 'RANDOM()' if rand else 'votes DESC'
     with connect() as c:
-        return {
-            'as_first': c.execute(f'SELECT * FROM leaders WHERE name LIKE ? AND votes > ? AND naughty=0 ORDER BY {order} LIMIT ?', (f'{egg} %', LEADER_THRESHOLD, limit)).fetchall(),
-            'as_second': c.execute(f'SELECT * FROM leaders WHERE name LIKE ? AND votes > ? AND naughty=0 ORDER BY {order} LIMIT ?', (f'% {egg}', LEADER_THRESHOLD, limit)).fetchall(),
-        }
+        as_first = c.execute(
+            f'SELECT * FROM leaders WHERE name LIKE ? AND votes > ? AND naughty=0 ORDER BY {order} LIMIT ?',
+            (f'{egg} %', LEADER_THRESHOLD, limit),
+        ).fetchall()
+        if len(as_first) < limit:
+            rem = limit - len(as_first)
+            as_first.extend([{'name': f'{egg} {r["name"]}'} for r in c.execute(
+                'SELECT * FROM names WHERE naughty=0 AND (downvotes > ? OR downvotes > -(upvotes*3)) ORDER BY RANDOM() LIMIT ?',
+                (VOTE_THRESHOLD, rem),
+            )])
+
+        as_second = c.execute(
+            f'SELECT * FROM leaders WHERE name LIKE ? AND votes > ? AND naughty=0 ORDER BY {order} LIMIT ?',
+            (f'% {egg}', LEADER_THRESHOLD, limit),
+        ).fetchall()
+        if len(as_second) < limit:
+            rem = limit - len(as_second)
+            as_second.extend([{'name': f'{r["name"]} {egg}'} for r in c.execute(
+                'SELECT * FROM names WHERE naughty=0 AND (downvotes > ? OR downvotes > -(upvotes*3)) ORDER BY RANDOM() LIMIT ?',
+                (VOTE_THRESHOLD, rem),
+            )])
+
+    return {
+        'as_first': as_first,
+        'as_second': as_second,
+    }
 
 
 
