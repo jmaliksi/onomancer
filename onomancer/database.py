@@ -352,6 +352,15 @@ def annotate_egg(egg, first=0, second=0):
         c.execute('UPDATE names SET first_votes=first_votes+?, second_votes=second_votes+? WHERE name=?', (first, second, egg))
 
 
+def get_annotate_examples(egg, limit=5, rand=0):
+    order = 'RANDOM()' if rand else 'votes DESC'
+    with connect() as c:
+        return {
+            'as_first': c.execute(f'SELECT * FROM leaders WHERE name LIKE ? AND votes > ? ORDER BY {order} LIMIT ?', (f'{egg} %', LEADER_THRESHOLD, limit)).fetchall(),
+            'as_second': c.execute(f'SELECT * FROM leaders WHERE name LIKE ? AND votes > ? ORDER BY {order} LIMIT ?', (f'% {egg}', LEADER_THRESHOLD, limit)).fetchall(),
+        }
+
+
 
 def load():
     conn = sqlite3.connect(DB_NAME)

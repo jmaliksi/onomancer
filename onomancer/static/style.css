@@ -270,3 +270,25 @@ a {
     color: #444;
     cursor: default;
 }
+
+.annotateExamples {
+    display: flex;
+    flex-direction: row;
+    max-width: 40em;
+    margin: auto;
+    color: #ddd;
+    font-size: .9em;
+    animation-duration: .5s;
+    animation-name: annotateEx;
+}
+
+@keyframes annotateEx {
+    from {color: black;}
+    to {color: #ddd;}
+}
+
+.annotateExamples ul {
+    width: 40%;
+    list-style-type: none;
+    margin: auto;
+}

@@ -25,6 +25,22 @@
         Weak
     </label>
 </form>
+{% if examples %}
+<div class="annotateExamples">
+    <ul>
+        {% for n in examples['as_first'] %}
+        <li>{{n['name']}}</li>
+        {% endfor %}
+    </ul>
+    <ul>
+        {% for n in examples['as_second'] %}
+        <li>{{n['name']}}</li>
+        {% endfor %}
+    </ul>
+</div>
+<p>&nbsp;</p>
+{% endif %}
+<a href="/annotate?name={{super_secret(name, rotkey)}}&examples=1">examples</a>
 <a href="/annotate">skip</a>
 <a href="/annotate?name={{super_secret(name, rotkey)}}&flagForm=1">flag</a>
 {% if flag_form %}

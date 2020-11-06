@@ -221,6 +221,10 @@ def annotate():
     flag = 'flagForm' in request.args
     if flag:
         message = 'What is your reason for flagging this egg?'
+    examples = {}
+    if 'examples' in request.args:
+        message = 'Observe context...'
+        examples = database.get_annotate_examples(name)
     # rotkey already set by posts
     return make_response(render_template(
         'annotate.html',
@@ -228,6 +232,7 @@ def annotate():
         flag_form=flag,
         message=message,
         rotkey=session['USER_CSRF'] + session['rotkey'],
+        examples=examples,
     ))
 
 
