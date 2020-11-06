@@ -560,7 +560,7 @@ def collect():
         saves=saves,
     ))
     if request.args.get('save'):
-        res.set_cookie(request.args['save'], value=friend_code)
+        res.set_cookie(request.args['save'], value=friend_code, max_age=100000000)
     if request.args.get('clear'):
         res.delete_cookie(request.args['clear'])
     return res
