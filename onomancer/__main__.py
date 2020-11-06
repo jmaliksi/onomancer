@@ -84,6 +84,7 @@ def super_safe_decrypt(a, b):
 
 
 app.jinja_env.globals.update(super_secret=super_safe_encrypt)
+app.jinja_env.globals.update(testing=lambda: app.debug)
 
 
 @app.before_request
@@ -167,6 +168,65 @@ def vote(message=''):
     ))
     session['rotkey'] = rotkey
     return res
+
+
+@app.route('/annotate', methods=['GET', 'POST'], strict_slashes=False)
+@require_csrf
+def annotate():
+    message = 'The margins stained...'
+
+    if request.method == 'POST':
+        name = request.form['name']
+        rotkey = session['rotkey']
+        name = super_safe_decrypt(
+            urllib.parse.unquote(name),
+            session['PREV_NONCE'] + rotkey,
+        )
+        message = 'A note taken. '
+        judgement = ord(request.form['judgement'])
+        if judgement == 128072:  # left
+            database.annotate_egg(name, first=1)
+            message += 'The ink shifts left...'
+        elif judgement == 128073:  # right
+            database.annotate_egg(name, second=1)
+            message += 'The ink shifts right...'
+        elif judgement == 128588:
+            database.annotate_egg(name, first=1, second=1)
+            message += random.choice([
+                'The ink swirls...',
+                'The ink settles...',
+            ])
+        elif judgement == 128078:
+            database.upvote_name(name, thumbs=-1)
+            message += 'The ink fades...'
+
+        rotkey = secrets.token_urlsafe(100)
+        session['rotkey'] = rotkey
+
+    name = request.args.get('name', None)
+    if not name:
+        name = database.get_eggs(limit=1, rand=1)[0]
+    else:
+        rotkey = session['rotkey']
+        if rotkey:
+            name = super_safe_decrypt(name, session['USER_CSRF'] + rotkey)
+        try:
+            name = _process_name(name)
+        except ValueError:
+            name = database.get_eggs(limit=1, rand=1)[0]
+            message = 'Naughty...'
+
+    flag = 'flagForm' in request.args
+    if flag:
+        message = 'What is your reason for flagging this egg?'
+    # rotkey already set by posts
+    return make_response(render_template(
+        'annotate.html',
+        name=name,
+        flag_form=flag,
+        message=message,
+        rotkey=session['USER_CSRF'] + session['rotkey'],
+    ))
 
 
 @app.route('/leaderboard')
@@ -337,6 +397,7 @@ def get_bad_eggs(key):
 @app.route('/flag', methods=['POST'])
 @require_csrf
 def flag():
+    is_egg = request.form.get('egg', False)
     name = super_safe_decrypt(
         urllib.parse.unquote(request.form['name']),
         session['PREV_NONCE'] + session['rotkey'],
@@ -346,16 +407,19 @@ def flag():
         rotkey = secrets.token_urlsafe(100)
         session['rotkey'] = rotkey
         return make_response(render_template(
-            'vote.html',
+            'annotate.html' if is_egg else 'vote.html',
             name=name,
             message='Provide a reason.',
             rotkey=session['USER_CSRF'] + rotkey,
             flag_form=True,
         ))
-    database.flag_name(name, reason)
+    if is_egg:
+        database.flag_egg(name, reason)
+    else:
+        database.flag_name(name, reason)
     rotkey = secrets.token_urlsafe(100)
     session['rotkey'] = rotkey
-    return vote()
+    return redirect(url_for('annotate')) if is_egg else vote()
 
 
 @app.route('/moderate/admin-eggs/<key>', methods=['GET', 'POST'], strict_slashes=False)

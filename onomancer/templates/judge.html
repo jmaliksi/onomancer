@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block subNav %}
+    <a href="/vote">Adjudicate</a>
+    <a href="/annotate">Annotate</a>
+{% endblock %}
+{% block content %}
+<div class="center">
+    <span>{% block cta %}{% endblock%}</span>
+    <h1 class="name">{{name}}</h1>
+    {% block console %}{% endblock %}
+    <p class="message">{{message}}</p>
+</div>
+{% endblock %}

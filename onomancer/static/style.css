@@ -79,6 +79,23 @@ a {
     min-width: 3em;
     border: 0;
     cursor: pointer;
+    flex-grow: 1;
+}
+
+#judgeForm label {
+    display: inline-flex;
+    align-items: center;
+    flex-direction: column;
+    white-space: normal;
+    min-width: 3em;
+    max-width: 100px;
+    width: 15%;
+    font-size: .8em;
+    color: #ccc;
+}
+
+#judgeForm>label>input {
+    width: 100%;
 }
 
 .center {

@@ -1,0 +1,36 @@
+{% extends "judge.html" %}
+{% block cta %}Note onomastic positioning...{% endblock %}
+{% block console %}
+<form id="judgeForm" method="post" action="/annotate">
+    {{ csrf_html(session['USER_CSRF'])|safe }}
+    <input type="hidden" name="name" value="{{super_secret(name, rotkey)}}" />
+    <label>
+        <input type="submit" name="judgement" value="&#128072"/>
+        Left Name
+    </label>
+    <label>
+        <input type="submit" name="judgement" value="&#128073"/>
+        Right Name
+    </label>
+    <label>
+        <input type="submit" name="judgement" value="&#128588"/>
+        Ambidextrous
+    </label>
+    <label>
+        <input type="submit" name="judgement" value="&#128078"/>
+        Weak
+    </label>
+</form>
+<a href="/annotate">skip</a>
+<a href="/annotate?name={{super_secret(name, rotkey)}}&flagForm=1">flag</a>
+{% if flag_form %}
+<p>&nbsp;</p>
+<form id="flagForm" method="post" action="/flag">
+    {{ csrf_html(session['USER_CSRF'])|safe }}
+    <input type="hidden" name="name" value="{{super_secret(name, rotkey)}}" />
+    <input type="hidden" name="egg" value="1" />
+    <input type="text" name="reason" autofocus/>
+    <input type="submit" alt="flag" name="flag" value="Flag"/>
+</form>
+{% endif %}
+{% endblock %}

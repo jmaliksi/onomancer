@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if testing() %}
+    <link rel="shortcut icon" href="{{url_for('static', filename='crystal-ball2.png')}}" />
+    {% else %}
+    <link rel="shortcut icon" href="{{url_for('static', filename='crystal-ball.png')}}" />
+    {% endif %}
 </head>
 <body>
     <a href="/moderate/{{key}}">Moderate</a>
@@ -49,6 +54,8 @@
         <li>Upvotes: {{name['upvotes']}}</li>
         <li>Downvotes: {{name['downvotes']}}</li>
         <li>Naughty: {{naughty_map(name['naughty'])}}</li>
+        <li>Left: {{name['first_votes']}}</li>
+        <li>Right: {{name['second_votes']}}</li>
     </ul>
     <form action="/moderate/admin-eggs/{{key}}" method="post">
         {{ csrf_html(session['USER_CSRF'])|safe }}

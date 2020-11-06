@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if testing() %}
+    <link rel="shortcut icon" href="{{url_for('static', filename='crystal-ball2.png')}}" />
+    {% else %}
+    <link rel="shortcut icon" href="{{url_for('static', filename='crystal-ball.png')}}" />
+    {% endif %}
 </head>
 <body>
     <a href="/moderate/{{key}}">Refresh</a>
@@ -26,7 +31,10 @@
     <form action="/moderate/{{key}}/eggs" method="post">
         {{ csrf_html(session['USER_CSRF'])|safe }}
         {% for id_, name in eggs.items() %}
-        <p>{{name}}</p>
+        <p>{{name['name']}}</p>
+        {% if name['flag'] %}
+        <p><b>FLAGGED:</b> {{name['flag']}}</p>
+        {% endif %}
         <input type="radio" id="good{{id_}}" name="{{id_}}" value="good" />
         <label for="good{{id_}}">good</label>
         <input type="radio" id="bad{{id_}}" name="{{id_}}" value="bad" />

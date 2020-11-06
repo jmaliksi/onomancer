@@ -4,7 +4,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    {% if testing() %}
+    <link rel="shortcut icon" href="{{url_for('static', filename='aquarium2.png')}}" />
+    {% else %}
     <link rel="shortcut icon" href="{{url_for('static', filename='aquarium.png')}}" />
+    {% endif %}
     <title>Onomancer</title>
 </head>
 <body>
@@ -20,8 +24,8 @@
         <div id="header">{% block header %}{% endblock %}</div>
         <div id="content">{% block content %}{% endblock %}</div>
         <div id="footer">
-            <a href="https://blaseball.com">Blaseball</a>
-            <a href="https://github.com/jmaliksi/onomancer">GitHub</a>
+            <a href="https://blaseball.com" target="_blank">Blaseball</a>
+            <a href="https://github.com/jmaliksi/onomancer" target="_blank">GitHub</a>
             <a href="/about">what</a>
         </div>
     </div>

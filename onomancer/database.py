@@ -137,8 +137,24 @@ def get_random_name():
     with conn:
         if random.random() > .2:
             rows = conn.execute(
-                f'SELECT name FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 3)) ORDER BY RANDOM() LIMIT 2')
-            name = ' '.join([row['name'] for row in rows])
+                f'SELECT * FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 3)) ORDER BY RANDOM() LIMIT 2').fetchall()
+
+            # choose which goes first and second
+            # roll die between whether combined firsts or seconds the chooser
+            # lol what is this mess
+            total_first_votes = rows[0]['first_votes'] + rows[1]['second_votes'] + 1
+            total_second_votes = rows[0]['second_votes'] + rows[1]['second_votes'] + 1
+            if random.random() * (total_first_votes + total_second_votes) < total_first_votes:
+                if random.random() * total_first_votes < rows[0]['first_votes']:
+                    name = f'{rows[0]["name"]} {rows[1]["name"]}'
+                else:
+                    name = f'{rows[1]["name"]} {rows[0]["name"]}'
+            else:
+                if random.random() * total_second_votes < rows[0]['second_votes']:
+                    name = f'{rows[1]["name"]} {rows[0]["name"]}'
+                else:
+                    name = f'{rows[0]["name"]} {rows[1]["name"]}'
+
             votes = conn.execute(f'SELECT * FROM leaders WHERE name = ? AND votes <= {LEADER_THRESHOLD} LIMIT 1', (name,))
             if not votes.fetchone():
                 return name
@@ -165,7 +181,7 @@ def get_mod_list():
                 r['id']: r for r in conn.execute('SELECT * FROM leaders WHERE naughty = 1')
             },
             'eggs': {
-                r['id']: r['name'] for r in conn.execute('SELECT * FROM names WHERE naughty = 1')
+                r['id']: r for r in conn.execute('SELECT * FROM names WHERE naughty = 1')
             },
         }
 
@@ -222,7 +238,7 @@ def mark_naughty(id_, is_leader=True, naughty=-1):
 
 def reset_egg(id_):
     with connect() as conn:
-        conn.execute('UPDATE names SET upvotes=0, downvotes=0 WHERE id = ?', (id_, ))
+        conn.execute('UPDATE names SET upvotes=0, downvotes=0, first_votes=0, second_votes=0 WHERE id = ?', (id_, ))
 
 
 def reset_leader(id_):
@@ -270,6 +286,11 @@ def random_pool(count=100):
 def flag_name(name, reason):
     with connect() as conn:
         conn.execute('INSERT INTO leaders (name, votes, naughty, flag) VALUES (?, 0, 1, ?) ON CONFLICT (name) DO UPDATE SET flag=?, naughty=1', (name, reason, reason))
+
+
+def flag_egg(name, reason):
+    with connect() as conn:
+        conn.execute('UPDATE names SET naughty=1,flag=? WHERE name=?', (reason, name))
 
 
 def collect(friends=14, threshold=1):
@@ -324,6 +345,11 @@ def get_eggs(threshold=0, limit=100, offset=0, rand=0):
                 (threshold, offset, limit),
             )
         ]
+
+
+def annotate_egg(egg, first=0, second=0):
+    with connect() as c:
+        c.execute('UPDATE names SET first_votes=first_votes+?, second_votes=second_votes+? WHERE name=?', (first, second, egg))
 
 
 
