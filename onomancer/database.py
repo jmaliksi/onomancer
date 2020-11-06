@@ -311,18 +311,19 @@ def get_collection_ids(names):
 
 def get_names_from_ids(ids):
     with connect() as conn:
-        print(ids)
         rows = conn.execute(f'SELECT * FROM leaders WHERE id IN ({",".join(["?"] * len(ids))})', ids)
         res = {r['id']: r['name'] for r in rows}
         return [res[id_] if id_ in res else '-' for id_ in ids]
 
 
-def hash_dump():
-    with connect() as c:
-        return [
-            [name['name'], hash(name['name'])] for name in
-            c.execute('SELECT * FROM leaders WHERE naughty = 0')
-        ]
+def dump_names():
+    with connect() as conn:
+        return [dict(r) for r in conn.execute('SELECT * FROM names')]
+
+
+def dump_leaders():
+    with connect() as conn:
+        return [dict(r) for r in conn.execute('SELECT * FROM leaders')]
 
 
 def get_names(threshold=0, limit=100, offset=0, rand=0):

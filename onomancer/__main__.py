@@ -615,11 +615,20 @@ def _uncurse_collection(code):
     return database.get_names_from_ids(ids)
 
 
-@app.route('/moderate/dump/<key>')
-def mod_dump(key):
+@app.route('/moderate/dumpEggs/<key>')
+@limiter.limit('1/minute')
+def mod_dump_eggs(key):
     if app.config['MOD_KEY'] != key:
         return redirect(url_for('what'))
-    return jsonify(database.hash_dump())
+    return jsonify(database.dump_names())
+
+
+@app.route('/moderate/dumpNames/<key>')
+@limiter.limit('1/minute')
+def mod_dump_names(key):
+    if app.config['MOD_KEY'] != key:
+        return redirect(url_for('what'))
+    return jsonify(database.dump_leaders())
 
 
 @app.route('/api/getName')
