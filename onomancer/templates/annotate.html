@@ -1,5 +1,5 @@
 {% extends "judge.html" %}
-{% block cta %}Formuate onomastic bearings...{% endblock %}
+{% block cta %}Measure bearings...{% endblock %}
 {% block console %}
 <form id="judgeForm" method="post" action="/annotate">
     {{ csrf_html(session['USER_CSRF'])|safe }}
