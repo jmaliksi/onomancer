@@ -199,6 +199,8 @@ def annotate():
         elif judgement == 128078:
             database.upvote_name(name, thumbs=-1)
             message += 'The ink fades...'
+        elif judgement == 129335:
+            message = 'The next line...'
 
         rotkey = secrets.token_urlsafe(100)
         session['rotkey'] = rotkey

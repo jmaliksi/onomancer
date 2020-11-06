@@ -96,6 +96,7 @@ a {
 
 #judgeForm>label>input {
     width: 100%;
+    min-width: 1em;
 }
 
 .center {
