@@ -5,8 +5,8 @@
     <meta name="description" content="Distill the Ultimate Blaseball Name.">
     <meta name="robots" content="index, nofollow">
 
-    <meta name="twitter:title" content="{{ share_name or 'Onomancer' }}">
-    <meta name="twitter:description" content="Distill the Ultimate Blaseball Name.">
+    <meta name="twitter:title" content="{{ share_title or 'Onomancer' }}">
+    <meta name="twitter:description" content="{{ share_desc or 'Distill the Ultimate Blaseball Name.'}}">
     <meta property="twitter:card" content="summary">
     {% if share_image %}
     <meta name="twitter:image" content="{{share_image}}">
@@ -14,8 +14,8 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://onomancer.sibr.dev">
-    <meta property="og:title" content="{{ share_name or 'Onomancer' }}">
-    <meta property="og:description" content="Distill the Ultimate Blaseball Name.">
+    <meta property="og:title" content="{{ share_title or 'Onomancer' }}">
+    <meta property="og:description" content="{{ share_desc or 'Distill the Ultimate Blaseball Name.'}}">
     {% if share_image %}
     <meta property="og:image" content="{{share_image}}">
     {% endif %}

@@ -136,8 +136,12 @@ def get_random_name():
     conn = connect()
     with conn:
         if random.random() > .2:
+            order = 'RANDOM()'
+            if random.random() < .3:
+                # try weighting by new names
+                order = '(1+upvotes-downvotes), RANDOM()'
             rows = conn.execute(
-                f'SELECT * FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 3)) ORDER BY RANDOM() LIMIT 2').fetchall()
+                f'SELECT * FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 3)) ORDER BY {order} LIMIT 2').fetchall()
 
             # choose which goes first and second
             # roll die between whether combined firsts or seconds the chooser
@@ -295,7 +299,7 @@ def flag_egg(name, reason):
 
 def collect(friends=14, threshold=1):
     with connect() as conn:
-        res = conn.execute('SELECT * FROM leaders WHERE naughty = 0 AND votes >= ? ORDER BY RANDOM () LIMIT ?', (threshold, friends))
+        res = conn.execute('SELECT * FROM leaders WHERE naughty = 0 AND votes >= ? ORDER BY RANDOM() LIMIT ?', (threshold, friends))
         return [r['name'] for r in res]
 
 
