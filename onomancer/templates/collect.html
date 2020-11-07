@@ -13,9 +13,9 @@
 </span>
 <div class="collect">
     <h3>Lineup</h3>
-    {% for (name, stars, halfstar) in lineup %}
+    {% for (name, stars, halfstar, anim) in lineup %}
     <div class="collectRow">
-        <div class="collectColumn nameCol">
+        <div class="collectColumn nameCol {{anim}}">
             <form action="collect" method="post" class="inlineForm">
                 {{ csrf_html(session['USER_CSRF'])|safe }}
                 <input type="hidden" name="name" value="{{super_secret(name, token)}}"/>
@@ -43,9 +43,9 @@
     </div>
     {% endfor %}
     <h3>Rotation</h3>
-    {% for (name, stars, halfstar) in rotation %}
+    {% for (name, stars, halfstar, anim) in rotation %}
     <div class="collectRow">
-        <div class="collectColumn nameCol">
+        <div class="collectColumn nameCol {{anim}}">
             <form action="collect" method="post" class="inlineForm">
                 {{ csrf_html(session['USER_CSRF'])|safe }}
                 <input type="hidden" name="name" value="{{super_secret(name, token)}}"/>

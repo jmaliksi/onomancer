@@ -496,21 +496,31 @@ def collect():
             urllib.parse.unquote(request.form['name']),
             token * 10,
         )
+        anim = {}
         if command == 'flip':
             flipped = ' '.join(name_to_burn.split(' ')[::-1])
             database.upvote_name(flipped, thumbs=0)
             collection[collection.index(name_to_burn)] = flipped
+            anim = {'type': 'reverb', 'who': flipped}
         elif command == 'fire':
-            collection[collection.index(name_to_burn)] = database.collect(1)[0]
+            rookie = database.collect(1)[0]
+            collection[collection.index(name_to_burn)] = rookie
+            anim = {'type': 'burning', 'who': rookie}
         elif command == 'reverb':
             collection = sorted(collection, key=lambda _: random.random())
+            anim = {'type': 'reverb_all', 'who': None}
         elif command == 'fireworks':
-            return redirect(url_for('collect'))
-        return redirect(url_for(
+            anim = {'type': 'burn_all', 'who': None}
+            res = redirect(url_for('collect'))
+            res.set_cookie('anim', json.dumps(anim), max_age=10)
+            return res
+        res = redirect(url_for(
             'collect',
             t=token[:8],
             f=_curse_collection(*collection),
         ))
+        res.set_cookie('anim', json.dumps(anim), max_age=10)
+        return res
     token = request.args.get('token') or request.args.get('t')
     if not token:
         token = secrets.token_hex(4)
@@ -519,31 +529,36 @@ def collect():
             t=token,
             f=_curse_collection(*database.collect()),
         ))
+
+    anim = request.cookies.get('anim', {})
+    if anim:
+        anim = json.loads(anim)
+
     saves = {
         'save1': request.cookies.get('save1'),
         'save2': request.cookies.get('save2'),
         'save3': request.cookies.get('save3'),
     }
     # f is for friends
-    if request.args.get('collection') or request.args.get('c'):
-        # legacy
-        collection = [
-            (
-                super_safe_decrypt(name, token * 10),
-                range(_curse_name(name)[0]),
-                _curse_name(name)[1],
-            )
-            for name in (request.args.getlist('c') or request.args.getlist('collection'))
-        ]
-    elif request.args.get('load'):
+    if request.args.get('load'):
         loaded = saves[request.args['load']]
         collection = [
-            (name, range(_curse_name(name)[0]), _curse_name(name)[1])
+            (
+                name,
+                range(_curse_name(name)[0]),
+                _curse_name(name)[1],
+                '',
+            )
             for name in _uncurse_collection(loaded)
         ]
     else:
         collection = [
-            (name, range(_curse_name(name)[0]), _curse_name(name)[1])
+            (
+                name,
+                range(_curse_name(name)[0]),
+                _curse_name(name)[1],
+                _get_animation(name, anim),
+            )
             for name in _uncurse_collection(request.args['f'])
         ]
     friends = [n[0] for n in collection]
@@ -571,6 +586,19 @@ def collect():
     if request.args.get('clear'):
         res.delete_cookie(request.args['clear'])
     return res
+
+
+def _get_animation(name, anim):
+    if not anim:
+        return ''
+    if anim['type'] == 'reverb_all':
+        return 'reverb'
+    if anim['type'] == 'burn_all':
+        return 'burning'
+    if anim['who'] == name:
+        return anim['type']
+    return ''
+
 
 @functools.lru_cache()
 def _curse_name(name):

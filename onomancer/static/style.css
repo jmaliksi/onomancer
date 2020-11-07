@@ -27,6 +27,13 @@ h1.name {
     font-size: 3em;
     margin: 15px;
     line-height: 1em;
+    animation-duration: .5s;
+    animation-name: fadeInName;
+}
+
+@keyframes fadeInName {
+    from {color: black;}
+    to {color:inherit}
 }
 
 #content {
@@ -230,6 +237,39 @@ a {
 .nameCol {
     flex: 2;
     display: inline;
+}
+
+.burning {
+    animation-duration: 1s;
+    animation-name: burnInName;
+}
+
+@keyframes burnInName {
+    from {
+        color: black;
+        background-color: red;
+    }
+
+    to {
+        color: white;
+        background-color: black;
+    }
+}
+
+.reverb {
+    animation-duration: .5s;
+    animation-name: reverbName;
+}
+
+@keyframes reverbName {
+    from {
+        color: black;
+        letter-spacing: -.5em;
+    }
+    to {
+        color: white;
+        letter-spacing: inherit;
+    }
 }
 
 .nameCol form {
