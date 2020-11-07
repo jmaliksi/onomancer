@@ -1,7 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>Onomancer</title>
+    <meta name="description" content="Distill the Ultimate Blaseball Name.">
+    <meta name="robots" content="index, nofollow">
+
+    <meta name="twitter:title" content="{{ share_name or 'Onomancer' }}">
+    <meta name="twitter:description" content="Distill the Ultimate Blaseball Name.">
+    <meta property="twitter:card" content="summary">
+    {% if share_image %}
+    <meta name="twitter:image" content="{{share_image}}">
+    {% endif %}
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://onomancer.sibr.dev">
+    <meta property="og:title" content="{{ share_name or 'Onomancer' }}">
+    <meta property="og:description" content="Distill the Ultimate Blaseball Name.">
+    {% if share_image %}
+    <meta property="og:image" content="{{share_image}}">
+    {% endif %}
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     {% if testing() %}
@@ -9,7 +30,6 @@
     {% else %}
     <link rel="shortcut icon" href="{{url_for('static', filename='aquarium.png')}}" />
     {% endif %}
-    <title>Onomancer</title>
 </head>
 <body>
     <div id="container">
