@@ -470,8 +470,13 @@ def load():
 
 def backfill_guids():
     with connect() as c:
-        c.execute('UPDATE leaders SET guid=? WHERE guid IS NULL', (str(uuid.uuid4()),))
-        c.execute('UPDATE names SET guid=? WHERE guid IS NULL', (str(uuid.uuid4()),))
+        rows = c.execute('SELECT id FROM leaders WHERE guid IS NULL').fetchall()
+        for row in rows:
+            c.execute('UPDATE leaders SET guid=? WHERE id=?', (str(uuid.uuid4()), row['id'],))
+        rows = c.execute('SELECT id FROM names WHERE guid IS NULL').fetchall()
+        for row in rows:
+            c.execute('UPDATE names SET guid=? WHERE id=?', (str(uuid.uuid4()), row['id'],))
+
 
 
 if __name__ == '__main__':
