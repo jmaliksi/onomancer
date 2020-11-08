@@ -1,6 +1,7 @@
 import random
 import sqlite3
 import sys
+import uuid
 
 DB_NAME = 'data/onomancer.db'
 VOTE_THRESHOLD = -15
@@ -25,6 +26,8 @@ def bootstrap():
             conn.execute('ALTER TABLE names ADD COLUMN flag TEXT')
             conn.execute('ALTER TABLE names ADD COLUMN first_votes INTEGER DEFAULT 0')
             conn.execute('ALTER TABLE names ADD COLUMN second_votes INTEGER DEFAULT 0')
+            conn.execute('ALTER TABLE names ADD COLUMN guid TEXT')
+            conn.execute('CREATE UNIQUE INDEX idx_names_guid ON names (guid)')
         except Exception:
             pass
 
@@ -34,6 +37,8 @@ def bootstrap():
             conn.execute('CREATE UNIQUE INDEX idx_leaders_name ON leaders (name)')
             conn.execute('ALTER TABLE leaders ADD COLUMN naughty INTEGER DEFAULT 0')
             conn.execute('ALTER TABLE leaders ADD COLUMN flag TEXT')
+            conn.execute('ALTER TABLE leaders ADD COLUMN guid TEXT')
+            conn.execute('CREATE UNIQUE INDEX idx_leaders_guid ON names (guid)')
         except Exception:
             pass
 
@@ -54,16 +59,17 @@ def clear():
 def migrate():
     conn = connect()
     with conn:
-        conn.execute('ALTER TABLE names ADD COLUMN flag TEXT')
-        conn.execute('ALTER TABLE names ADD COLUMN first_votes INTEGER DEFAULT 0')
-        conn.execute('ALTER TABLE names ADD COLUMN second_votes INTEGER DEFAULT 0')
+        conn.execute('ALTER TABLE names ADD COLUMN guid TEXT')
+        conn.execute('CREATE UNIQUE INDEX idx_names_guid ON names (guid)')
+        conn.execute('ALTER TABLE leaders ADD COLUMN guid TEXT')
+        conn.execute('CREATE UNIQUE INDEX idx_leaders_guid ON names (guid)')
 
 
 def add_name(name):
     name = name.replace(' ', u"\u00A0")  # replace with nonbreaking space
     conn = connect()
     with conn:
-        conn.execute('INSERT INTO names (name, upvotes, downvotes, naughty) VALUES (?, 0, 0, 1) ON CONFLICT (name) DO UPDATE SET upvotes = upvotes', (name,))
+        conn.execute('INSERT INTO names (name, upvotes, downvotes, naughty, guid) VALUES (?, 0, 0, 1, ?) ON CONFLICT (name) DO UPDATE SET upvotes = upvotes', (name, str(uuid.uuid4())))
     return name
 
 
@@ -88,7 +94,7 @@ def upvote_name(name, thumbs=1):
             for egg in eggs:
                 n = conn.execute('SELECT * FROM names WHERE name = ?', (egg,)).fetchone()
                 if not n:
-                    conn.execute('INSERT INTO names (name, upvotes, downvotes, naughty) VALUES (?, 0, 0, 1)', (egg,))
+                    conn.execute('INSERT INTO names (name, upvotes, downvotes, naughty, guid) VALUES (?, 0, 0, 1, ?)', (egg, str(uuid.uuid4())))
                 if not n or n['naughty'] != 0:
                     naughty = 1
 
@@ -102,7 +108,7 @@ def upvote_name(name, thumbs=1):
         if thumbs < 0 and check_egg_threshold(name):
             mult = 2
 
-        conn.execute('INSERT INTO leaders (name, votes, naughty) VALUES (?, ?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, naughty, thumbs * mult))
+        conn.execute('INSERT INTO leaders (name, votes, naughty, guid) VALUES (?, ?, ?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, naughty, str(uuid.uuid4()), thumbs * mult))
 
 
 def flip_leader(name):
@@ -112,7 +118,7 @@ def flip_leader(name):
         flipped = ' '.join(name.split(' ')[::-1])
         sibling = c.execute('SELECT * FROM leaders WHERE name = ?', (flipped,)).fetchone()
         if not sibling:
-            c.execute('INSERT INTO leaders (name, votes, naughty) VALUES (?, 0, 0)', (flipped,))
+            c.execute('INSERT INTO leaders (name, votes, naughty, guid) VALUES (?, 0, 0, ?)', (flipped, str(uuid.uuid4())))
             sibling_votes = 0
         else:
             sibling_votes = sibling['votes']
@@ -137,11 +143,15 @@ def get_random_name():
     with conn:
         if random.random() > .2:
             order = 'RANDOM()'
-            if random.random() < .3:
-                # try weighting by new names
-                order = '(1+upvotes-downvotes), RANDOM()'
-            rows = conn.execute(
-                f'SELECT * FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 3)) ORDER BY {order} LIMIT 2').fetchall()
+            if random.random() < .25:
+                rows = conn.execute(
+                    'SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR downvotes>-(upvotes*3)) ORDER BY upvotes-downvotes LIMIT 50',
+                    (VOTE_THRESHOLD,),
+                ).fetchall()
+                rows = sorted(rows, key=lambda _: random.random())
+            else:
+                rows = conn.execute(
+                    f'SELECT * FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 3)) ORDER BY RANDOM() LIMIT 2').fetchall()
 
             # choose which goes first and second
             # roll die between whether combined firsts or seconds the chooser
@@ -289,7 +299,7 @@ def random_pool(count=100):
 
 def flag_name(name, reason):
     with connect() as conn:
-        conn.execute('INSERT INTO leaders (name, votes, naughty, flag) VALUES (?, 0, 1, ?) ON CONFLICT (name) DO UPDATE SET flag=?, naughty=1', (name, reason, reason))
+        conn.execute('INSERT INTO leaders (name, votes, naughty, flag, guid) VALUES (?, 0, 1, ?, ?) ON CONFLICT (name) DO UPDATE SET flag=?, naughty=1', (name, reason, str(uuid.uuid4()), reason))
 
 
 def flag_egg(name, reason):
@@ -453,33 +463,20 @@ def load():
     with conn:
         for name in names:
             try:
-                conn.execute('INSERT INTO names (name) VALUES (?)', (name,))
+                conn.execute('INSERT INTO names (name, guid) VALUES (?, ?)', (name, str(uuid.uuid4())))
             except Exception:
                 pass
 
 
-def replace_whitespace(dry=True):
+def backfill_guids():
     with connect() as c:
-        print('total rows')
-        print(dict(c.execute('SELECT count(*) FROM names').fetchone()))
-        print('rows found')
-        names = c.execute('SELECT * FROM names WHERE name LIKE "% %"').fetchall()
-        print(len(names))
-        print('replacing')
-        for name in names:
-            print('UPDATE names SET name=? WHERE name=?', (name['name'].replace(' ', u'\u00A0'), name['name']))
-            if dry:
-                continue
-            c.execute('UPDATE names SET name=? WHERE name=?', (name['name'].replace(' ', u'\u00A0'), name['name']))
-        if not dry:
-            c.execute('DELETE FROM leaders WHERE name LIKE "% % %"')
+        c.execute('UPDATE leaders SET guid=? WHERE guid IS NULL', (str(uuid.uuid4()),))
+        c.execute('UPDATE names SET guid=? WHERE guid IS NULL', (str(uuid.uuid4()),))
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 3 and sys.argv[1] == 'purge':
         purge(sys.argv[2])
-    elif len(sys.argv) == 3 and sys.argv[1] == 'whitespace':
-        replace_whitespace(dry=sys.argv[2] != 'what')
     else:
         for arg in sys.argv:
             if arg == 'clear':
