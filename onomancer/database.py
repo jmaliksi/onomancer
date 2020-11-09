@@ -13,8 +13,11 @@ VOTE_THRESHOLD = -15
 LEADER_THRESHOLD = -4
 
 
+with open('data/imagekit.key', 'r') as f:
+    imagekit_key = f.read()
+
 imagekit = ImageKit(
-    private_key='private_g0koygrdn2OgywMbmvDST+ourAM=', # TODO
+    private_key=imagekit_key,
     public_key='public_sb9Ym97kLySuXDx8WAm0OFVvmWg=',
     url_endpoint='https://ik.imagekit.io/4waizx9and',
 )
@@ -456,6 +459,27 @@ def get_image_url(name=None, guid=None):
     return img_url
 
 
+@functools.lru_cache(1024)
+def get_collection_image_url(*names):
+    name_string = '\n'.join(
+        ['Lineup', ''] +
+        list(names[:8]) +
+        ['', 'Rotation', ''] +
+        list(names[8:]))
+    img_url = imagekit.url({
+        'path': '/onomancer/black_rectangle_7xapQJdUh.jpg',
+        'transformation': [{
+            'ote': quote(base64.b64encode(name_string.encode('utf8')).decode('ascii')),
+            'overlay_text_font_family': 'Lora',
+            'overlay_text_font_size': 24,
+            'overlay_text_color': 'FFFFFF',
+            'otw': 900,
+            'oth': 600,
+        }],
+    })
+    return img_url
+
+
 def load():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
@@ -540,7 +564,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 3 and sys.argv[1] == 'purge':
         purge(sys.argv[2])
     elif len(sys.argv) == 3 and sys.argv[1] == 'img':
-        print(get_image_url(sys.argv[2]))
+        print(get_collection_image_url(*sys.argv[2].split(',')))
     else:
         for arg in sys.argv:
             if arg == 'clear':
