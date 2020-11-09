@@ -160,7 +160,7 @@ def get_random_name():
             order = 'RANDOM()'
             if random.random() < .25:
                 rows = conn.execute(
-                    'SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR downvotes>-(upvotes*3)) ORDER BY upvotes-downvotes LIMIT 50',
+                    'SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR downvotes>-(upvotes*3)) ORDER BY upvotes-downvotes LIMIT 100',
                     (VOTE_THRESHOLD,),
                 ).fetchall()
                 rows = sorted(rows, key=lambda _: random.random())
@@ -461,21 +461,48 @@ def get_image_url(name=None, guid=None):
 
 @functools.lru_cache(1024)
 def get_collection_image_url(*names):
-    name_string = '\n'.join(
-        ['Lineup', ''] +
-        list(names[:8]) +
-        ['', 'Rotation', ''] +
-        list(names[8:]))
-    img_url = imagekit.url({
-        'path': '/onomancer/black_rectangle_7xapQJdUh.jpg',
-        'transformation': [{
-            'ote': quote(base64.b64encode(name_string.encode('utf8')).decode('ascii')),
+    transforms = []
+    transforms.append({
+        'overlay_text': 'Lineup',
+        'overlay_text_typography': 'bold',
+        'overlay_text_font_family': 'Lora',
+        'overlay_text_font_size': 30,
+        'overlay_text_color': 'FFFFFF',
+        'overlay_y': 40,
+        'overlay_x': 250,
+    })
+    for i, name in enumerate(names[:9]):
+        transforms.append({
+            'ote': quote(base64.b64encode(name.encode('utf8')).decode('ascii')),
             'overlay_text_font_family': 'Lora',
             'overlay_text_font_size': 24,
             'overlay_text_color': 'FFFFFF',
-            'otw': 900,
-            'oth': 600,
-        }],
+            'overlay_y': 80 + (i * 26),
+            'overlay_x': 250,
+        })
+
+    transforms.append({
+        'overlay_text': 'Rotation',
+        'overlay_text_typography': 'bold',
+        'overlay_text_font_family': 'Lora',
+        'overlay_text_font_size': 30,
+        'overlay_text_color': 'FFFFFF',
+        'overlay_y': 340,
+        'overlay_x': 250,
+    })
+    for i, name in enumerate(names[9:]):
+        transforms.append({
+            'ote': quote(base64.b64encode(name.encode('utf8')).decode('ascii')),
+            'overlay_text_font_family': 'Lora',
+            'overlay_text_font_size': 24,
+            'overlay_text_color': 'FFFFFF',
+            'overlay_y': 380 + (i * 26),
+            'overlay_x': 250,
+        })
+
+    img_url = imagekit.url({
+        'path': '/onomancer/black_rectangle_7xapQJdUh.jpg',
+        'transformation': transforms,
     })
     return img_url
 

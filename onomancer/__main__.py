@@ -697,6 +697,27 @@ def shareName(guid):
     ))
 
 
+@app.route('/shareCollection/<friends>')
+def shareCollection(friends):
+    collection = [
+        (
+            name,
+            range(_curse_name(name)[0]),
+            _curse_name(name)[1],
+            '',
+        )
+        for name in _uncurse_collection(friends)
+    ]
+    img_url = database.get_collection_image_url(*[c[0] for c in collection])
+    return make_response(render_template(
+        'shareCollection.html',
+        lineup=collection[:9],
+        rotation=collection[9:],
+        message='Gathered and sowed...',
+        share_image=img_url
+    ))
+
+
 if __name__ == '__main__':
     debug = False
     if 'test' in sys.argv:

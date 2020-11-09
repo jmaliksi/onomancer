@@ -1,29 +1,11 @@
 {% extends "regard.html" %}
 {% block title %}Collection{% endblock %}
 {% block names %}
-<span>
-    <form action="collect" method="post" class="inlineForm toplineForm">
-        {{ csrf_html(session['USER_CSRF'])|safe }}
-        <input type="hidden" name="collection" value="{{collection}}"/>
-        <input type="hidden" name="token" value="{{token}}"/>
-        <button type="button" value="back" onclick="history.back()">&#9194</button>
-        <button type="submit" name="command" value="reverb">&#127754</button>
-        <button type="submit" name="command" value="fireworks">&#129512</button>
-    </form>
-</span>
 <div class="collect">
     <h3>Lineup</h3>
     {% for (name, stars, halfstar, anim) in lineup %}
     <div class="collectRow">
         <div class="collectColumn nameCol {{anim}}">
-            <form action="collect" method="post" class="inlineForm">
-                {{ csrf_html(session['USER_CSRF'])|safe }}
-                <input type="hidden" name="name" value="{{super_secret(name, token)}}"/>
-                <input type="hidden" name="collection" value="{{collection}}"/>
-                <input type="hidden" name="token" value="{{token}}"/>
-                <button type="submit" name="command" value="fire">&#128293</button>
-                <button type="submit" name="command" value="flip">&#128257</button>
-            </form>
             {{name}}
         </div>
         <div class="collectColumn stars">
@@ -46,14 +28,6 @@
     {% for (name, stars, halfstar, anim) in rotation %}
     <div class="collectRow">
         <div class="collectColumn nameCol {{anim}}">
-            <form action="collect" method="post" class="inlineForm">
-                {{ csrf_html(session['USER_CSRF'])|safe }}
-                <input type="hidden" name="name" value="{{super_secret(name, token)}}"/>
-                <input type="hidden" name="collection" value="{{collection}}"/>
-                <input type="hidden" name="token" value="{{token}}"/>
-                <button type="submit" name="command" value="fire">&#128293</button>
-                <button type="submit" name="command" value="flip">&#128257</button>
-            </form>
             {{name}}
         </div>
         <div class="collectColumn stars">
@@ -71,16 +45,5 @@
     </div>
     {% endfor %}
 </div>
-<div><p><small><a href="/shareCollection/{{friends}}" target="_blank">share</a></small></p></div>
-<div class="save">
-    {% for save_name, info in saves.items() %}
-    <form class="saveCol" action="collect" method="get">
-        <input type="hidden" name="t" value="{{token[:8]}}"/>
-        <input type="hidden" name="f" value="{{friends}}"/>
-        <button type="submit" name="save" value="{{save_name}}" class="saveButton">save</button>
-        <button type="submit" name="load" value="{{save_name}}" class="saveButton {% if not info %}unsaved{% endif %}" {% if not info %}disabled{% endif %}>load</button>
-        <button type="submit" name="clear" value="{{save_name}}" class="saveButton {% if not info %}unsaved{% endif %}" {% if not info %}disabled{% endif %}>clear</button>
-    </form>
-    {% endfor %}
-</div>
+<div><p><small><a href="/collect">Collect...</a></small></p></div>
 {% endblock %}
