@@ -13,8 +13,11 @@ VOTE_THRESHOLD = -15
 LEADER_THRESHOLD = -4
 
 
-with open('data/imagekit.key', 'r') as f:
-    imagekit_key = f.read()
+try:
+    with open('data/imagekit.key', 'r') as f:
+        imagekit_key = f.read()
+except Exception as e:
+    print(e)
 
 imagekit = ImageKit(
     private_key=imagekit_key,
