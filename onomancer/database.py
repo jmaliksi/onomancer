@@ -486,9 +486,8 @@ def get_collection_image_url(*names):
             'ote': quote(base64.b64encode((('•' * len(name[1])) + ('·' if name[2] else '')).encode('utf8')).decode('ascii')),
             'overlay_text_font_size': 40,
             'overlay_text_color': 'FFFFFF',
-            'overlay_text_font_family': 'Open sans',
-            'overlay_y': 75 + (i * 26),
-            'overlay_x': 550,
+            'overlay_y': 75 + (i * 27),
+            'overlay_x': 580,
         })
 
     transforms.append({
@@ -513,9 +512,8 @@ def get_collection_image_url(*names):
             'ote': quote(base64.b64encode((('•' * len(name[1])) + ('·' if name[2] else '')).encode('utf8')).decode('ascii')),
             'overlay_text_font_size': 40,
             'overlay_text_color': 'FFFFFF',
-            'overlay_text_font_family': 'Open sans',
-            'overlay_y': 375 + (i * 26),
-            'overlay_x': 550,
+            'overlay_y': 375 + (i * 27),
+            'overlay_x': 580,
         })
 
 
