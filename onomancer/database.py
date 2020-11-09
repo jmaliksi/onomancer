@@ -471,16 +471,24 @@ def get_collection_image_url(*names):
         'overlay_text_font_size': 30,
         'overlay_text_color': 'FFFFFF',
         'overlay_y': 50,
-        'overlay_x': 250,
+        'overlay_x': 400,
     })
     for i, name in enumerate(names[:9]):
         transforms.append({
-            'ote': quote(base64.b64encode(name.encode('utf8')).decode('ascii')),
+            'ote': quote(base64.b64encode(name[0].encode('utf8')).decode('ascii')),
             'overlay_text_font_family': 'Lora',
             'overlay_text_font_size': 21,
             'overlay_text_color': 'FFFFFF',
             'overlay_y': 90 + (i * 26),
             'overlay_x': 250,
+        })
+        transforms.append({
+            'ote': quote(base64.b64encode((('•' * len(name[1])) + ('·' if name[2] else '')).encode('utf8')).decode('ascii')),
+            'overlay_text_font_size': 40,
+            'overlay_text_color': 'FFFFFF',
+            'overlay_text_font_family': 'Open sans',
+            'overlay_y': 75 + (i * 26),
+            'overlay_x': 550,
         })
 
     transforms.append({
@@ -490,17 +498,26 @@ def get_collection_image_url(*names):
         'overlay_text_font_size': 30,
         'overlay_text_color': 'FFFFFF',
         'overlay_y': 350,
-        'overlay_x': 250,
+        'overlay_x': 400,
     })
     for i, name in enumerate(names[9:]):
         transforms.append({
-            'ote': quote(base64.b64encode(name.encode('utf8')).decode('ascii')),
+            'ote': quote(base64.b64encode(name[0].encode('utf8')).decode('ascii')),
             'overlay_text_font_family': 'Lora',
             'overlay_text_font_size': 21,
             'overlay_text_color': 'FFFFFF',
             'overlay_y': 390 + (i * 26),
             'overlay_x': 250,
         })
+        transforms.append({
+            'ote': quote(base64.b64encode((('•' * len(name[1])) + ('·' if name[2] else '')).encode('utf8')).decode('ascii')),
+            'overlay_text_font_size': 40,
+            'overlay_text_color': 'FFFFFF',
+            'overlay_text_font_family': 'Open sans',
+            'overlay_y': 375 + (i * 26),
+            'overlay_x': 550,
+        })
+
 
     img_url = imagekit.url({
         'path': '/onomancer/black_rectangle_7xapQJdUh.jpg',

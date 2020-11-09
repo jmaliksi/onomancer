@@ -604,15 +604,15 @@ def _get_animation(name, anim):
 
 @functools.lru_cache()
 def _curse_name(name):
-    h = hash(name)
-    half_star = h < 0
     try:
-        h = hash(name)
-        half_star = h < 0
+        h = int((''.join(str(ord(c)) for c in name) * 4)[:19])
+        half_star = h % 2 == 0
         h = str(int(abs(h)))
         rating = round((float(h[1:7]) + float(h[7:13]) + float(h[13:])) / 500000.0) - ((int(h[0]) % 3) - 1)
         return rating, half_star
     except Exception:
+        h = hash(name)
+        half_star = h < 0
         return h % 6, half_star
 
 
@@ -708,7 +708,7 @@ def shareCollection(friends):
         )
         for name in _uncurse_collection(friends)
     ]
-    img_url = database.get_collection_image_url(*[c[0] for c in collection])
+    img_url = database.get_collection_image_url(*collection)
     return make_response(render_template(
         'shareCollection.html',
         lineup=collection[:9],
