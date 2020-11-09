@@ -9,8 +9,8 @@ import uuid
 from imagekitio import ImageKit
 
 DB_NAME = 'data/onomancer.db'
-VOTE_THRESHOLD = -15
-LEADER_THRESHOLD = -4
+VOTE_THRESHOLD = -10
+LEADER_THRESHOLD = -2
 
 
 try:
@@ -162,18 +162,18 @@ def get_random_name():
             order = 'RANDOM()'
             if random.random() < .25:
                 rows = conn.execute(
-                    'SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR downvotes>-(upvotes*3)) ORDER BY upvotes-downvotes LIMIT 100',
+                    'SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR downvotes>-(upvotes*2)) ORDER BY upvotes-downvotes LIMIT 100',
                     (VOTE_THRESHOLD,),
                 ).fetchall()
                 if random.random() < .5:
                     rows.extend(conn.execute(
-                        'SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR downvotes>-(upvotes*3)) ORDER BY RANDOM() LIMIT 50',
+                        'SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR downvotes>-(upvotes*2)) ORDER BY RANDOM() LIMIT 50',
                         (VOTE_THRESHOLD,),
                     ).fetchall())
                 rows = sorted(rows, key=lambda _: random.random())
             else:
                 rows = conn.execute(
-                    f'SELECT * FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 3)) ORDER BY RANDOM() LIMIT 2').fetchall()
+                    f'SELECT * FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 2)) ORDER BY RANDOM() LIMIT 2').fetchall()
 
             # choose which goes first and second
             # roll die between whether combined firsts or seconds the chooser
@@ -195,15 +195,21 @@ def get_random_name():
             if not votes.fetchone():
                 return name
             # no good name gen, just pick something good from the leaderboard
-        rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY RANDOM() LIMIT 1')
-        return rows.fetchone()['name']
+        if random.random() < .25:
+            # pull something from the top of the board
+            rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes LIMIT 100').fetchall()
+            rows = sorted(rows, key=lambda _: random.random())
+            name = rows[0]['name']
+        else:
+            name = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY RANDOM() LIMIT 1').fetchone()['name']
+        return name
 
 
 def check_egg_threshold(fullname, threshold=VOTE_THRESHOLD):
     names = fullname.split(' ', 1)
     conn = connect()
     with conn:
-        rows = conn.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND downvotes < -(upvotes * 3))', names)
+        rows = conn.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND downvotes < -(upvotes * 2))', names)
         if rows.fetchone():
             return True
     return False
@@ -306,7 +312,7 @@ def admin_eggs():
     with connect() as conn:
         return {
             'naughty': [dict(r) for r in conn.execute('SELECT * FROM names WHERE naughty = -1')],
-            'measured': [dict(r) for r in conn.execute(f'SELECT * FROM names WHERE downvotes <= -(upvotes * 3) AND downvotes <= {VOTE_THRESHOLD}')],
+            'measured': [dict(r) for r in conn.execute(f'SELECT * FROM names WHERE downvotes <= -(upvotes * 2) AND downvotes <= {VOTE_THRESHOLD}')],
         }
 
 
@@ -405,7 +411,7 @@ def get_annotate_examples(egg, limit=5, rand=0):
         if len(as_first) < limit:
             rem = limit - len(as_first)
             as_first.extend([{'name': f'{egg} {r["name"]}'} for r in c.execute(
-                'SELECT * FROM names WHERE naughty=0 AND (downvotes > ? OR downvotes > -(upvotes*3)) ORDER BY RANDOM() LIMIT ?',
+                'SELECT * FROM names WHERE naughty=0 AND (downvotes > ? OR downvotes > -(upvotes*2)) ORDER BY RANDOM() LIMIT ?',
                 (VOTE_THRESHOLD, rem),
             )])
 
@@ -416,7 +422,7 @@ def get_annotate_examples(egg, limit=5, rand=0):
         if len(as_second) < limit:
             rem = limit - len(as_second)
             as_second.extend([{'name': f'{r["name"]} {egg}'} for r in c.execute(
-                'SELECT * FROM names WHERE naughty=0 AND (downvotes > ? OR downvotes > -(upvotes*3)) ORDER BY RANDOM() LIMIT ?',
+                'SELECT * FROM names WHERE naughty=0 AND (downvotes > ? OR downvotes > -(upvotes*2)) ORDER BY RANDOM() LIMIT ?',
                 (VOTE_THRESHOLD, rem),
             )])
 
