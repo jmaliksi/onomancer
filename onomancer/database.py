@@ -454,19 +454,19 @@ def get_image_url(name=None, guid=None):
         name = get_name_from_guid(guid)
     longest = max(*[len(n) for n in name.split(' ')])
     if longest > 20:
-        font_size = 72
+        font_size = 36
     elif longest > 10:
-        font_size = 100
+        font_size = 50
     else:
-        font_size = 150
+        font_size = 75
     img_url = imagekit.url({
-        'path': '/onomancer/black_rectangle_7xapQJdUh.jpg',
+        'path': '/onomancer/black_rectangle_90Zei2Nio.jpg',
         'transformation': [{
             'ote': quote(base64.b64encode(name.encode('utf8')).decode('ascii')),
             'overlay_text_font_family': 'Lora',
             'overlay_text_font_size': font_size,
             'overlay_text_color': 'FFFFFF',
-            'otw': 900,
+            'otw': 450,
         }],
     })
     return img_url
