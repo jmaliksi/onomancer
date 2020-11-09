@@ -16,15 +16,14 @@ LEADER_THRESHOLD = -4
 try:
     with open('data/imagekit.key', 'r') as f:
         imagekit_key = f.read()
+
+    imagekit = ImageKit(
+        private_key=imagekit_key,
+        public_key='public_sb9Ym97kLySuXDx8WAm0OFVvmWg=',
+        url_endpoint='https://ik.imagekit.io/4waizx9and',
+    )
 except Exception as e:
     print(e)
-
-imagekit = ImageKit(
-    private_key=imagekit_key,
-    public_key='public_sb9Ym97kLySuXDx8WAm0OFVvmWg=',
-    url_endpoint='https://ik.imagekit.io/4waizx9and',
-)
-
 
 def connect():
     conn = sqlite3.connect(DB_NAME)
