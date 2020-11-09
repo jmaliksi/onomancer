@@ -158,6 +158,7 @@ def vote(message=''):
     flag = 'flagForm' in request.args
     if flag:
         message = 'What is your reason for flagging this name?'
+    share_guid = database.share_guid(name)
     rotkey = secrets.token_urlsafe(100)
     res = make_response(render_template(
         'vote.html',
@@ -165,6 +166,7 @@ def vote(message=''):
         message=message,
         rotkey=session['USER_CSRF'] + rotkey,
         flag_form=flag,
+        share_guid=share_guid,
     ))
     session['rotkey'] = rotkey
     return res
@@ -681,6 +683,18 @@ def get_eggs():
     offset = int(request.args.get('offset', 0))
     rand = request.args.get('random', 0)
     return jsonify(database.get_eggs(threshold, limit, offset, rand))
+
+
+@app.route('/shareName/<guid>')
+def shareName(guid):
+    name = database.get_name_from_guid(guid)
+    img_url = database.get_image_url(name=name)
+    return make_response(render_template(
+        'share.html',
+        name=name,
+        message='The token shared...',
+        share_image=img_url,
+    ))
 
 
 if __name__ == '__main__':

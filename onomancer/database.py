@@ -1,11 +1,21 @@
+import functools
 import random
 import sqlite3
 import sys
 import uuid
 
+from imagekitio import ImageKit
+
 DB_NAME = 'data/onomancer.db'
 VOTE_THRESHOLD = -15
 LEADER_THRESHOLD = -4
+
+
+imagekit = ImageKit(
+    private_key='private_g0koygrdn2OgywMbmvDST+ourAM=', # TODO
+    public_key='public_sb9Ym97kLySuXDx8WAm0OFVvmWg=',
+    url_endpoint='https://ik.imagekit.io/4waizx9and',
+)
 
 
 def connect():
@@ -330,6 +340,12 @@ def get_names_from_ids(ids):
         return [res[id_] if id_ in res else '-' for id_ in ids]
 
 
+@functools.lru_cache(1024)
+def get_name_from_guid(guid):
+    with connect() as c:
+        return c.execute('SELECT name FROM leaders WHERE guid=?', (guid,)).fetchone()['name']
+
+
 def dump_names():
     with connect() as conn:
         return [dict(r) for r in conn.execute('SELECT * FROM names')]
@@ -397,6 +413,45 @@ def get_annotate_examples(egg, limit=5, rand=0):
         'as_second': as_second,
     }
 
+
+@functools.lru_cache(1024)
+def share_guid(name):
+    with connect() as c:
+        r = c.execute('SELECT guid FROM leaders WHERE name=?', (name,)).fetchone()
+        if r:
+            return r['guid']
+        guid = str(uuid.uuid4())
+        # TODO check naughtiness
+        c.execute(
+            'INSERT INTO leaders (name, votes, naughty, guid) VALUES (?, 0, ?, ?)',
+            (name, 1, guid))
+        return guid
+
+
+@functools.lru_cache(1024)
+def get_image_url(name=None, guid=None):
+    if not name and not guid:
+        raise ValueError()
+    if not name:
+        name = get_name_from_guid(guid)
+    longest = max(*[len(n) for n in name.split(' ')])
+    if longest > 20:
+        font_size = 72
+    elif longest > 10:
+        font_size = 100
+    else:
+        font_size = 150
+    img_url = imagekit.url({
+        'path': '/onomancer/black_rectangle_7xapQJdUh.jpg',
+        'transformation': [{
+            'overlay_text': name,
+            'overlay_text_font_family': 'Lora',
+            'overlay_text_font_size': font_size,
+            'overlay_text_color': 'FFFFFF',
+            'otw': 900,
+        }],
+    })
+    return img_url
 
 
 def load():
@@ -482,6 +537,8 @@ def backfill_guids():
 if __name__ == '__main__':
     if len(sys.argv) == 3 and sys.argv[1] == 'purge':
         purge(sys.argv[2])
+    elif len(sys.argv) == 3 and sys.argv[1] == 'img':
+        print(get_image_url(sys.argv[2]))
     else:
         for arg in sys.argv:
             if arg == 'clear':
