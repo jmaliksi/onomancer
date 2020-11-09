@@ -430,7 +430,7 @@ def share_guid(name):
         guid = str(uuid.uuid4())
         # TODO check naughtiness
         c.execute(
-            'INSERT INTO leaders (name, votes, naughty, guid) VALUES (?, 0, ?, ?) ON CONFCLIT (name) DO UPDATE SET votes=votes',
+            'INSERT INTO leaders (name, votes, naughty, guid) VALUES (?, 0, ?, ?) ON CONFLICT (name) DO UPDATE SET votes=votes',
             (name, 0, guid))
         return guid
 
