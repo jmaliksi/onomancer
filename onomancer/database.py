@@ -197,9 +197,8 @@ def get_random_name():
             # no good name gen, just pick something good from the leaderboard
         if random.random() < .25:
             # pull something from the top of the board
-            rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes LIMIT 100').fetchall()
-            rows = sorted(rows, key=lambda _: random.random())
-            name = rows[0]['name']
+            rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes LIMIT 200').fetchall()
+            name = random.choice(rows)['name']
         else:
             name = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY RANDOM() LIMIT 1').fetchone()['name']
         return name
