@@ -165,6 +165,11 @@ def get_random_name():
                     'SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR downvotes>-(upvotes*3)) ORDER BY upvotes-downvotes LIMIT 100',
                     (VOTE_THRESHOLD,),
                 ).fetchall()
+                if random.random() < .5:
+                    rows.extend(conn.execute(
+                        'SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR downvotes>-(upvotes*3)) ORDER BY RANDOM() LIMIT 50',
+                        (VOTE_THRESHOLD,),
+                    ).fetchall())
                 rows = sorted(rows, key=lambda _: random.random())
             else:
                 rows = conn.execute(
