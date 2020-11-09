@@ -1,7 +1,9 @@
+import base64
 import functools
 import random
 import sqlite3
 import sys
+from urllib.parse import quote
 import uuid
 
 from imagekitio import ImageKit
@@ -444,7 +446,7 @@ def get_image_url(name=None, guid=None):
     img_url = imagekit.url({
         'path': '/onomancer/black_rectangle_7xapQJdUh.jpg',
         'transformation': [{
-            'overlay_text': name,
+            'ote': quote(base64.b64encode(name.encode('utf8')).decode('ascii')),
             'overlay_text_font_family': 'Lora',
             'overlay_text_font_size': font_size,
             'overlay_text_color': 'FFFFFF',
