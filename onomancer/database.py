@@ -470,16 +470,16 @@ def get_collection_image_url(*names):
         'overlay_text_font_family': 'Lora',
         'overlay_text_font_size': 30,
         'overlay_text_color': 'FFFFFF',
-        'overlay_y': 40,
+        'overlay_y': 50,
         'overlay_x': 250,
     })
     for i, name in enumerate(names[:9]):
         transforms.append({
             'ote': quote(base64.b64encode(name.encode('utf8')).decode('ascii')),
             'overlay_text_font_family': 'Lora',
-            'overlay_text_font_size': 24,
+            'overlay_text_font_size': 21,
             'overlay_text_color': 'FFFFFF',
-            'overlay_y': 80 + (i * 26),
+            'overlay_y': 90 + (i * 26),
             'overlay_x': 250,
         })
 
@@ -489,16 +489,16 @@ def get_collection_image_url(*names):
         'overlay_text_font_family': 'Lora',
         'overlay_text_font_size': 30,
         'overlay_text_color': 'FFFFFF',
-        'overlay_y': 340,
+        'overlay_y': 350,
         'overlay_x': 250,
     })
     for i, name in enumerate(names[9:]):
         transforms.append({
             'ote': quote(base64.b64encode(name.encode('utf8')).decode('ascii')),
             'overlay_text_font_family': 'Lora',
-            'overlay_text_font_size': 24,
+            'overlay_text_font_size': 21,
             'overlay_text_color': 'FFFFFF',
-            'overlay_y': 380 + (i * 26),
+            'overlay_y': 390 + (i * 26),
             'overlay_x': 250,
         })
 
