@@ -353,7 +353,7 @@ def rate():
 
     message = f'Your judgement is rendered.'
     if judgement == 128077:  # upvote
-        database.upvote_name(name, thumbs=2)
+        database.upvote_name(name, thumbs=1)
         message += ' The Onomancer nods...'
     elif judgement == 128154:  # love
         database.upvote_name(name, thumbs=3)
