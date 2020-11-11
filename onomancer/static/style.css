@@ -138,6 +138,11 @@ a {
     margin: 15px;
 }
 
+.leaderItem a {
+    text-decoration: none;
+    margin: 0;
+}
+
 .inlineForm button {
     text-decoration: none;
     background: none;

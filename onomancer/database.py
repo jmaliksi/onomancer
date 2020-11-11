@@ -23,6 +23,7 @@ try:
         url_endpoint='https://ik.imagekit.io/4waizx9and',
     )
 except Exception as e:
+    imagekit = None
     print(e)
 
 def connect():
@@ -152,12 +153,7 @@ def get_leaders(top=20):
     conn = connect()
     with conn:
         rows = conn.execute(f'SELECT * FROM leaders WHERE naughty = 0 AND votes > {LEADER_THRESHOLD} ORDER BY votes DESC, RANDOM() LIMIT ?', (top,))
-        return [
-            {
-                'name': row['name'],
-                'votes': row['votes'],
-            } for row in rows
-        ]
+        return [dict(row) for row in rows]
 
 
 def get_random_name():
@@ -452,6 +448,8 @@ def share_guid(name):
 
 @functools.lru_cache(1024)
 def get_image_url(name=None, guid=None):
+    if not imagekit:
+        raise Exception('Imagekit not initialized')
     if not name and not guid:
         raise ValueError()
     if not name:
@@ -478,6 +476,8 @@ def get_image_url(name=None, guid=None):
 
 @functools.lru_cache(1024)
 def get_collection_image_url(*names):
+    if not imagekit:
+        raise Exception('Imagekit not initialized')
     transforms = []
     transforms.append({
         'overlay_text': 'Lineup',
