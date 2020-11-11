@@ -716,7 +716,7 @@ def shareCollection(friends):
         rotation=collection[9:],
         message='Gathered and sowed...',
         share_image=img_url,
-        share_url=f'https://onomancer.sibr.dev/shareCollections/{friends}',
+        share_url=f'https://onomancer.sibr.dev/shareCollection/{friends}',
     ))
 
 
