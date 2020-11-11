@@ -671,6 +671,15 @@ def get_name():
 
 @app.route('/api/getNames')
 def get_names():
+    valid_args = {
+        'threshold',
+        'limit',
+        'offset',
+        'random',
+    }
+    for arg in request.args:
+        if arg not in valid_args:
+            return jsonify({'error': f'unrecognized query parameter `{arg}`'}), 400
     threshold = int(request.args.get('threshold', 0))
     limit = int(request.args.get('limit', 100))
     offset = int(request.args.get('offset', 0))
@@ -680,6 +689,15 @@ def get_names():
 
 @app.route('/api/getEggs')
 def get_eggs():
+    valid_args = {
+        'threshold',
+        'limit',
+        'offset',
+        'random',
+    }
+    for arg in request.args:
+        if arg not in valid_args:
+            return jsonify({'error': f'unrecognized query parameter `{arg}`'}), 400
     threshold = int(request.args.get('threshold', 0))
     limit = int(request.args.get('limit', 100))
     offset = int(request.args.get('offset', 0))
