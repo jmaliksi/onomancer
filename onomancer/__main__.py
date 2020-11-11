@@ -360,6 +360,8 @@ def rate():
         message += ' The Onomancer smiles...'
     elif judgement == 128148:  # hate
         database.upvote_name(name, thumbs=-2)
+        flipped = ' '.join(name.split(' ')[::-1])
+        database.upvote_name(flipped, thumbs=-1, hit_eggs=False)
         message += ' The Onomancer frowns...'
     elif judgement == 128078:  # thumbs down
         database.upvote_name(name, thumbs=-1)
