@@ -6,9 +6,9 @@
         {{ csrf_html(session['USER_CSRF'])|safe }}
         <input type="hidden" name="collection" value="{{collection}}"/>
         <input type="hidden" name="token" value="{{token}}"/>
-        <button type="button" value="back" onclick="history.back()">&#9194</button>
-        <button type="submit" name="command" value="reverb">&#127754</button>
-        <button type="submit" name="command" value="fireworks">&#129512</button>
+        <button type="button" alt="undo" title="Undo" value="back" onclick="history.back()">&#9194</button>
+        <button type="submit" alt="shuffle roster" title="Shuffle roster" name="command" value="reverb">&#127754</button>
+        <button type="submit" alt="new collection" title="New collection" name="command" value="fireworks">&#129512</button>
     </form>
 </span>
 <div class="collect">
@@ -21,8 +21,8 @@
                 <input type="hidden" name="name" value="{{super_secret(name, token)}}"/>
                 <input type="hidden" name="collection" value="{{collection}}"/>
                 <input type="hidden" name="token" value="{{token}}"/>
-                <button type="submit" name="command" value="fire">&#128293</button>
-                <button type="submit" name="command" value="flip">&#128257</button>
+                <button type="submit" alt="incinerate" title="Incinerate" name="command" value="fire">&#128293</button>
+                <button type="submit" alt="reverse name" title="Reverse name" name="command" value="flip">&#128257</button>
             </form>
             {{name}}
         </div>
@@ -51,8 +51,8 @@
                 <input type="hidden" name="name" value="{{super_secret(name, token)}}"/>
                 <input type="hidden" name="collection" value="{{collection}}"/>
                 <input type="hidden" name="token" value="{{token}}"/>
-                <button type="submit" name="command" value="fire">&#128293</button>
-                <button type="submit" name="command" value="flip">&#128257</button>
+                <button type="submit" alt="incinerate" title="Incinerate" name="command" value="fire">&#128293</button>
+                <button type="submit" alt="reverse name" title="Reverse name" name="command" value="flip">&#128257</button>
             </form>
             {{name}}
         </div>
@@ -78,9 +78,9 @@
     <form class="saveCol" action="collect" method="get">
         <input type="hidden" name="t" value="{{token[:8]}}"/>
         <input type="hidden" name="f" value="{{friends}}"/>
-        <button type="submit" name="save" value="{{save_name}}" class="saveButton">save</button>
-        <button type="submit" name="load" value="{{save_name}}" class="saveButton {% if not info %}unsaved{% endif %}" {% if not info %}disabled{% endif %}>load</button>
-        <button type="submit" name="clear" value="{{save_name}}" class="saveButton {% if not info %}unsaved{% endif %}" {% if not info %}disabled{% endif %}>clear</button>
+        <button type="submit" name="save" alt="save collection" title="Save collection" value="{{save_name}}" class="saveButton">save</button>
+        <button type="submit" name="load" alt="load collection" title="Load collection" value="{{save_name}}" class="saveButton {% if not info %}unsaved{% endif %}" {% if not info %}disabled{% endif %}>load</button>
+        <button type="submit" name="clear" alt="delete collection" title="Delete collection" value="{{save_name}}" class="saveButton {% if not info %}unsaved{% endif %}" {% if not info %}disabled{% endif %}>clear</button>
     </form>
     {% endfor %}
 </div>

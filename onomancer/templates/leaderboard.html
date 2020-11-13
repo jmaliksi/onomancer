@@ -9,8 +9,8 @@
             {{ csrf_html(session['USER_CSRF'])|safe }}
             {% if not patience %}
             <input type="hidden" name="name" value="{{super_secret(name['name'], rotkey)}}"/>
-            <button type="submit" name="command" value="flip">&#128257</button>
-            <button type="submit" name="command" value="down">&#128315</button>
+            <button type="submit" alt="reverse name" title="Reverse name" name="command" value="flip">&#128257</button>
+            <button type="submit" alt="downvote" title="Downvote" name="command" value="down">&#128315</button>
             {% endif %}
         </form>
     </li>
