@@ -167,6 +167,7 @@ def vote(message=''):
         rotkey=session['USER_CSRF'] + rotkey,
         flag_form=flag,
         share_guid=share_guid,
+        reverse=request.args.get('reverse', False),
     ))
     session['rotkey'] = rotkey
     return res
@@ -354,6 +355,13 @@ def rate():
     message = f'Your judgement is rendered.'
     if judgement == 128077:  # upvote
         database.upvote_name(name, thumbs=1)
+        if request.form['reverse']:
+            try:
+                eggs = name.split(' ', 1)
+                database.annotate_egg(eggs[0], first=1)
+                database.annotate_egg(eggs[1], second=1)
+            except KeyError:
+                pass
         message += ' The Onomancer nods...'
     elif judgement == 128154:  # love
         database.upvote_name(name, thumbs=3)

@@ -4,6 +4,7 @@
 <form id='judgeForm' method="post" action="/rate">
     {{ csrf_html(session['USER_CSRF'])|safe }}
     <input type="hidden" name="name" value="{{super_secret(name, rotkey)}}" />
+    <input type="hidden" name="reverse" value="{{reverse}}"/>
     <label>
       <input type="submit" alt="no" name="judgement" value="&#128148" />
       No
