@@ -357,6 +357,12 @@ def rate():
         message += ' The Onomancer nods...'
     elif judgement == 128154:  # love
         database.upvote_name(name, thumbs=3)
+        try:
+            eggs = name.split(' ', 1)
+            database.annotate_egg(eggs[0], first=1)
+            database.annotate_egg(eggs[1], second=1)
+        except KeyError:
+            pass
         message += ' The Onomancer smiles...'
     elif judgement == 128148:  # hate
         database.upvote_name(name, thumbs=-2)
