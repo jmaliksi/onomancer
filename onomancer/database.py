@@ -163,7 +163,7 @@ def get_random_name():
             order = 'RANDOM()'
             if random.random() < .25:
                 rows = conn.execute(
-                    'SELECT * FROM names WHERE naughty=0 AND (downvotes>=? OR upvotes+downvotes>=-2) ORDER BY upvotes-downvotes LIMIT 100',
+                    'SELECT * FROM names WHERE naughty=0 AND (downvotes>=? OR upvotes+downvotes>=-2) ORDER BY upvotes-downvotes, RANDOM() LIMIT 100',
                     (VOTE_THRESHOLD,),
                 ).fetchall()
                 if random.random() < .5:
@@ -195,17 +195,21 @@ def get_random_name():
             votes = conn.execute(f'SELECT * FROM leaders WHERE name = ? AND votes <= {LEADER_THRESHOLD} LIMIT 1', (name,))
             if not votes.fetchone():
                 return name
-            # no good name gen, just pick something good from the leaderboard
+
+        # no good name gen, just pick something good from the leaderboard
         if random.random() < 1:
             # pull something from the top of the board
-            rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes DESC LIMIT 300 OFFSET 100').fetchall()
-            name = random.choice(rows)['name']
-        elif random.random() < .10:
+            try:
+                rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes DESC, RANDOM() LIMIT 300 OFFSET 100').fetchall()
+                return random.choice(rows)['name']
+            except IndexError:
+                pass
+        if random.random() < .10:
             # pull something from the bottom of the board to differentiate it faster
-            rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes ASC LIMIT 200').fetchall()
-            name = random.choice(rows)['name']
-        else:
-            name = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY RANDOM() LIMIT 1').fetchone()['name']
+            rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes ASC, RANDOM() LIMIT 200').fetchall()
+            return random.choice(rows)['name']
+
+        name = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY RANDOM() LIMIT 1').fetchone()['name']
         return name
 
 
