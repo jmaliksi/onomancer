@@ -262,7 +262,7 @@ def leaderboard(message=None, patience=None):
 
 @app.route('/downLeader', methods=['POST'])
 @require_csrf
-@limiter.limit('3/minute')
+@limiter.limit('6/minute')
 def downLeader():
     command = request.form.get('command')
     if not command:
@@ -273,11 +273,11 @@ def downLeader():
         database.flip_leader(name)
         message = "The pages thrum with feedback..."
     elif command == 'down':
-        database.upvote_name(name, thumbs=-1)
+        database.upvote_name(name, thumbs=-2)
         message = "A judgement made, the Chosen shift..."
     else:
         message = "Hmm?"
-    return leaderboard(message=message, patience=30)
+    return leaderboard(message=message, patience=10)
 
 @app.route('/egg')
 def egg(message='The Onomancer waits...'):
