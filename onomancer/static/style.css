@@ -82,7 +82,7 @@ a {
 #judgeForm input {
     font-size: 25px;
     width: 15%;
-    max-width: 100px;
+    max-width: 150px;
     min-width: 3em;
     border: 0;
     cursor: pointer;

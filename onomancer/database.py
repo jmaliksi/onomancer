@@ -173,7 +173,7 @@ def get_random_name():
                 rows = sorted(rows, key=lambda _: random.random())
             else:
                 rows = conn.execute(
-                    f'SELECT * FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR downvotes > -(upvotes * 2)) ORDER BY RANDOM() LIMIT 2').fetchall()
+                    f'SELECT * FROM names WHERE naughty = 0 AND (downvotes > {VOTE_THRESHOLD} OR upvotes+downvotes>=-2) ORDER BY RANDOM() LIMIT 2').fetchall()
 
             # choose which goes first and second
             # roll die between whether combined firsts or seconds the chooser
@@ -216,7 +216,7 @@ def check_egg_threshold(fullname, threshold=VOTE_THRESHOLD):
     names = fullname.split(' ', 1)
     conn = connect()
     with conn:
-        rows = conn.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND downvotes < -(upvotes * 2))', names)
+        rows = conn.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND upvotes+downvotes<-2)', names)
         if rows.fetchone():
             return True
     return False
