@@ -81,9 +81,10 @@ a {
 
 #judgeForm input {
     font-size: 25px;
-    width: 15%;
+    width: 20%;
     max-width: 150px;
     min-width: 3em;
+    height: 1.7em;
     border: 0;
     cursor: pointer;
     flex-grow: 1;
@@ -95,8 +96,8 @@ a {
     flex-direction: column;
     white-space: normal;
     min-width: 3em;
-    max-width: 100px;
-    width: 15%;
+    max-width: 150px;
+    width: 20%;
     font-size: .8em;
     color: #ccc;
     hyphens: manual;
