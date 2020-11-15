@@ -200,7 +200,7 @@ def get_random_name():
         if random.random() < 1:
             # pull something from the top of the board
             try:
-                rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes DESC, RANDOM() LIMIT 300 OFFSET 100').fetchall()
+                rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes DESC, RANDOM() LIMIT 1000 OFFSET 100').fetchall()
                 return random.choice(rows)['name']
             except IndexError:
                 pass
