@@ -378,6 +378,7 @@ def rate():
         database.upvote_name(flipped, thumbs=-1, hit_eggs=False)
         message += ' The Onomancer frowns...'
     elif judgement == 128078:  # thumbs down
+        database.upvote_name(flipped, thumbs=-1, hit_eggs=False)
         database.upvote_name(name, thumbs=-1)
         message += ' The Onomancer stares...'
 
