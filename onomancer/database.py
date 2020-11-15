@@ -163,14 +163,13 @@ def get_random_name():
             order = 'RANDOM()'
             if random.random() < .25:
                 rows = conn.execute(
-                    'SELECT * FROM names WHERE naughty=0 AND (downvotes>=? OR upvotes+downvotes>=-2) ORDER BY upvotes-downvotes, RANDOM() LIMIT 100',
+                    'SELECT * FROM names WHERE naughty=0 AND (downvotes>=? OR upvotes+downvotes>=-2) ORDER BY upvotes-downvotes, RANDOM() LIMIT 500',
                     (VOTE_THRESHOLD,),
                 ).fetchall()
-                if random.random() < .5:
-                    rows.extend(conn.execute(
-                        'SELECT * FROM names WHERE naughty=0 AND (downvotes>=? OR upvotes+downvotes>=-2) ORDER BY RANDOM() LIMIT 50',
-                        (VOTE_THRESHOLD,),
-                    ).fetchall())
+                rows.extend(conn.execute(
+                    'SELECT * FROM names WHERE naughty=0 AND (downvotes>=? OR upvotes+downvotes>=-2) ORDER BY RANDOM() LIMIT 100',
+                    (VOTE_THRESHOLD,),
+                ).fetchall())
                 rows = sorted(rows, key=lambda _: random.random())
             else:
                 rows = conn.execute(
