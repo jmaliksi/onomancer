@@ -188,10 +188,10 @@ def annotate():
         message = 'A note taken. '
         judgement = ord(request.form['judgement'])
         if judgement == 128072:  # left
-            database.annotate_egg(name, first=1)
+            database.annotate_egg(name, first=2)
             message += 'The ink shifts left...'
         elif judgement == 128073:  # right
-            database.annotate_egg(name, second=1)
+            database.annotate_egg(name, second=2)
             message += 'The ink shifts right...'
         elif judgement == 128588:
             database.annotate_egg(name, first=1, second=1)
