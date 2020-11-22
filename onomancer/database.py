@@ -159,7 +159,7 @@ def get_leaders(top=20):
 def get_random_name():
     conn = connect()
     with conn:
-        if random.random() > .2:
+        if random.random() > .3:
             order = 'RANDOM()'
             if random.random() < .25:
                 rows = conn.execute(
@@ -196,7 +196,7 @@ def get_random_name():
                 return name
 
         # no good name gen, just pick something good from the leaderboard
-        if random.random() < .1:
+        if random.random() < .05:
             # pull something from the top of the board
             try:
                 rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes DESC, RANDOM() LIMIT 1000 OFFSET 100').fetchall()

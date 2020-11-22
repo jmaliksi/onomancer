@@ -225,9 +225,7 @@ def annotate():
     if flag:
         message = 'What is your reason for flagging this egg?'
     examples = {}
-    if 'examples' in request.args:
-        message = 'Observe context...'
-        examples = database.get_annotate_examples(name)
+    examples = database.get_annotate_examples(name)
     # rotkey already set by posts
     return make_response(render_template(
         'annotate.html',
@@ -375,7 +373,7 @@ def rate():
     elif judgement == 128148:  # hate
         database.upvote_name(name, thumbs=-2)
         flipped = ' '.join(name.split(' ')[::-1])
-        database.upvote_name(flipped, thumbs=-1, hit_eggs=False)
+        database.upvote_name(flipped, thumbs=-2, hit_eggs=False)
         message += ' The Onomancer frowns...'
     elif judgement == 128078:  # thumbs down
         flipped = ' '.join(name.split(' ')[::-1])
