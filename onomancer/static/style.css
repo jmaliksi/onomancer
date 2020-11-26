@@ -247,7 +247,7 @@ a {
 }
 
 .nameCol {
-    flex: 3;
+    flex: 5;
     display: inline;
 }
 
@@ -311,7 +311,7 @@ a {
 }
 
 .stars {
-    flex: 1;
+    flex: 2;
 }
 
 .saveCol {
