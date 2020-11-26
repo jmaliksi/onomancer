@@ -799,7 +799,7 @@ def stash():
                 return res
             message = 'An appelation stashed.'
 
-    names = []
+    names = {}
     if stashed:
         stashed = list(set(stashed))
         names = database.get_names_from_guids(stashed)
