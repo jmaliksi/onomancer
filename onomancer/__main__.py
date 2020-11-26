@@ -545,6 +545,7 @@ def collect():
             anim = {'type': 'feedback', 'who': rookie}
         res = redirect(url_for(
             'collect',
+            _anchor='collection',
             t=token[:8],
             f=_curse_collection(*collection),
         ))
