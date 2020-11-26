@@ -3,7 +3,6 @@
 {% block names %}
 <span>
     <form action="collect" method="post" class="inlineForm toplineForm">
-        {{ csrf_html(session['USER_CSRF'])|safe }}
         <input type="hidden" name="collection" value="{{collection}}"/>
         <input type="hidden" name="token" value="{{token}}"/>
         <button type="button" alt="undo" title="Undo" value="back" onclick="history.back()">&#9194</button>
@@ -17,14 +16,14 @@
     <div class="collectRow">
         <div class="collectColumn nameCol {{anim}}">
             <form action="collect" method="post" class="inlineForm">
-                {{ csrf_html(session['USER_CSRF'])|safe }}
                 <input type="hidden" name="name" value="{{super_secret(name, token)}}"/>
                 <input type="hidden" name="collection" value="{{collection}}"/>
                 <input type="hidden" name="token" value="{{token}}"/>
                 <button type="submit" alt="incinerate" title="Incinerate" name="command" value="fire">&#128293</button>
+                <button type="submit" alt="feedback" title="Feedback from stash" name="command" value="feedback">&#127908</button>
                 <button type="submit" alt="reverse name" title="Reverse name" name="command" value="flip">&#128257</button>
             </form>
-            {{name}}
+            <a href="/shareName/{{name}}" target="_blank">{{name}}</a>
         </div>
         <div class="collectColumn stars">
             {% for star in stars %}
@@ -47,14 +46,14 @@
     <div class="collectRow">
         <div class="collectColumn nameCol {{anim}}">
             <form action="collect" method="post" class="inlineForm">
-                {{ csrf_html(session['USER_CSRF'])|safe }}
                 <input type="hidden" name="name" value="{{super_secret(name, token)}}"/>
                 <input type="hidden" name="collection" value="{{collection}}"/>
                 <input type="hidden" name="token" value="{{token}}"/>
                 <button type="submit" alt="incinerate" title="Incinerate" name="command" value="fire">&#128293</button>
+                <button type="submit" alt="feedback" title="Feedback from stash" name="command" value="feedback">&#127908</button>
                 <button type="submit" alt="reverse name" title="Reverse name" name="command" value="flip">&#128257</button>
             </form>
-            {{name}}
+            <a href="/shareName/{{name}}" target="_blank">{{name}}</a>
         </div>
         <div class="collectColumn stars">
             {% for star in stars %}

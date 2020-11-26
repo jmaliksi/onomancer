@@ -365,6 +365,17 @@ def get_names_from_ids(ids):
         return [res[id_] if id_ in res else '-' for id_ in ids]
 
 
+def get_names_from_guids(guids):
+    with connect() as conn:
+        rows = conn.execute(f'SELECT * FROM leaders WHERE guid IN ({",".join(["?"] * len(guids))}) ORDER BY name', guids)
+        return {r['guid']: r['name'] for r in rows}
+
+
+def get_guid_for_name(name):
+    with connect() as conn:
+        return conn.execute('SELECT guid FROM leaders WHERE name=?', (name,)).fetchone()['guid']
+
+
 @functools.lru_cache(1024)
 def get_name_from_guid(guid):
     with connect() as c:

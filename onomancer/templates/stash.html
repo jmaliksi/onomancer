@@ -1,0 +1,16 @@
+{% extends "regard.html" %}
+{% block title %}Stash{% endblock %}
+{% block names %}
+<ul, class="undecoratedList">
+    {% for guid, name in names.items() %}
+    <li class="leaderItem" key="{{name}}">
+        <span><a href="/shareName/{{guid}}" target="_blank">{{name}}</a></span>
+        <form action="stash" method="post" class="inlineForm">
+            {{ csrf_html(session['USER_CSRF'])|safe }}
+            <input type="hidden" name="guid" value="{{guid}}"/>
+            <button type="submit" alt="remove" title="Eject" name="command" value="eject">&#9167&#65039</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,7 +1,7 @@
 {% extends "judge.html" %}
 {% block cta %}Render judgement...{% endblock %}
 {% block console %}
-<form id='judgeForm' method="post" action="/rate">
+<form class='judgeForm' method="post" action="/rate">
     {{ csrf_html(session['USER_CSRF'])|safe }}
     <input type="hidden" name="name" value="{{super_secret(name, rotkey)}}" />
     <input type="hidden" name="reverse" value="{{reverse}}"/>
@@ -27,6 +27,13 @@
     <a href="/vote">skip</a>
     <a href="/vote?name={{super_secret(name, rotkey)}}&flagForm=1">flag</a>
     <a href="shareName/{{share_guid}}" target="_blank">share</a>
+    <form action="/stash" method="post" class="inlineForm">
+        {{ csrf_html(session['USER_CSRF'])|safe }}
+        <input type="hidden" name="guid" value="{{share_guid}}"/>
+        <input type="hidden" name="command" value="stash"/>
+        <input type="hidden" name="redirect" value="vote"/>
+        <button type="submit" alt="stash" title="Save to stash" value="stash" style="text-decoration:underline;margin:10px;">stash</button>
+    </form>
 </div>
 {% if flag_form %}
 <p>&nbsp;</p>

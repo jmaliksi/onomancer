@@ -75,11 +75,11 @@ a {
     margin: 10px;
 }
 
-#judgeForm {
+.judgeForm {
     margin-bottom: 25px;
 }
 
-#judgeForm input {
+.judgeForm input {
     font-size: 25px;
     width: 20%;
     max-width: 150px;
@@ -90,7 +90,7 @@ a {
     flex-grow: 1;
 }
 
-#judgeForm label {
+.judgeForm label {
     display: inline-flex;
     align-items: center;
     flex-direction: column;
@@ -103,7 +103,7 @@ a {
     hyphens: manual;
 }
 
-#judgeForm>label>input {
+.judgeForm>label>input {
     width: 100%;
     min-width: 2em;
 }
@@ -144,13 +144,18 @@ a {
     margin: 0;
 }
 
+.undecoratedList li {
+    list-style-type: none;
+}
+
 .inlineForm button {
     text-decoration: none;
     background: none;
     border: none;
     padding: 0;
-    font-size: 7pt;
     cursor: pointer;
+    color: inherit;
+    font: inherit;
 }
 
 .inlineForm {
@@ -242,8 +247,13 @@ a {
 }
 
 .nameCol {
-    flex: 2;
+    flex: 3;
     display: inline;
+}
+
+.nameCol a {
+    text-decoration: none;
+    margin: 0;
 }
 
 .burning {
@@ -255,6 +265,23 @@ a {
     from {
         color: black;
         background-color: red;
+    }
+
+    to {
+        color: white;
+        background-color: black;
+    }
+}
+
+.feedback {
+    animation-duration: 1s;
+    animation-name: feedbackName;
+}
+
+@keyframes feedbackName {
+    from {
+        color: black;
+        background-color: blue;
     }
 
     to {

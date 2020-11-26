@@ -134,12 +134,15 @@ def what():
 
 
 @app.route('/vote', strict_slashes=False)
-def vote(message=''):
+def vote(message='', guid=None):
     name = request.args.get('name', None)
     if not name:
         if not message:
             message = 'A card is drawn...'
-        name = database.get_random_name()
+        if guid:
+            name = database.get_name_from_guid(guid)
+        else:
+            name = database.get_random_name()
     else:
         rotkey = session['rotkey']
         if rotkey:
@@ -501,7 +504,6 @@ def admin_eggs(key):
 
 
 @app.route('/collect', methods=['GET', 'POST'])
-@require_csrf
 def collect():
     if request.method == 'POST':
         token = request.form['token']
@@ -532,6 +534,15 @@ def collect():
             res = redirect(url_for('collect'))
             res.set_cookie('anim', json.dumps(anim), max_age=10)
             return res
+        elif command == 'feedback':
+            stashed = json.loads(request.cookies.get('stash', '[]'))
+            stashed = [s for s in stashed if s]
+            if not stashed:
+                rookie = database.collect(1)[0]
+            else:
+                rookie = database.get_name_from_guid(random.choice(stashed))
+            collection[collection.index(name_to_burn)] = rookie
+            anim = {'type': 'feedback', 'who': rookie}
         res = redirect(url_for(
             'collect',
             t=token[:8],
@@ -720,15 +731,20 @@ def get_eggs():
 
 
 @app.route('/shareName/<guid>')
-def shareName(guid):
-    name = database.get_name_from_guid(guid)
+def shareName(guid, message='The token shared...'):
+    try:
+        name = database.get_name_from_guid(guid)
+    except TypeError:
+        guid = database.get_guid_for_name(guid)
+        return redirect(url_for('shareName', guid=guid))
     img_url = database.get_image_url(name=name)
     return make_response(render_template(
         'share.html',
         name=name,
-        message='The token shared...',
+        message=message,
         share_image=img_url,
         share_url=f'https://onomancer.sibr.dev/shareName/{guid}',
+        share_guid=guid,
     ))
 
 
@@ -752,6 +768,55 @@ def shareCollection(friends):
         share_image=img_url,
         share_url=f'https://onomancer.sibr.dev/shareCollection/{friends}',
     ))
+
+
+@app.route('/stash', methods=['GET', 'POST'])
+@require_csrf
+def stash():
+    stashed = json.loads(request.cookies.get('stash', '[]'))
+    stashed = [s for s in stashed if s]
+
+    message = ''
+    if request.method == 'POST':
+        command = request.form['command']
+        guid = request.form['guid']
+        redirect = request.form.get('redirect', 'share')
+        if command == 'eject':
+            stashed.remove(guid)
+            message = 'The monicker expunged.'
+        if command == 'stash':
+            stashed.append(guid)
+            if redirect == 'vote':
+                res = vote(
+                    message='The name stashed.',
+                    guid=guid,
+                )
+                res.set_cookie(
+                    'stash',
+                    value=json.dumps(stashed),
+                    max_age=1000000000,
+                )
+                return res
+            message = 'An appelation stashed.'
+
+    names = []
+    if stashed:
+        stashed = list(set(stashed))
+        names = database.get_names_from_guids(stashed)
+    if not names:
+        message = 'An empty stash'
+
+    res = make_response(render_template(
+        'stash.html',
+        names=names,
+        message=message,
+    ))
+    res.set_cookie(
+        'stash',
+        value=json.dumps(stashed),
+        max_age=1000000000,
+    )
+    return res
 
 
 if __name__ == '__main__':

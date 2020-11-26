@@ -1,5 +1,13 @@
 {% extends "judge.html" %}
 {% block cta %}A glimpse...{% endblock %}
 {% block console %}
-<a href="/vote">Next</a>
+<div>
+    <a href="/vote">next</a>
+    <form action="/stash" method="post" class="inlineForm">
+        {{ csrf_html(session['USER_CSRF'])|safe }}
+        <input type="hidden" name="guid" value="{{share_guid}}"/>
+        <input type="hidden" name="command" value="stash"/>
+        <button type="submit" alt="stash" title="Save to stash" value="stash" style="text-decoration:underline;margin:10px;">stash</button>
+    </form>
+</div>
 {% endblock %}
