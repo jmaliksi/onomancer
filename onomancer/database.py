@@ -472,7 +472,10 @@ def get_image_url(name=None, guid=None):
         raise ValueError()
     if not name:
         name = get_name_from_guid(guid)
-    longest = max(*[len(n) for n in name.split(' ')])
+    try:
+        longest = max(*[len(n) for n in name.split(' ')])
+    except TypeError:
+        longest = len(name)
     if longest > 20:
         font_size = 36
     elif longest > 10:
