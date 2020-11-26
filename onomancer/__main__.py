@@ -360,7 +360,7 @@ def rate():
             try:
                 eggs = name.split(' ', 1)
                 database.annotate_egg(eggs[0], first=1)
-                database.annotate_egg(eggs[1], second=1)
+                database.annotate_egg(eggs[-1], second=1)
             except KeyError:
                 pass
         message += ' The Onomancer nods...'
@@ -369,7 +369,7 @@ def rate():
         try:
             eggs = name.split(' ', 1)
             database.annotate_egg(eggs[0], first=1)
-            database.annotate_egg(eggs[1], second=1)
+            database.annotate_egg(eggs[-1], second=1)
         except KeyError:
             pass
         message += ' The Onomancer smiles...'
