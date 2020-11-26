@@ -178,7 +178,7 @@ def get_random_name():
             # choose which goes first and second
             # roll die between whether combined firsts or seconds the chooser
             # lol what is this mess
-            total_first_votes = rows[0]['first_votes'] + rows[1]['second_votes'] + 1
+            total_first_votes = rows[0]['first_votes'] + rows[1]['first_votes'] + 1
             total_second_votes = rows[0]['second_votes'] + rows[1]['second_votes'] + 1
             if random.random() * (total_first_votes + total_second_votes) < total_first_votes:
                 if random.random() * total_first_votes < rows[0]['first_votes']:
