@@ -56,7 +56,8 @@ limiter = Limiter(
     default_limits=['5/second'],
 )
 
-profanity.load_words([
+profanity.load_words()
+profanity.load_words(profanity.words + [
     'trump',
     'pewdipie',
     'rowling',
@@ -511,43 +512,53 @@ def collect():
             super_safe_decrypt(urllib.parse.unquote(name), token * 10)
             for name in json.loads(request.form['collection'])
         ]
-        command = request.form['command']
-        name_to_burn = 'name' in request.form and super_safe_decrypt(
-            urllib.parse.unquote(request.form['name']),
-            token * 10,
-        )
+        cname = 'Collection'
         anim = {}
-        if command == 'flip':
-            flipped = ' '.join(name_to_burn.split(' ')[::-1])
-            database.upvote_name(flipped, thumbs=0)
-            collection[collection.index(name_to_burn)] = flipped
-            anim = {'type': 'reverb', 'who': flipped}
-        elif command == 'fire':
-            rookie = database.collect(1)[0]
-            collection[collection.index(name_to_burn)] = rookie
-            anim = {'type': 'burning', 'who': rookie}
-        elif command == 'reverb':
-            collection = sorted(collection, key=lambda _: random.random())
-            anim = {'type': 'reverb_all', 'who': None}
-        elif command == 'fireworks':
-            anim = {'type': 'burn_all', 'who': None}
-            res = redirect(url_for('collect'))
-            res.set_cookie('anim', json.dumps(anim), max_age=10)
-            return res
-        elif command == 'feedback':
-            stashed = json.loads(request.cookies.get('stash', '[]'))
-            stashed = [s for s in stashed if s]
-            if not stashed:
+        if request.form.get('cname'):
+            try:
+                cname = ' '.join([
+                    _process_name(n) for n in request.form['cname'].split(' ')
+                ])
+            except ValueError:
+                cname = 'Collection'
+        if request.form.get('command'):
+            command = request.form.get('command')
+            name_to_burn = 'name' in request.form and super_safe_decrypt(
+                urllib.parse.unquote(request.form['name']),
+                token * 10,
+            )
+            if command == 'flip':
+                flipped = ' '.join(name_to_burn.split(' ')[::-1])
+                database.upvote_name(flipped, thumbs=0)
+                collection[collection.index(name_to_burn)] = flipped
+                anim = {'type': 'reverb', 'who': flipped}
+            elif command == 'fire':
                 rookie = database.collect(1)[0]
-            else:
-                rookie = database.get_name_from_guid(random.choice(stashed))
-            collection[collection.index(name_to_burn)] = rookie
-            anim = {'type': 'feedback', 'who': rookie}
+                collection[collection.index(name_to_burn)] = rookie
+                anim = {'type': 'burning', 'who': rookie}
+            elif command == 'reverb':
+                collection = sorted(collection, key=lambda _: random.random())
+                anim = {'type': 'reverb_all', 'who': None}
+            elif command == 'fireworks':
+                anim = {'type': 'burn_all', 'who': None}
+                res = redirect(url_for('collect'))
+                res.set_cookie('anim', json.dumps(anim), max_age=10)
+                return res
+            elif command == 'feedback':
+                stashed = json.loads(request.cookies.get('stash', '[]'))
+                stashed = [s for s in stashed if s]
+                if not stashed:
+                    rookie = database.collect(1)[0]
+                else:
+                    rookie = database.get_name_from_guid(random.choice(stashed))
+                collection[collection.index(name_to_burn)] = rookie
+                anim = {'type': 'feedback', 'who': rookie}
         res = redirect(url_for(
             'collect',
             _anchor='collection',
             t=token[:8],
             f=_curse_collection(*collection),
+            cname=cname,
         ))
         res.set_cookie('anim', json.dumps(anim), max_age=10)
         return res
@@ -563,11 +574,12 @@ def collect():
     anim = request.cookies.get('anim', {})
     if anim:
         anim = json.loads(anim)
+    cname = request.args.get('cname', '')
 
     saves = {
-        'save1': request.cookies.get('save1'),
-        'save2': request.cookies.get('save2'),
-        'save3': request.cookies.get('save3'),
+        'save1': _parse_collection_cookie('save1'),
+        'save2': _parse_collection_cookie('save2'),
+        'save3': _parse_collection_cookie('save3'),
     }
     # f is for friends
     if request.args.get('load'):
@@ -579,8 +591,9 @@ def collect():
                 _curse_name(name)[1],
                 '',
             )
-            for name in _uncurse_collection(loaded)
+            for name in _uncurse_collection(loaded[0])
         ]
+        cname = loaded[1]
     else:
         collection = [
             (
@@ -594,7 +607,7 @@ def collect():
     friends = [n[0] for n in collection]
     friend_code = _curse_collection(*friends).decode()
     if request.args.get('save'):
-        saves[request.args['save']] = friend_code
+        saves[request.args['save']] = (friend_code, cname)
     if request.args.get('clear'):
         saves[request.args['clear']] = None
     res = make_response(render_template(
@@ -610,12 +623,24 @@ def collect():
         collection=json.dumps([super_secret(n, token * 10) for n in friends]),
         friends=friend_code,
         saves=saves,
+        cname=cname,
+        len=len,
     ))
     if request.args.get('save'):
-        res.set_cookie(request.args['save'], value=friend_code, max_age=100000000)
+        res.set_cookie(request.args['save'], value=f'{friend_code}:{cname}', max_age=100000000)
     if request.args.get('clear'):
         res.delete_cookie(request.args['clear'])
     return res
+
+
+def _parse_collection_cookie(cookie_name):
+    cookie = request.cookies.get(cookie_name)
+    if not cookie:
+        return (None, None)
+    tokens = cookie.split(':')
+    if len(tokens) == 2:
+        return (tokens[0], tokens[1])
+    return (cookie, None)
 
 
 def _get_animation(name, anim):
@@ -739,6 +764,9 @@ def shareName(guid, message='The token shared...'):
         guid = database.get_guid_for_name(guid)
         return redirect(url_for('shareName', guid=guid))
     img_url = database.get_image_url(name=name)
+    flag = 'flagForm' in request.args
+    if flag:
+        message = 'What is your reason for flagging this name?'
     return make_response(render_template(
         'share.html',
         name=name,
@@ -746,6 +774,8 @@ def shareName(guid, message='The token shared...'):
         share_image=img_url,
         share_url=f'https://onomancer.sibr.dev/shareName/{guid}',
         share_guid=guid,
+        flag_form=flag,
+        rotkey=session['USER_CSRF'] + secrets.token_urlsafe(100),
     ))
 
 
@@ -768,6 +798,8 @@ def shareCollection(friends):
         message='Gathered and sowed...',
         share_image=img_url,
         share_url=f'https://onomancer.sibr.dev/shareCollection/{friends}',
+        cname=request.args.get('cname', 'Collection'),
+        meta_title=request.args.get('cname', 'Collection'),
     ))
 
 

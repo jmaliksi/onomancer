@@ -3,6 +3,7 @@
 {% block console %}
 <div>
     <a href="/vote">next</a>
+    <a href="/shareName/{{share_guid}}?flagForm=1">flag</a>
     <form action="/stash" method="post" class="inlineForm">
         {{ csrf_html(session['USER_CSRF'])|safe }}
         <input type="hidden" name="guid" value="{{share_guid}}"/>
@@ -10,4 +11,13 @@
         <button type="submit" alt="stash" title="Save to stash" value="stash" style="text-decoration:underline;margin:10px;">stash</button>
     </form>
 </div>
+{% if flag_form %}
+<p>&nbsp;</p>
+<form id="flagForm" method="post" action="/flag">
+    {{ csrf_html(session['USER_CSRF'])|safe }}
+    <input type="hidden" name="name" value="{{super_secret(name, rotkey)}}" />
+    <input type="text" name="reason" autofocus/>
+    <input type="submit" alt="flag" name="flag" value="Flag"/>
+</form>
+{% endif %}
 {% endblock %}

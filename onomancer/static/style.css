@@ -320,6 +320,12 @@ a {
     flex: 1;
 }
 
+.saveCol label {
+    font-size: .8em;
+    color: #ccc;
+    overflow: hidden;
+}
+
 .save {
     flex-direction: row;
     display: flex;
@@ -365,4 +371,21 @@ a {
     width: 40%;
     list-style-type: none;
     margin: auto;
+}
+
+.collectionName {
+    background: none;
+    border-style: solid;
+    border-color: black;
+    color: inherit;
+    font-family: inherit;
+    font-style: inherit;
+    text-align: center;
+    font-size: inherit;
+    font-variant: inherit;
+    font-weight: 500;
+}
+
+.collectionName:hover {
+    border-color: gray;
 }

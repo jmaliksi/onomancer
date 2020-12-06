@@ -1,12 +1,12 @@
 {% extends "regard.html" %}
-{% block title %}Collection{% endblock %}
+{% block title %}{{cname}}{% endblock %}
 {% block names %}
 <div class="collect">
     <h3>Lineup</h3>
     {% for (name, stars, halfstar, anim) in lineup %}
     <div class="collectRow">
         <div class="collectColumn nameCol {{anim}}">
-            {{name}}
+            <a href="/shareName/{{name}}" target="_blank">{{name}}</a>
         </div>
         <div class="collectColumn stars">
             {% for star in stars %}
@@ -28,7 +28,7 @@
     {% for (name, stars, halfstar, anim) in rotation %}
     <div class="collectRow">
         <div class="collectColumn nameCol {{anim}}">
-            {{name}}
+            <a href="/shareName/{{name}}" target="_blank">{{name}}</a>
         </div>
         <div class="collectColumn stars">
             {% for star in stars %}
