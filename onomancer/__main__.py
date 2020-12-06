@@ -799,7 +799,7 @@ def shareCollection(friends):
         share_image=img_url,
         share_url=f'https://onomancer.sibr.dev/shareCollection/{friends}',
         cname=request.args.get('cname', 'Collection'),
-        meta_title=request.args.get('cname', 'Collection'),
+        share_title=request.args.get('cname', 'Collection'),
     ))
 
 
