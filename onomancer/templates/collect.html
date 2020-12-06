@@ -1,10 +1,10 @@
 {% extends "regard.html" %}
 {% block title %}
 <a id="collection">
-    <form action="collect" method="post" class="inlineForm toplineForm">
+    <form action="collect" method="post" class="inlineForm toplineForm" id="collectName">
         <input type="hidden" name="collection" value="{{collection}}"/>
         <input type="hidden" name="token" value="{{token}}"/>
-        <input type="text" id="cname" name="cname" value="{{cname or 'Collection'}}" class="collectionName" />
+        <input type="text" id="cname" name="cname" value="{{cname or 'Collection'}}" class="collectionName" onfocusout="document.getElementById('collectName').submit()" />
     </form>
 </a>
 {% endblock %}
