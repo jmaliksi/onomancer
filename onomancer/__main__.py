@@ -242,30 +242,20 @@ def annotate():
 
 
 @app.route('/leaderboard')
-def leaderboard(message=None, patience=None):
+def leaderboard(message=None):
     names = database.get_leaders(top=50)
-    patience_cookie = request.cookies.get('patience')
-    if not message and patience_cookie:
-        message = 'Them that descend still settle...'
     res = make_response(render_template(
         'leaderboard.html',
         names=names,
         message=message,
-        patience=patience or patience_cookie,
         rotkey=session['USER_CSRF'] + session['rotkey'],
     ))
-    if patience:
-        res.set_cookie(
-            'patience',
-            value=str(patience),
-            max_age=patience,
-        )
     return res
 
 
 @app.route('/downLeader', methods=['POST'])
 @require_csrf
-@limiter.limit('6/minute')
+@limiter.limit('1/second')
 def downLeader():
     command = request.form.get('command')
     if not command:
@@ -276,11 +266,11 @@ def downLeader():
         database.flip_leader(name)
         message = "The pages thrum with feedback..."
     elif command == 'down':
-        database.upvote_name(name, thumbs=-2)
+        database.upvote_name(name, thumbs=-1)
         message = "A judgement made, the Chosen shift..."
     else:
         message = "Hmm?"
-    return leaderboard(message=message, patience=10)
+    return leaderboard(message=message)
 
 @app.route('/egg')
 def egg(message='The Onomancer waits...'):
@@ -521,20 +511,24 @@ def collect():
                 ])
             except ValueError:
                 cname = 'Collection'
+        anchor = 'titleAnchor'
         if request.form.get('command'):
             command = request.form.get('command')
             name_to_burn = 'name' in request.form and super_safe_decrypt(
                 urllib.parse.unquote(request.form['name']),
                 token * 10,
             )
+            idx = -1
             if command == 'flip':
                 flipped = ' '.join(name_to_burn.split(' ')[::-1])
                 database.upvote_name(flipped, thumbs=0)
-                collection[collection.index(name_to_burn)] = flipped
+                idx = collection.index(name_to_burn)
+                collection[idx] = flipped
                 anim = {'type': 'reverb', 'who': flipped}
             elif command == 'fire':
                 rookie = database.collect(1)[0]
-                collection[collection.index(name_to_burn)] = rookie
+                idx = collection.index(name_to_burn)
+                collection[idx] = rookie
                 anim = {'type': 'burning', 'who': rookie}
             elif command == 'reverb':
                 collection = sorted(collection, key=lambda _: random.random())
@@ -551,11 +545,18 @@ def collect():
                     rookie = database.collect(1)[0]
                 else:
                     rookie = database.get_name_from_guid(random.choice(stashed))
-                collection[collection.index(name_to_burn)] = rookie
+                idx = collection.index(name_to_burn)
+                collection[idx] = rookie
                 anim = {'type': 'feedback', 'who': rookie}
+            if idx >= 9:
+                anchor = 'rotationAnchor'
+            elif idx >= 0:
+                anchor = 'lineupAnchor'
+            else:
+                anchor = 'titleAnchor'
         res = redirect(url_for(
             'collect',
-            _anchor='collection',
+            _anchor=anchor,
             t=token[:8],
             f=_curse_collection(*collection),
             cname=cname,

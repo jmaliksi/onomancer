@@ -1,11 +1,11 @@
 {% extends "regard.html" %}
 {% block title %}
-<a id="collection">
-    <form action="collect" method="post" class="inlineForm toplineForm" id="collectName">
-        <input type="hidden" name="collection" value="{{collection}}"/>
-        <input type="hidden" name="token" value="{{token}}"/>
-        <input type="text" id="cname" name="cname" value="{{cname or 'Collection'}}" class="collectionName" onfocusout="document.getElementById('collectName').submit()" />
-    </form>
+<a id="titleAnchor">
+<form action="collect" method="post" class="inlineForm toplineForm" id="collectName">
+    <input type="hidden" name="collection" value="{{collection}}"/>
+    <input type="hidden" name="token" value="{{token}}"/>
+    <input type="text" id="cname" name="cname" value="{{cname or 'Collection'}}" class="collectionName" onfocusout="document.getElementById('collectName').submit()" />
+</form>
 </a>
 {% endblock %}
 {% block names %}
@@ -20,7 +20,9 @@
     </form>
 </span>
 <div class="collect">
-    <h3>Lineup</h3>
+    <a id="lineupAnchor">
+        <h3>Lineup</h3>
+    </a>
     {% for (name, stars, halfstar, anim) in lineup %}
     <div class="collectRow">
         <div class="collectColumn nameCol {{anim}}">
@@ -51,7 +53,9 @@
         </div>
     </div>
     {% endfor %}
-    <h3>Rotation</h3>
+    <a id="rotationAnchor"/>
+        <h3>Rotation</h3>
+    </a>
     {% for (name, stars, halfstar, anim) in rotation %}
     <div class="collectRow">
         <div class="collectColumn nameCol {{anim}}">

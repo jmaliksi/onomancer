@@ -188,7 +188,7 @@ a {
     .poolItem a {
         animation-duration: 15s;
         animation-name: poolFade;
-        color: #222;
+        color: #333;
     }
 
     .poolItem a:hover {
@@ -204,7 +204,7 @@ a {
 
     @keyframes poolFade {
         from {color: white;}
-        to {color: #222;}
+        to {color: #333;}
     }
 }
 
