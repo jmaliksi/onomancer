@@ -53,6 +53,9 @@ Gets a single name. Same algorithm that serves up names for rating, which is a c
 
 Rate limit: 10/s
 
+Parameters:
+* `with_stats` - generate FK stats for this name
+
 
 ## Get Names
 
@@ -67,6 +70,7 @@ Parameters:
 * `limit` - page size, default 100
 * `offset` - page offset, default 0
 * `random` - returns in random order if set to true, default 0
+* `with_stats` - generate FK stats for each name
 
 ## Get Eggs
 
@@ -76,8 +80,27 @@ Gets n individual eggs in alphabetical order.
 
 Rate limit: 5/s
 
-Parameters
+Parameters:
 * `threshold` - filter names with votes at or above this threshold, default 0
 * `limit` - page size, default 100
 * `offset` - page offset, default 0
 * `random` - returns in random order if set to true, default 0
+
+## Generate Stats
+
+`/api/generateStats/<name>`
+
+Rate limit: 1/s
+
+Given any name, use the letters to seed an RNG to generate FK stats.
+
+## Get Stats
+
+`/api/getStats/`
+
+Rate limit: 5/s
+
+Given a comma separated lst of guids, returns FK stats for all those names.
+
+Parameters:
+* `ids` (required) - comma separated list of guids

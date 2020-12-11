@@ -24,6 +24,7 @@ from profanity import profanity
 from flask_limiter import Limiter
 from flask_limiter.util import get_ipaddr
 from pylru import lrucache
+from blaseball_mike.models import Player
 
 from onomancer import database
 
@@ -585,26 +586,10 @@ def collect():
     # f is for friends
     if request.args.get('load'):
         loaded = saves[request.args['load']]
-        collection = [
-            (
-                name,
-                range(_curse_name(name)[0]),
-                _curse_name(name)[1],
-                '',
-            )
-            for name in _uncurse_collection(loaded[0])
-        ]
+        collection = _load_collection(loaded[0])
         cname = loaded[1]
     else:
-        collection = [
-            (
-                name,
-                range(_curse_name(name)[0]),
-                _curse_name(name)[1],
-                _get_animation(name, anim),
-            )
-            for name in _uncurse_collection(request.args['f'])
-        ]
+        collection = _load_collection(request.args['f'], anim)
     friends = [n[0] for n in collection]
     friend_code = _curse_collection(*friends).decode()
     if request.args.get('save'):
@@ -654,6 +639,26 @@ def _get_animation(name, anim):
     if anim['who'] == name:
         return anim['type']
     return ''
+
+
+def _load_collection(friends, anim=None):
+    names = _uncurse_collection(friends)
+    collection = []
+    for i, name in enumerate(names):
+        player = Player.make_random(seed=name)
+        if i < 9:
+            rating = player.batting_stars
+        else:
+            rating = player.pitching_stars
+        rating = math.modf(rating)
+        collection.append((
+            name,
+            range(int(rating[1])),
+            rating[0] >= .5,
+            _get_animation(name, anim),
+        ))
+
+    return collection
 
 
 @functools.lru_cache()
@@ -718,7 +723,11 @@ def mod_dump_names(key):
 @app.route('/api/getName')
 @limiter.limit('10/second')
 def get_name():
-    return jsonify(database.get_random_name())
+    name = database.get_random_name()
+    with_stats = request.args.get('with_stats', False)
+    if with_stats:
+        return Player.make_random(name=name, seed=name).json()
+    return jsonify(name)
 
 
 @app.route('/api/getNames')
@@ -728,6 +737,7 @@ def get_names():
         'limit',
         'offset',
         'random',
+        'with_stats',
     }
     for arg in request.args:
         if arg not in valid_args:
@@ -736,7 +746,13 @@ def get_names():
     limit = int(request.args.get('limit', 100))
     offset = int(request.args.get('offset', 0))
     rand = request.args.get('random', 0)
-    return jsonify(database.get_names(threshold, limit, offset, rand))
+
+    names = database.get_names(threshold, limit, offset, rand)
+    with_stats = request.args.get('with_stats', False)
+    if with_stats:
+        return jsonify([Player.make_random(name=name, seed=name).json() for name in names])
+
+    return jsonify(names)
 
 
 @app.route('/api/getEggs')
@@ -756,6 +772,26 @@ def get_eggs():
     rand = request.args.get('random', 0)
     return jsonify(database.get_eggs(threshold, limit, offset, rand))
 
+
+@app.route('/api/generateStats/<name>')
+@limiter.limit('1/second')
+def generateStats(name):
+    player = Player.make_random(name=name, seed=name)
+    return jsonify(player.json())
+
+
+@app.route('/api/getStats')
+def getStats():
+    guids = request.args.get('ids', '').split(',')
+    if not guids:
+        return jsonify({'error': 'missing argument `ids`'}), 400
+    names = database.get_names_from_guids(guids)
+    res = {}
+    for guid, name in names.items():
+        p = Player.make_random(name=name, seed=name)
+        setattr(p, 'id', guid)
+        res[guid] = p.json()
+    return jsonify(res)
 
 @app.route('/shareName/<guid>')
 def shareName(guid, message='The token shared...'):
@@ -782,15 +818,7 @@ def shareName(guid, message='The token shared...'):
 
 @app.route('/shareCollection/<friends>')
 def shareCollection(friends):
-    collection = [
-        (
-            name,
-            range(_curse_name(name)[0]),
-            _curse_name(name)[1],
-            '',
-        )
-        for name in _uncurse_collection(friends)
-    ]
+    collection = _load_collection(friends)
     img_url = database.get_collection_image_url(*collection)
     return make_response(render_template(
         'shareCollection.html',
