@@ -726,7 +726,7 @@ def get_name():
     name = database.get_random_name()
     with_stats = request.args.get('with_stats', False)
     if with_stats:
-        return Player.make_random(name=name, seed=name).json()
+        return _make_player_json(name)
     return jsonify(name)
 
 
@@ -750,7 +750,7 @@ def get_names():
     names = database.get_names(threshold, limit, offset, rand)
     with_stats = request.args.get('with_stats', False)
     if with_stats:
-        return jsonify([Player.make_random(name=name, seed=name).json() for name in names])
+        return jsonify([_make_player_json(name) for name in names])
 
     return jsonify(names)
 
@@ -776,8 +776,7 @@ def get_eggs():
 @app.route('/api/generateStats/<name>')
 @limiter.limit('1/second')
 def generateStats(name):
-    player = Player.make_random(name=name, seed=name)
-    return jsonify(player.json())
+    return jsonify(_make_player_json(name))
 
 
 @app.route('/api/getStats')
@@ -788,9 +787,7 @@ def getStats():
     names = database.get_names_from_guids(guids)
     res = {}
     for guid, name in names.items():
-        p = Player.make_random(name=name, seed=name)
-        setattr(p, 'id', guid)
-        res[guid] = p.json()
+        res[guid] = _make_player_json(name, id_=guid)
     return jsonify(res)
 
 @app.route('/shareName/<guid>')
@@ -804,6 +801,27 @@ def shareName(guid, message='The token shared...'):
     flag = 'flagForm' in request.args
     if flag:
         message = 'What is your reason for flagging this name?'
+    examine = 'examine' in request.args
+    stars = None
+    interview = None
+    if examine:
+        message = 'The notes lift...'
+        player = _make_player_json(name)
+        stars = [
+            ('Batting', range(int(player['batting_stars'])), math.modf(player['batting_stars'])[0]),
+            ('Pitching', range(int(player['pitching_stars'])), math.modf(player['pitching_stars'])[0]),
+            ('Baserunning', range(int(player['baserunning_stars'])), math.modf(player['baserunning_stars'])[0]),
+            ('Defense', range(int(player['defense_stars'])), math.modf(player['defense_stars'])[0]),
+        ]
+        interview = [
+            ('Evolution', 'Base'),
+            ('Pregame Ritual', ['Appraisal', 'Regarding', 'Offering'][player['fate'] % 3]),
+            ('Coffee Style', 'Coffee?'),
+            ('Blood Type', 'Blood?'),
+            ('Fate', player['fate']),
+            ('Soulscream', player['soulscream']),
+
+        ]
     return make_response(render_template(
         'share.html',
         name=name,
@@ -813,6 +831,9 @@ def shareName(guid, message='The token shared...'):
         share_guid=guid,
         flag_form=flag,
         rotkey=session['USER_CSRF'] + secrets.token_urlsafe(100),
+        examine=examine,
+        stars=stars,
+        interview=interview,
     ))
 
 
@@ -879,6 +900,27 @@ def stash():
         max_age=1000000000,
     )
     return res
+
+
+def _make_player_json(name, id_=None):
+    player = Player.make_random(name=name, seed=name)
+    js = player.json()
+    props = [
+        'soulscream',
+        'batting_rating',
+        'batting_stars',
+        'pitching_rating',
+        'pitching_stars',
+        'baserunning_rating',
+        'baserunning_stars',
+        'defense_rating',
+        'defense_stars',
+    ]
+    for prop in props:
+        js[prop] = getattr(player, prop)
+    if id_:
+        js['id'] = id_
+    return js
 
 
 if __name__ == '__main__':

@@ -389,3 +389,13 @@ a {
 .collectionName:hover {
     border-color: gray;
 }
+
+.wrap {
+    overflow-wrap: anywhere;
+}
+
+.examine {
+    width: 50%;
+    max-width: 25em;
+    margin: auto;
+}
