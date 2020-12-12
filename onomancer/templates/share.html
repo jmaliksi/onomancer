@@ -17,8 +17,8 @@
     <p>&nbsp;</p>
     {% for (stat, wholes, halfstar) in stars %}
     <div class="collectRow">
-        <div class="collectColumn nameCol">{{stat}}</div>
-        <div class="collectColumn stars">
+        <div class="collectColumn">{{stat}}</div>
+        <div class="collectColumn">
             {% for star in wholes %}
             <span>
             <svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.2" baseProfile="tiny" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
@@ -36,8 +36,8 @@
     {% endfor %}
     {% for k, v in interview %}
     <div class="collectRow">
-        <div class="collectColumn nameCol">{{k}}</div>
-        <div class="collectColumn stars wrap" {%if k == 'Soulscream'%}style="color:red;font-style:italic"{%endif%}>{{v}}</div>
+        <div class="collectColumn">{{k}}</div>
+        <div class="collectColumn wrap" {%if k == 'Soulscream'%}style="color:red;font-style:italic"{%endif%}>{{v}}</div>
     </div>
     {% endfor %}
 </div>
