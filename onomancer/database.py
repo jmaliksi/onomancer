@@ -199,7 +199,9 @@ def get_random_name():
         if random.random() < .05:
             # pull something from the top of the board
             try:
-                rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes DESC, RANDOM() LIMIT 1000 OFFSET 100').fetchall()
+                max_votes = conn.execute('SELECT max(votes) as m FROM leaders').fetchone()
+                thresh = (max_votes['m'] - 3) if max_votes else 0
+                rows = conn.execute('SELECT name FROM leaders WHERE votes > ? AND naughty=0 AND votes <= ? ORDER BY votes DESC, RANDOM() LIMIT 1000', (LEADER_THRESHOLD, thresh)).fetchall()
                 return random.choice(rows)['name']
             except IndexError:
                 pass
