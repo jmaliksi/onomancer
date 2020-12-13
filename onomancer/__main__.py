@@ -841,17 +841,18 @@ def shareName(guid, message='The token shared...'):
     if flag:
         message = 'What is your reason for flagging this name?'
     examine = 'examine' in request.args
-    stars = None
     interview = None
+
+    player = _make_player_json(name)
+    stars = [
+        ('Batting', range(int(player['batting_stars'])), math.modf(player['batting_stars'])[0]),
+        ('Pitching', range(int(player['pitching_stars'])), math.modf(player['pitching_stars'])[0]),
+        ('Baserunning', range(int(player['baserunning_stars'])), math.modf(player['baserunning_stars'])[0]),
+        ('Defense', range(int(player['defense_stars'])), math.modf(player['defense_stars'])[0]),
+    ]
+
     if examine:
         message = 'The notes lift...'
-        player = _make_player_json(name)
-        stars = [
-            ('Batting', range(int(player['batting_stars'])), math.modf(player['batting_stars'])[0]),
-            ('Pitching', range(int(player['pitching_stars'])), math.modf(player['pitching_stars'])[0]),
-            ('Baserunning', range(int(player['baserunning_stars'])), math.modf(player['baserunning_stars'])[0]),
-            ('Defense', range(int(player['defense_stars'])), math.modf(player['defense_stars'])[0]),
-        ]
         interview = [
             ('Evolution', 'Base'),
             ('Pregame Ritual', ['Appraisal', 'Regarding', 'Offering'][player['fate'] % 3]),
@@ -861,6 +862,14 @@ def shareName(guid, message='The token shared...'):
             ('Soulscream', player['soulscream']),
 
         ]
+
+    share_desc = '\n'.join([
+        f'Soulscream: {player["soulscream"]}',
+        f'Batting: {"★" * len(stars[0][1])}{"☆" if stars[0][2] else ""}',
+        f'Pitching: {"★" * len(stars[1][1])}{"☆" if stars[1][2] else ""}',
+        f'Baserunning: {"★" * len(stars[2][1])}{"☆" if stars[2][2] else ""}',
+        f'Defense: {"★" * len(stars[3][1])}{"☆" if stars[3][2] else ""}',
+    ])
     return make_response(render_template(
         'share.html',
         name=name,
@@ -873,6 +882,8 @@ def shareName(guid, message='The token shared...'):
         examine=examine,
         stars=stars,
         interview=interview,
+        share_title=name,
+        share_desc=share_desc,
     ))
 
 
