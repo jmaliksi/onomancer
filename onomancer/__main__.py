@@ -864,11 +864,11 @@ def shareName(guid, message='The token shared...'):
         ]
 
     share_desc = '\n'.join([
-        f'Soulscream: {player["soulscream"]}',
         f'Batting: {"★" * len(stars[0][1])}{"☆" if stars[0][2] else ""}',
         f'Pitching: {"★" * len(stars[1][1])}{"☆" if stars[1][2] else ""}',
         f'Baserunning: {"★" * len(stars[2][1])}{"☆" if stars[2][2] else ""}',
         f'Defense: {"★" * len(stars[3][1])}{"☆" if stars[3][2] else ""}',
+        f'Soulscream: {player["soulscream"]}',
     ])
     return make_response(render_template(
         'share.html',
