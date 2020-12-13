@@ -14,34 +14,36 @@
     <script>
         var ctx = document.getElementById("chart");
         var chart = new Chart(ctx, {
-            type: 'scatter',
+            type: 'bar',
             data: {
+                labels: {{ids}},
                 datasets: [
                     {
-                        label: 'Good eggs',
+                        label: 'Upvotes',
                         data: [
-                            {% for egg in good_eggs %}
-                            {
-                                x: {{egg['x']}},
-                                y: {{egg['y']}}
-                            },
+                            {% for egg in eggs %}
+                            {{egg['upvotes']}},
                             {% endfor %}
                         ],
                         backgroundColor: "#00f"
                     },
                     {
-                        label: 'Bad eggs',
+                        label: 'Downvotes',
                         data: [
-                            {% for egg in bad_eggs %}
-                            {
-                                x: {{egg['x']}},
-                                y: {{egg['y']}}
-                            },
+                            {% for egg in eggs %}
+                            {{egg['downvotes']}},
                             {% endfor %}
                         ],
                         backgroundColor: "#f00"
                     }
                 ]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        stacked: true
+                    }]
+                }
             }
         });
     </script>

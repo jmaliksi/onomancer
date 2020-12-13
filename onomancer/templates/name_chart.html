@@ -10,7 +10,7 @@
     <script src="{{url_for('static', filename='Chart.min.js')}}"></script>
 </head>
 <body>
-    <canvas id="chart" width="700" height="500"></canvas>
+    <canvas id="chart" width="16" height="8"></canvas>
     <script>
         var ctx = document.getElementById("chart");
         var chart = new Chart(ctx, {
@@ -21,6 +21,13 @@
                     label: 'Count by votes',
                     data: {{count}},
                 }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        type: "{{type_}}"
+                    }]
+                }
             }
         });
     </script>

@@ -724,10 +724,12 @@ def mod_dump_names(key):
 @limiter.limit('1/second')
 def chart_names():
     count, votes = database.chart_leaders()
+    type_ = request.args.get('type', 'linear')
     return make_response(render_template(
         'name_chart.html',
         count=count,
         votes=votes,
+        type_=type_,
     ))
 
 
@@ -741,6 +743,19 @@ def chart_eggs():
         'egg_chart.html',
         good_eggs=good,
         bad_eggs=bad,
+    ))
+
+
+@app.route('/chart/eggVotes')
+@limiter.limit('1/second')
+def chart_egg_votes():
+    start = request.args.get('start', 1)
+    end = request.args.get('end', None)
+    votes = database.chart_egg_votes(start=start, end=end)
+    return make_response(render_template(
+        'egg_vote_chart.html',
+        eggs=votes,
+        ids=[v['id'] for v in votes],
     ))
 
 

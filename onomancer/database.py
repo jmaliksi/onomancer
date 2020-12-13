@@ -414,6 +414,16 @@ def chart_eggs(start=1, end=None):
         return good, bad
 
 
+def chart_egg_votes(start=1, end=None):
+    with connect() as conn:
+        if not end:
+            end = conn.execute('SELECT MAX(id) as m FROM names').fetchone()['m']
+        return conn.execute(
+            'SELECT id, upvotes, downvotes FROM names WHERE naughty=0 AND id>=? AND id<=? ORDER BY id',
+            (start, end),
+        ).fetchall()
+
+
 def get_names(threshold=0, limit=100, offset=0, rand=0):
     with connect() as c:
         order = 'RANDOM()' if rand else 'name'
