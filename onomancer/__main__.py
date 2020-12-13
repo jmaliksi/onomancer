@@ -720,6 +720,30 @@ def mod_dump_names(key):
     return jsonify(database.dump_leaders())
 
 
+@app.route('/chart/names')
+@limiter.limit('1/second')
+def chart_names():
+    count, votes = database.chart_leaders()
+    return make_response(render_template(
+        'name_chart.html',
+        count=count,
+        votes=votes,
+    ))
+
+
+@app.route('/chart/eggs')
+@limiter.limit('1/second')
+def chart_eggs():
+    start = request.args.get('start', 1)
+    end = request.args.get('end', None)
+    good, bad = database.chart_eggs(start=start, end=end)
+    return make_response(render_template(
+        'egg_chart.html',
+        good_eggs=good,
+        bad_eggs=bad,
+    ))
+
+
 @app.route('/api/getName')
 @limiter.limit('10/second')
 def get_name():

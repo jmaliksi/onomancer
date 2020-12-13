@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if testing() %}
+    <link rel="shortcut icon" href="{{url_for('static', filename='crystal-ball2.png')}}" />
+    {% else %}
+    <link rel="shortcut icon" href="{{url_for('static', filename='crystal-ball.png')}}" />
+    {% endif %}
+    <script src="{{url_for('static', filename='Chart.min.js')}}"></script>
+</head>
+<body>
+    <canvas id="chart" width="700" height="500"></canvas>
+    <script>
+        var ctx = document.getElementById("chart");
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{votes}},
+                datasets: [{
+                    label: 'Count by votes',
+                    data: {{count}},
+                }]
+            }
+        });
+    </script>
+</body>

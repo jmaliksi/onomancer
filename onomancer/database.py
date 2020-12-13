@@ -5,6 +5,7 @@ import sqlite3
 import sys
 from urllib.parse import quote
 import uuid
+from collections import namedtuple
 
 from imagekitio import ImageKit
 
@@ -392,6 +393,25 @@ def dump_names():
 def dump_leaders():
     with connect() as conn:
         return [dict(r) for r in conn.execute('SELECT * FROM leaders')]
+
+
+def chart_leaders():
+    with connect() as conn:
+        res = conn.execute('SELECT count(*) as c, votes FROM leaders GROUP BY votes ORDER BY votes').fetchall()
+        return [r['c'] for r in res], [r['votes'] for r in res]
+
+
+def chart_eggs(start=1, end=None):
+    with connect() as conn:
+        if not end:
+            end = conn.execute('SELECT MAX(id) as m FROM names').fetchone()['m']
+        good = conn.execute(
+            'SELECT id as x, upvotes+downvotes as y FROM names WHERE naughty=0 AND id>=? AND id<=? AND (downvotes>=? OR upvotes+downvotes>=-2) ORDER BY id',
+            (start, end, VOTE_THRESHOLD))
+        bad = conn.execute(
+            'SELECT id as x, upvotes+downvotes as y FROM names WHERE naughty=0 AND id>=? AND id<=? AND (downvotes<? AND upvotes+downvotes<-2) ORDER BY id',
+            (start, end, VOTE_THRESHOLD))
+        return good, bad
 
 
 def get_names(threshold=0, limit=100, offset=0, rand=0):
