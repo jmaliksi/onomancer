@@ -47,7 +47,6 @@ try:
 except Exception as e:
     print(e)
 
-
 csrf = CSRF(config=CSRF_CONFIG)
 app = csrf.init_app(app)
 
@@ -56,6 +55,18 @@ limiter = Limiter(
     key_func=get_ipaddr,
     default_limits=['5/second'],
 )
+
+class HttpsProxy(object):
+    def __init__(self, app):
+        self.app = app
+        self.url_scheme = 'https'
+
+    def __call__(self, environ, start_response):
+        environ['wsgi.url_scheme'] = self.url_scheme
+        return self.app(environ, start_response)
+
+app.wsgi_app = HttpsProxy(app.wsgi_app)
+
 
 profanity.load_words()
 profanity.load_words(profanity.words + [
@@ -977,4 +988,5 @@ if __name__ == '__main__':
     debug = False
     if 'test' in sys.argv:
         debug = True
+        app.wsgi_app.url_scheme = 'http'
     app.run(host='0.0.0.0', port=5001, debug=debug)
