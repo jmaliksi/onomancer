@@ -278,7 +278,7 @@ def downLeader():
         database.flip_leader(name)
         message = "The pages thrum with feedback..."
     elif command == 'down':
-        database.upvote_name(name, thumbs=-1)
+        database.upvote_name(name, thumbs=-1, hit_eggs=False)
         message = "A judgement made, the Chosen shift..."
     else:
         message = "Hmm?"

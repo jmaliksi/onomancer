@@ -197,15 +197,6 @@ def get_random_name():
                 return name
 
         # no good name gen, just pick something good from the leaderboard
-        if random.random() < .05:
-            # pull something from the top of the board
-            try:
-                max_votes = conn.execute('SELECT max(votes) as m FROM leaders').fetchone()
-                thresh = (max_votes['m'] - 3) if max_votes else 0
-                rows = conn.execute('SELECT name FROM leaders WHERE votes > ? AND naughty=0 AND votes <= ? ORDER BY votes DESC, RANDOM() LIMIT 1000', (LEADER_THRESHOLD, thresh)).fetchall()
-                return random.choice(rows)['name']
-            except IndexError:
-                pass
         if random.random() < .1:
             # pull something from the bottom of the board to differentiate it faster
             rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes ASC, RANDOM() LIMIT 200').fetchall()
