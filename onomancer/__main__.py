@@ -657,6 +657,7 @@ def _load_collection(friends, anim=None):
     collection = []
     for i, name in enumerate(names):
         player = Player.make_random(seed=name)
+        player = player.simulated_copy(buffs={'overall_rating': (player.total_fingers - 10) * .01})
         if i < 9:
             rating = player.batting_stars
         else:
@@ -965,6 +966,7 @@ def stash():
 
 def _make_player_json(name, id_=None):
     player = Player.make_random(name=name, seed=name)
+    player = player.simulated_copy(buffs={'overall_rating': (player.total_fingers - 10) * .01})
     js = player.json()
     props = [
         'soulscream',
