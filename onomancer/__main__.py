@@ -924,6 +924,7 @@ def reflect():
     stars = []
     interview = []
     fk = False
+    vibe = None
     if name:
         player = _make_player_json(name)
         if request.args.get('vibe'):
