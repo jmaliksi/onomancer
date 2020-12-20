@@ -1087,8 +1087,9 @@ def _make_player_json(name, id_=None):
     if id_:
         js['id'] = id_
     now = datetime.datetime.utcnow()
-    current_vibe = player.get_vibe((now - datetime.datetime(now.year, now.month, now.day, 17)).seconds / 3600)
-    js['current_vibe'] = current_vibe
+    monday = now - datetime.timedelta(days=now.weekday())
+    current_day = (now - monday.replace(hour=17)).total_seconds() / 3600
+    js['current_vibe'] = player.get_vibe(current_day)
     return js
 
 
