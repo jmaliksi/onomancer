@@ -1007,7 +1007,7 @@ def reflect():
                 ('Cinnamon', round(player['cinnamon'], 6), player['cinnamon']),
                 ('Deceased', player['deceased'], 1.0 - player['deceased']),
                 ('Peanut Allergy', player['peanutAllergy'], 1.0 - player['peanutAllergy']),
-                ('Pressurization', round(player['pressurization'], 6), player['pressurization']),
+                ('Pressurization', round(player['pressurization'], 6), 1.0 - player['pressurization']),
                 ('Soul', player['soul'], 0),
                 ('Total Fingers', player['totalFingers'], 0),
             ])
