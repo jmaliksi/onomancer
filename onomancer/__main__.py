@@ -933,7 +933,19 @@ def reflect():
     fk = False
     vibe = None
     if name:
-        player = _make_player_json(name)
+        try:
+            p = Player.find_by_name(name)
+            player = p.json()
+            player['current_vibe'] = p.get_vibe(_current_day())
+            player['batting_stars'] = p.batting_stars
+            player['pitching_stars'] = p.pitching_stars
+            player['baserunning_stars'] = p.baserunning_stars
+            player['defense_stars'] = p.defense_stars
+            player['soulscream'] = p.soulscream
+            player['blood'] = p.blood
+            player['coffee'] = p.coffee
+        except (AttributeError, KeyError):
+            player = _make_player_json(name)
         if request.args.get('vibe'):
             player['current_vibe'] = float(request.args['vibe'])
         if player['current_vibe'] < -0.8:
@@ -958,9 +970,9 @@ def reflect():
         ]
         interview = [
             ('Evolution', 'Base', None),
-            ('Pregame Ritual', ['Appraisal', 'Regarding', 'Offering'][player['fate'] % 3], None),
-            ('Coffee Style', 'Coffee?', None),
-            ('Blood Type', 'Blood?', None),
+            ('Pregame Ritual', player.get('ritual', ['Appraisal', 'Regarding', 'Offering'][player['fate'] % 3]), None),
+            ('Coffee Style', player.get('coffee', 'Coffee?'), None),
+            ('Blood Type', player.get('blood', 'Blood?'), None),
             ('Fate', player['fate'], None),
             ('Soulscream', player['soulscream'], None),
         ]
@@ -1093,11 +1105,14 @@ def _make_player_json(name, id_=None):
         js[prop] = getattr(player, prop)
     if id_:
         js['id'] = id_
+    js['current_vibe'] = player.get_vibe(_current_day())
+    return js
+
+
+def _current_day():
     now = datetime.datetime.utcnow()
     monday = now - datetime.timedelta(days=now.weekday())
-    current_day = (now - monday.replace(hour=17)).total_seconds() / 3600
-    js['current_vibe'] = player.get_vibe(current_day)
-    return js
+    return (now - monday.replace(hour=17)).total_seconds() / 3600
 
 
 if __name__ == '__main__':
