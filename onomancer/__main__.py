@@ -932,6 +932,7 @@ def reflect():
     interview = []
     fk = False
     vibe = None
+    message = 'Whisper a name, and See its fate...'
     if name:
         try:
             p = Player.find_by_name(name)
@@ -944,8 +945,10 @@ def reflect():
             player['soulscream'] = p.soulscream
             player['blood'] = p.blood
             player['coffee'] = p.coffee
+            message = 'A name already known...'
         except (AttributeError, KeyError):
             player = _make_player_json(name)
+            message = 'A page removed, the ink swirls...'
         if request.args.get('vibe'):
             player['current_vibe'] = float(request.args['vibe'])
         if player['current_vibe'] < -0.8:
@@ -1011,6 +1014,7 @@ def reflect():
                 ('Soul', player['soul'], 0),
                 ('Total Fingers', player['totalFingers'], 0),
             ])
+            message = 'The page is shorn'
     return make_response(render_template(
         'reflect.html',
         name=name,
@@ -1018,6 +1022,7 @@ def reflect():
         interview=interview,
         fk=fk,
         vibe=vibe,
+        message=message,
     ))
 
 
