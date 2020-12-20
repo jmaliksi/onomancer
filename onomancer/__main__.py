@@ -845,8 +845,15 @@ def get_eggs():
 
 
 @app.route('/api/generateStats/<name>')
-@limiter.limit('25/second')
+@limiter.limit('50/second')
 def generateStats(name):
+    return jsonify(_make_player_json(name))
+
+
+@app.route('/api/generateStats2')
+@limiter.limit('50/second')
+def generateStats2():
+    name = request.args.get('name')
     return jsonify(_make_player_json(name))
 
 
