@@ -914,17 +914,48 @@ def reflect():
             ('Defense', range(int(player['defense_stars'])), math.modf(player['defense_stars'])[0]),
         ]
         interview = [
-            ('Evolution', 'Base'),
-            ('Pregame Ritual', ['Appraisal', 'Regarding', 'Offering'][player['fate'] % 3]),
-            ('Coffee Style', 'Coffee?'),
-            ('Blood Type', 'Blood?'),
-            ('Fate', player['fate']),
-            ('Soulscream', player['soulscream']),
+            ('Evolution', 'Base', None),
+            ('Pregame Ritual', ['Appraisal', 'Regarding', 'Offering'][player['fate'] % 3], None),
+            ('Coffee Style', 'Coffee?', None),
+            ('Blood Type', 'Blood?', None),
+            ('Fate', player['fate'], None),
+            ('Soulscream', player['soulscream'], None),
         ]
         fk = request.args.get('fk') == "True"
         if fk:
             # TODO extend interview with fk
-            interview.extend(list(player.items()))
+            interview.extend([
+                ('Base Thirst', round(player['baseThirst'], 6), player['baseThirst']),
+                ('Continuation', round(player['continuation'], 6), player['continuation']),
+                ('Ground Friction', round(player['groundFriction'], 6), player['groundFriction']),
+                ('Indulgence', round(player['indulgence'], 6), player['indulgence']),
+                ('Laserlikeness', round(player['laserlikeness'], 6), player['laserlikeness']),
+                ('Divinity', round(player['divinity'], 6), player['divinity']),
+                ('Martyrdom', round(player['martyrdom'], 6), player['martyrdom']),
+                ('Moxie', round(player['moxie'], 6), player['moxie']),
+                ('Musclitude', round(player['musclitude'], 6), player['musclitude']),
+                ('Patheticism', round(player['patheticism'], 6), 1.0 - player['patheticism']),
+                ('Thwackability', round(player['thwackability'], 6), player['thwackability']),
+                ('Tragicness', round(player['tragicness'], 6), 1.0 - player['tragicness']),
+                ('Anticapitalism', round(player['anticapitalism'], 6), player['anticapitalism']),
+                ('Chasiness', round(player['chasiness'], 6), player['chasiness']),
+                ('Omniscience', round(player['omniscience'], 6), player['omniscience']),
+                ('Tenaciousness', round(player['tenaciousness'], 6), player['tenaciousness']),
+                ('Watchfulness', round(player['watchfulness'], 6), player['watchfulness']),
+                ('Coldness', round(player['coldness'], 6), player['coldness']),
+                ('Overpowerment', round(player['overpowerment'], 6), player['overpowerment']),
+                ('Ruthlessness', round(player['ruthlessness'], 6), player['ruthlessness']),
+                ('Shakespearianism', round(player['shakespearianism'], 6), player['shakespearianism']),
+                ('Unthwackability', round(player['unthwackability'], 6), player['unthwackability']),
+                ('Suppression', round(player['suppression'], 6), player['suppression']),
+                ('Buoyancy', round(player['buoyancy'], 6), player['buoyancy']),
+                ('Cinnamon', round(player['cinnamon'], 6), player['cinnamon']),
+                ('Deceased', player['deceased'], 1.0 - player['deceased']),
+                ('Peanut Allergy', player['peanutAllergy'], 1.0 - player['peanutAllergy']),
+                ('Pressurization', round(player['pressurization'], 6), player['pressurization']),
+                ('Soul', player['soul'], 0),
+                ('Total Fingers', player['totalFingers'], 0),
+            ])
     return make_response(render_template(
         'reflect.html',
         name=name,

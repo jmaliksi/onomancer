@@ -9,6 +9,7 @@
     <input type="submit" value="Reflect"/>
 </form>
 {% if name %}
+<p>&nbsp;</p>
 <div class="examine">
     {% for (stat, wholes, halfstar) in stars %}
     <div class="collectRow">
@@ -29,14 +30,15 @@
         </div>
     </div>
     {% endfor %}
-    {% for k, v in interview %}
+    {% for k, v, b in interview %}
     <div class="collectRow">
         <div class="collectColumn">{{k}}</div>
-        <div class="collectColumn wrap" {%if k == 'Soulscream'%}style="color:red;font-style:italic"{%endif%}>{{v}}</div>
+        <div class="collectColumn wrap" {%if k == 'Soulscream'%}style="color:red;font-style:italic"{%endif%} {%if b%}style="color:rgb({{(1-b) * 255}},{{(1-b) * 255}},255"{%endif%}>{{v}}</div>
     </div>
     {% endfor %}
     <p>&nbsp;</p>
     <a href="/reflect?name={{name}}&fk={{not fk}}">{%if fk %}Close{%else%}Open{%endif%} Forbidden Knowledge</a>
+    <p>&nbsp;</p>
 </div>
 {% endif %}
 {% endblock %}
