@@ -1,4 +1,5 @@
 import base64
+import datetime
 import functools
 import json
 import random
@@ -825,7 +826,7 @@ def get_eggs():
 
 
 @app.route('/api/generateStats/<name>')
-@limiter.limit('1/second')
+@limiter.limit('25/second')
 def generateStats(name):
     return jsonify(_make_player_json(name))
 
@@ -872,7 +873,6 @@ def shareName(guid, message='The token shared...'):
             ('Blood Type', 'Blood?'),
             ('Fate', player['fate']),
             ('Soulscream', player['soulscream']),
-
         ]
 
     share_desc = '\n'.join([
@@ -896,6 +896,41 @@ def shareName(guid, message='The token shared...'):
         interview=interview,
         share_title=name,
         share_desc=share_desc,
+    ))
+
+
+@app.route('/reflect')
+def reflect():
+    name = request.args.get('name')
+    stars = []
+    interview = []
+    fk = False
+    if name:
+        player = _make_player_json(name)
+        stars = [
+            ('Batting', range(int(player['batting_stars'])), math.modf(player['batting_stars'])[0]),
+            ('Pitching', range(int(player['pitching_stars'])), math.modf(player['pitching_stars'])[0]),
+            ('Baserunning', range(int(player['baserunning_stars'])), math.modf(player['baserunning_stars'])[0]),
+            ('Defense', range(int(player['defense_stars'])), math.modf(player['defense_stars'])[0]),
+        ]
+        interview = [
+            ('Evolution', 'Base'),
+            ('Pregame Ritual', ['Appraisal', 'Regarding', 'Offering'][player['fate'] % 3]),
+            ('Coffee Style', 'Coffee?'),
+            ('Blood Type', 'Blood?'),
+            ('Fate', player['fate']),
+            ('Soulscream', player['soulscream']),
+        ]
+        fk = request.args.get('fk') == "True"
+        if fk:
+            # TODO extend interview with fk
+            interview.extend(list(player.items()))
+    return make_response(render_template(
+        'reflect.html',
+        name=name,
+        stars=stars,
+        interview=interview,
+        fk=fk,
     ))
 
 
@@ -983,6 +1018,9 @@ def _make_player_json(name, id_=None):
         js[prop] = getattr(player, prop)
     if id_:
         js['id'] = id_
+    now = datetime.datetime.utcnow()
+    current_vibe = player.get_vibe((now - datetime.datetime(now.year, now.month, now.day, 17)).seconds / 3600)
+    js['current_vibe'] = current_vibe
     return js
 
 
