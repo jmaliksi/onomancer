@@ -399,3 +399,10 @@ a {
     max-width: 25em;
     margin: auto;
 }
+
+.vibeLink {
+    margin: 0;
+    margin-left: 5px;
+    font-size: .8em;
+    font-style: italic;
+}

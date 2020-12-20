@@ -759,6 +759,25 @@ def chart_eggs():
     ))
 
 
+@app.route('/vibeGraph/<name>')
+def chart_vibes(name):
+    player = Player.make_random(name=name, seed=name)
+    player = player.simulated_copy(buffs={'overall_rating': (player.total_fingers - 10) * .01})
+    days = list(range(99))
+    vibes = [player.get_vibe(d) for d in days]
+    return make_response(render_template(
+        'vibe_chart.html',
+        days=days,
+        vibes=vibes,
+        quality=[.1] * len(days),
+        excellent=[.4] * len(days),
+        most_excellent=[.8] * len(days),
+        less=[-.1] * len(days),
+        far_less=[-.4] * len(days),
+        terrible=[-.8] * len(days),
+    ))
+
+
 @app.route('/chart/eggVotes')
 @limiter.limit('1/second')
 def chart_egg_votes():
@@ -907,6 +926,22 @@ def reflect():
     fk = False
     if name:
         player = _make_player_json(name)
+        if request.args.get('vibe'):
+            player['current_vibe'] = float(request.args['vibe'])
+        if player['current_vibe'] < -0.8:
+            vibe = ('Honestly Terrible', 'ff0000')
+        elif player['current_vibe'] < -0.4:
+            vibe = ('Far Less Than Ideal', 'ff4444')
+        elif player['current_vibe'] < -0.1:
+            vibe = ('Less Than Ideal', 'ffaaaa')
+        elif player['current_vibe'] < 0.1:
+            vibe = ('Neutral', 'fff')
+        elif player['current_vibe'] < 0.4:
+            vibe = ('Quality', 'ccffcc')
+        elif player['current_vibe'] < 0.8:
+            vibe = ('Excellent', '99ff99')
+        else:
+            vibe = ('Most Excellent', '00ff00')
         stars = [
             ('Batting', range(int(player['batting_stars'])), math.modf(player['batting_stars'])[0]),
             ('Pitching', range(int(player['pitching_stars'])), math.modf(player['pitching_stars'])[0]),
@@ -923,8 +958,8 @@ def reflect():
         ]
         fk = request.args.get('fk') == "True"
         if fk:
-            # TODO extend interview with fk
             interview.extend([
+                ('Current Vibe', round(player['current_vibe'], 6), None),
                 ('Base Thirst', round(player['baseThirst'], 6), player['baseThirst']),
                 ('Continuation', round(player['continuation'], 6), player['continuation']),
                 ('Ground Friction', round(player['groundFriction'], 6), player['groundFriction']),
@@ -962,6 +997,7 @@ def reflect():
         stars=stars,
         interview=interview,
         fk=fk,
+        vibe=vibe,
     ))
 
 

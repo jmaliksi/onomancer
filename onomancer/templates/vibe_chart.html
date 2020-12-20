@@ -1,0 +1,81 @@
+{% extends "offer.html" %}
+{% block content %}
+<script src="{{url_for('static', filename='Chart.min.js')}}"></script>
+<canvas id="chart" width="16" height="8"></canvas>
+<script>
+var ctx = document.getElementById("chart");
+var chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{days}},
+        datasets: [
+            {
+                label: 'Vibe Check',
+                data: {{vibes}},
+                borderColor: "#fff",
+                fill: false,
+                radius: 0,
+                borderWidth: 2,
+            },
+            {
+                label: 'Quality',
+                data: {{quality}},
+                borderColor: '#cfc8',
+                radius: 0,
+                borderWidth: 1,
+            },
+            {
+                label: 'Excellent',
+                data: {{excellent}},
+                borderColor: '#9f98',
+                radius: 0,
+                borderWidth: 1,
+            },
+            {
+                label: 'Most Excellent',
+                data: {{most_excellent}},
+                borderColor: '#0f08',
+                radius: 0,
+                borderWidth: 1,
+            },
+            {
+                label: 'Less Than Ideal',
+                data: {{less}},
+                borderColor: '#faa8',
+                radius: 0,
+                borderWidth: 1,
+            },
+            {
+                label: 'Far Less Than Ideal',
+                data: {{far_less}},
+                borderColor: '#f448',
+                radius: 0,
+                borderWidth: 1,
+            },
+            {
+                label: 'Honestly Terrible',
+                data: {{terrible}},
+                borderColor: '#f008',
+                radius: 0,
+                borderWidth: 1,
+            },
+
+        ],
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                gridLines: {
+                    zeroLineWidth: 1,
+                    zeroLineColor: '#222'
+                },
+                ticks: {
+                    suggestedMin: -1,
+                    suggestedMax: 1
+                }
+            }]
+        }
+    }
+});
+</script>
+{% endblock %}

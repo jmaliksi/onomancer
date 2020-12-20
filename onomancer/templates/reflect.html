@@ -11,6 +11,10 @@
 {% if name %}
 <p>&nbsp;</p>
 <div class="examine">
+    <div class="collectRow">
+        <div class="collectColumn">Current Vibes</div>
+        <div class="collectColumn" style="color:#{{vibe[1]}}">{{vibe[0]}}</div>
+    </div>
     {% for (stat, wholes, halfstar) in stars %}
     <div class="collectRow">
         <div class="collectColumn">{{stat}}</div>
@@ -33,7 +37,12 @@
     {% for k, v, b in interview %}
     <div class="collectRow">
         <div class="collectColumn">{{k}}</div>
-        <div class="collectColumn wrap" {%if k == 'Soulscream'%}style="color:red;font-style:italic"{%endif%} {%if b%}style="color:rgb({{(1-b) * 255}},{{(1-b) * 255}},255"{%endif%}>{{v}}</div>
+        <div class="collectColumn wrap" {%if k == 'Soulscream'%}style="color:red;font-style:italic"{%endif%} {%if b%}style="color:rgb({{(1-b) * 255}},{{(1-b) * 255}},255"{%endif%}>
+            {{v}}
+            {%if k == 'Current Vibe' %}
+            <a href="/vibeGraph/{{name}}" class="vibeLink" target="_blank">graph</a>
+            {%endif%}
+        </div>
     </div>
     {% endfor %}
     <p>&nbsp;</p>
