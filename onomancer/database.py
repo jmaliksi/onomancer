@@ -132,7 +132,7 @@ def upvote_name(name, thumbs=1, hit_eggs=True):
         if thumbs < 0 and check_egg_threshold(name):
             mult = 2
 
-        conn.execute('INSERT INTO leaders (name, votes, naughty, guid) VALUES (?, ?, ?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, thumbs, naughty, str(uuid.uuid4()), thumbs * mult))
+        conn.execute('INSERT INTO leaders (name, votes, naughty, guid) VALUES (?, 1, ?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, naughty, str(uuid.uuid4()), thumbs * mult))
 
 
 def flip_leader(name):
