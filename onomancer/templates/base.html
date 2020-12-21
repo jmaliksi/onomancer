@@ -9,17 +9,13 @@
     <meta property="og:url" content="{{share_url or 'https://onomancer.sibr.dev'}}">
     <meta property="og:title" content="{{ share_title or 'Onomancer' }}">
     <meta property="og:description" content="{{ share_desc or 'Distill the Ultimate Blaseball Name.'}}">
-    {% if share_image %}
-    <meta property="og:image" content="{{share_image}}"/>
-    <meta property="og:image:secure" content="{{share_image}}"/>
-    {% endif %}
+    <meta property="og:image" content="{{share_image or 'https://ik.imagekit.io/4waizx9and/onomancer/onomancer_F3_jtvpBt.png'}}"/>
+    <meta property="og:image:secure" content="{{share_image or 'https://ik.imagekit.io/4waizx9and/onomancer/onomancer_F3_jtvpBt.png'}}"/>
 
     <meta name="twitter:title" content="{{ share_title or 'Onomancer' }}">
     <meta name="twitter:description" content="{{ share_desc or 'Distill the Ultimate Blaseball Name.'}}">
     <meta property="twitter:card" content="summary_large_image">
-    {% if share_image %}
-    <meta name="twitter:image" content="{{share_image}}">
-    {% endif %}
+    <meta name="twitter:image" content="{{share_image or 'https://ik.imagekit.io/4waizx9and/onomancer/onomancer_F3_jtvpBt.png'}}">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
