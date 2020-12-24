@@ -94,6 +94,16 @@ Rate limit: 1/s
 
 Given any name, use the letters to seed an RNG to generate FK stats.
 
+`/api/generateStats2`
+
+Rate limit: 50/s
+
+This version properly handles slashes
+
+Parameters:
+* `name` - Required
+
+
 ## Get Stats
 
 `/api/getStats/`
@@ -104,3 +114,14 @@ Given a comma separated lst of guids, returns FK stats for all those names.
 
 Parameters:
 * `ids` (required) - comma separated list of guids
+
+## Get Collection
+
+`/api/getCollection`
+
+Given the entire share URL or just share code of a Collection, return a JSON blob representing the team with full player stats.
+
+Rate limit: 5/s
+
+Parameters:
+* `token` - Required. Either the full share URL or just the token (ie everything that comes after `shareCollection/` in the share URL)

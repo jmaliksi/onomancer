@@ -868,6 +868,26 @@ def getStats():
         res[guid] = _make_player_json(name, id_=guid)
     return jsonify(res)
 
+@app.route('/api/getCollection')
+def getCollection():
+    token = request.args.get('token')
+    if not token:
+        return jsonify({'error': 'missing argument `token`'}), 400
+    team_name = 'North Pole Placeholders'
+    if 'shareCollection/' in token:
+        token = token.split('shareCollection/')[1]
+    if '?cname=' in token:
+        token, team_name = token.split('?cname=')
+    names = _uncurse_collection(token)
+    collection = []
+    for name in names:
+        collection.append(_make_player_json(name))
+    return {
+        'fullName': team_name,
+        'lineup': collection[:9],
+        'rotation': collection[9:],
+    }
+
 @app.route('/shareName/<guid>')
 def shareName(guid, message='The token shared...'):
     try:
