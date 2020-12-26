@@ -415,6 +415,12 @@ def chart_egg_votes(start=1, end=None):
         ).fetchall()
 
 
+def chart_annotations():
+    with connect() as conn:
+        res = conn.execute('SELECT count(*) as c, first_votes-second_votes as diff FROM names GROUP BY diff ORDER BY diff').fetchall()
+        return [r['c'] for r in res], [r['diff'] for r in res]
+
+
 def get_names(threshold=0, limit=100, offset=0, rand=0):
     with connect() as c:
         order = 'RANDOM()' if rand else 'name'
