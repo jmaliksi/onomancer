@@ -751,8 +751,6 @@ def chart_names():
 @limiter.limit('1/second')
 def chart_annotations():
     count, votes = database.chart_annotations()
-    print(count)
-    print(votes)
     return make_response(render_template(
         'name_chart.html',
         count=count,
