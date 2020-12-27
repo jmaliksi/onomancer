@@ -51,7 +51,7 @@ Onomancer has a public API if you want to use these voted names in your own proj
 
 Gets a single name. Same algorithm that serves up names for rating, which is a chance to be a newly formed name or an existing name that's been upvoted.
 
-Rate limit: 10/s
+Rate limit: 25/s
 
 Parameters:
 * `with_stats` - generate FK stats for this name
@@ -63,7 +63,7 @@ Parameters:
 
 Gets n fully formed names in alphabetical order.
 
-Rate limit: 5/s
+Rate limit: 10/s
 
 Parameters:
 * `threshold` - filter names with votes at or above this threshold, default 0
@@ -78,7 +78,7 @@ Parameters:
 
 Gets n individual eggs in alphabetical order.
 
-Rate limit: 5/s
+Rate limit: 10/s
 
 Parameters:
 * `threshold` - filter names with votes at or above this threshold, default 0
@@ -90,7 +90,7 @@ Parameters:
 
 `/api/generateStats/<name>`
 
-Rate limit: 1/s
+Rate limit: 50/s
 
 Given any name, use the letters to seed an RNG to generate FK stats.
 
@@ -99,6 +99,17 @@ Given any name, use the letters to seed an RNG to generate FK stats.
 Rate limit: 50/s
 
 This version properly handles slashes
+
+Parameters:
+* `name` - Required
+
+## Get or Generate Stats
+
+`/api/getOrGenerateStats`
+
+Rate limit: 10/s
+
+Given a name, use the letters to seed an RNG to generate FK stats. If the name exists in Blaseball, returns that player info instead. **makes external calls to check for existence, treat with respect**
 
 Parameters:
 * `name` - Required

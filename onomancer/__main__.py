@@ -806,7 +806,7 @@ def chart_egg_votes():
 
 
 @app.route('/api/getName')
-@limiter.limit('10/second')
+@limiter.limit('25/second')
 def get_name():
     name = database.get_random_name()
     with_stats = request.args.get('with_stats', False)
@@ -816,6 +816,7 @@ def get_name():
 
 
 @app.route('/api/getNames')
+@limiter.limit('10/second')
 def get_names():
     valid_args = {
         'threshold',
@@ -841,6 +842,7 @@ def get_names():
 
 
 @app.route('/api/getEggs')
+@limiter.limit('10/second')
 def get_eggs():
     valid_args = {
         'threshold',
@@ -862,6 +864,34 @@ def get_eggs():
 @limiter.limit('50/second')
 def generateStats(name):
     return jsonify(_make_player_json(name))
+
+
+@app.route('/api/getOrGenerateStats')
+@limiter.limit('10/second')
+def getOrGenerateStats():
+    name = request.args.get('name')
+    if not name:
+        return jsonify({'error': 'missing required param `name`'}), 400
+    if len(name) > 240:
+        return jsonify({'error': 'name exceeds 240 characters'}), 400
+    return jsonify(_get_or_generate_player(name))
+
+
+def _get_or_generate_player(name):
+    try:
+        p = Player.find_by_name(name)
+        player = p.json()
+        player['current_vibe'] = p.get_vibe(_current_day())
+        player['batting_stars'] = p.batting_stars
+        player['pitching_stars'] = p.pitching_stars
+        player['baserunning_stars'] = p.baserunning_stars
+        player['defense_stars'] = p.defense_stars
+        player['soulscream'] = p.soulscream
+        player['blood'] = p.blood
+        player['coffee'] = p.coffee
+    except (AttributeError, KeyError):
+        player = _make_player_json(name)
+    return player
 
 
 @app.route('/api/generateStats2')
@@ -968,21 +998,12 @@ def reflect():
     vibe = None
     message = 'Whisper a name, and See its fate...'
     if name:
-        try:
-            p = Player.find_by_name(name)
-            player = p.json()
-            player['current_vibe'] = p.get_vibe(_current_day())
-            player['batting_stars'] = p.batting_stars
-            player['pitching_stars'] = p.pitching_stars
-            player['baserunning_stars'] = p.baserunning_stars
-            player['defense_stars'] = p.defense_stars
-            player['soulscream'] = p.soulscream
-            player['blood'] = p.blood
-            player['coffee'] = p.coffee
-            message = 'A name already known...'
-        except (AttributeError, KeyError):
-            player = _make_player_json(name)
-            message = 'A page removed, the ink swirls...'
+        if len(name) > 240:
+            return make_response(render_template(
+                'reflect.html',
+                message='Naughty...',
+            ))
+        player = _get_or_generate_player(name)
         if request.args.get('vibe'):
             player['current_vibe'] = float(request.args['vibe'])
         if player['current_vibe'] < -0.8:
