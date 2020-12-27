@@ -211,7 +211,7 @@ def annotate():
             database.annotate_egg(name, second=2)
             message += 'The ink shifts right...'
         elif judgement == 128588:
-            database.annotate_egg(name, first=1, second=1)
+            database.annotate_egg(name, both=True)
             message += random.choice([
                 'The ink swirls...',
                 'The ink settles...',

@@ -85,7 +85,10 @@
     </div>
     {% endfor %}
 </div>
-<div><p><small><a href="/shareCollection/{{friends}}{% if cname%}?cname={{cname}}{%endif%}" target="_blank">share</a></small></p></div>
+<div>
+    <small><a href="/shareCollection/{{friends}}{% if cname%}?cname={{cname}}{%endif%}" target="_blank">share</a></small>
+    <small><a href="/shareCollection/{{friends}}{% if cname%}?cname={{cname}}{%endif%}&mode={{mode_switch}}" target="_blank">switch mode: {{mode_switch}}</a></small>
+</div>
 <div><p class="message">Your decks...</p></div>
 <div class="save">
     {% for save_name, info in saves.items() %}

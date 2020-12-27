@@ -451,8 +451,13 @@ def get_eggs(threshold=0, limit=100, offset=0, rand=0):
         ]
 
 
-def annotate_egg(egg, first=0, second=0):
+def annotate_egg(egg, first=0, second=0, both=False):
     with connect() as c:
+        if both:
+            res = c.execute('SELECT * FROM names WHERE name=?', (egg,)).fetchone()
+            avg = (res['first_votes'] + res['second_votes']) / 2
+            first = -1 if res['first_votes'] > avg else 1
+            second = -1 if res['second_votes'] > avg else 1
         c.execute('UPDATE names SET first_votes=first_votes+?, second_votes=second_votes+? WHERE name=?', (first, second, egg))
 
 
