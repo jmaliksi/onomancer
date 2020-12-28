@@ -4,11 +4,24 @@
 <form action="collect" method="post" class="inlineForm toplineForm" id="collectName">
     <input type="hidden" name="collection" value="{{collection}}"/>
     <input type="hidden" name="token" value="{{token}}"/>
+    <input type="hidden" name="lineup_length" value="{{lineup_length}}"/>
+    <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
+    <input type="hidden" name="say" value="{{slogan}}"/>
     <input type="text" id="cname" name="cname" value="{{cname or 'Collection'}}" class="collectionName" onfocusout="document.getElementById('collectName').submit()" />
 </form>
 </a>
 {% endblock %}
 {% block names %}
+<p class="message">
+    <form action="collect" method="post" class="inlineForm toplineForm" id="collectSlogan">
+        <input type="hidden" name="collection" value="{{collection}}"/>
+        <input type="hidden" name="token" value="{{token}}"/>
+        <input type="hidden" name="lineup_length" value="{{lineup_length}}"/>
+        <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
+        <input type="hidden" id="cname" name="cname" value="{{cname or 'Collection'}}"/>
+        <input type="text" name="say" value="{{slogan}}" class="collectionSlogan" onfocusout="document.getElementById('collectSlogan').submit()"/>
+    </form>
+</p>
 <span>
     <form action="collect" method="post" class="inlineForm toplineForm">
         <input type="hidden" name="collection" value="{{collection}}"/>
@@ -16,6 +29,7 @@
         <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
         <input type="hidden" name="lineup_length" value="{{lineup_length}}"/>
         <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
+        <input type="hidden" name="say" value="{{slogan}}"/>
         <button type="button" alt="undo" title="Undo" value="back" onclick="history.back()">&#9194</button>
         <button type="submit" alt="shuffle roster" title="Shuffle roster" name="command" value="reverb">&#127754</button>
         <button type="submit" alt="new collection" title="New collection" name="command" value="fireworks">&#129512</button>
@@ -23,7 +37,18 @@
 </span>
 <div class="collect">
     <a id="lineupAnchor">
-        <h3>Lineup</h3>
+        <h3>
+            <form action="collect" method="post" class="inlineForm">
+                <input type="hidden" name="collection" value="{{collection}}"/>
+                <input type="hidden" name="token" value="{{token}}"/>
+                <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
+                <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
+                <input type="hidden" name="say" value="{{slogan}}"/>
+                <button type="submit" alt="Shorter lineup" title="Shorter lineup" name="lineup_length" value="{{lineup_length-1}}">&#128317</button>
+                <label>Lineup</label>
+                <button type="submit" alt="Longer lineup" title="Longer lineup" name="lineup_length" value="{{lineup_length+1}}">&#128316</button>
+            </form>
+        </h3>
     </a>
     {% for (name, stars, halfstar, anim) in lineup %}
     <div class="collectRow">
@@ -35,6 +60,7 @@
                 <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
                 <input type="hidden" name="lineup_length" value="{{lineup_length}}"/>
                 <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
+                <input type="hidden" name="say" value="{{slogan}}"/>
                 <button type="submit" alt="incinerate" title="Incinerate" name="command" value="fire">&#128293</button>
                 <button type="submit" alt="feedback" title="Feedback from stash" name="command" value="feedback">&#127908</button>
                 <button type="submit" alt="reverse name" title="Reverse name" name="command" value="flip">&#128257</button>
@@ -58,7 +84,18 @@
     </div>
     {% endfor %}
     <a id="rotationAnchor"/>
-        <h3>Rotation</h3>
+        <h3>
+            <form action="collect" method="post" class="inlineForm">
+                <input type="hidden" name="collection" value="{{collection}}"/>
+                <input type="hidden" name="token" value="{{token}}"/>
+                <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
+                <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
+                <input type="hidden" name="say" value="{{slogan}}"/>
+                <button type="submit" alt="Shorter rotation" title="Shorter rotation" name="rotation_length" value="{{rotation_length-1}}">&#128317</button>
+                <label>Rotation</label>
+                <button type="submit" alt="Longer rotation" title="Longer rotation" name="rotation_length" value="{{rotation_length+1}}">&#128316</button>
+            </form>
+        </h3>
     </a>
     {% for (name, stars, halfstar, anim) in rotation %}
     <div class="collectRow">
@@ -70,6 +107,7 @@
                 <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
                 <input type="hidden" name="lineup_length" value="{{lineup_length}}"/>
                 <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
+                <input type="hidden" name="say" value="{{slogan}}"/>
                 <button type="submit" alt="incinerate" title="Incinerate" name="command" value="fire">&#128293</button>
                 <button type="submit" alt="feedback" title="Feedback from stash" name="command" value="feedback">&#127908</button>
                 <button type="submit" alt="reverse name" title="Reverse name" name="command" value="flip">&#128257</button>
@@ -92,7 +130,7 @@
     {% endfor %}
 </div>
 <div class="shareDiv">
-    <small><a href="/shareCollection/{{friends}}?ll={{lineup_length}}{% if cname%}&cname={{cname}}{%endif%}" target="_blank">share</a></small>
+    <small><a href="/shareCollection/{{friends}}?ll={{lineup_length}}{% if cname%}&cname={{cname}}{%endif%}&say={{slogan}}" target="_blank">share</a></small>
     <small><a href="/collect?token={{token[:8]}}&f={{friends}}{% if cname%}&cname={{cname}}{%endif%}&settings=1&ll={{lineup_length}}&rl={{rotation_length}}">settings</a></small>
 </div>
 {% if settings %}
@@ -100,13 +138,21 @@
     <input type="hidden" name="t" value="{{token[:8]}}"/>
     <input type="hidden" name="f" value="{{friends}}"/>
     <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
+    <label for="cname">
+        Collection Name
+        <input id="cname" type="text" name="cname" value="{{cname or 'Collection'}}"/>
+    </label>
+    <label for="say">
+        Slogan
+        <input id="say" type="text" name="say" value="{{slogan}}"/>
+    </label>
     <label for="ll">
-        <input id="ll" type="text" name="ll" value="{{lineup_length}}"/>
         Lineup Length
+        <input id="ll" type="text" name="ll" value="{{lineup_length}}"/>
     </label>
     <label for="rl">
-        <input id="rl" type="text" name="rl" value="{{rotation_length}}"/>
         Rotation Length
+        <input id="rl" type="text" name="rl" value="{{rotation_length}}"/>
     </label>
     <input type="submit" alt="Save Settings" value="Save" />
 </form>
@@ -120,6 +166,7 @@
         <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
         <input type="hidden" name="ll" value="{{lineup_length}}"/>
         <input type="hidden" name="rl" value="{{rotation_length}}"/>
+        <input type="hidden" name="say" value="{{slogan}}"/>
         <label class="flex1 {%if not info[0]%}unsaved{%endif%}">{{info[1] if info[1] else '-Empty-'}}</label>
         <button type="submit" name="save" alt="save collection" title="Save collection" value="{{save_name}}" class="saveButton flex1">save</button>
         <button type="submit" name="load" alt="load collection" title="Load collection" value="{{save_name}}" class="flex1 saveButton {% if not info[0] %}unsaved{% endif %}" {% if not info[0] %}disabled{% endif %}>load</button>

@@ -314,9 +314,12 @@ a {
     flex: 2;
 }
 
-.settingsForm label {
-    display: inline-flex;
+.settingsForm {
+    display: flex;
     flex-direction: column;
+}
+
+.settingsForm label {
     font-size: .8em;
     color: #ccc;
     margin: 1em;
@@ -324,10 +327,6 @@ a {
 
 .shareDiv {
     margin: 1em;
-}
-
-.settingsForm>label>input {
-    width: 5em;
 }
 
 .flex1 {
@@ -410,6 +409,23 @@ a {
 }
 
 .collectionName:hover {
+    border-color: gray;
+}
+
+.collectionSlogan {
+    background: none;
+    border-style: solid;
+    border-color: black;
+    color: grey;
+    font-family: inherit;
+    font-style: italic;
+    text-align: center;
+    font-size: inherit;
+    font-variant: inherit;
+    width: 100%;
+}
+
+.collectionSlogan:hover {
     border-color: gray;
 }
 

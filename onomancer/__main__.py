@@ -512,7 +512,12 @@ def collect():
     lineup_length = int(request.args.get('ll', 9))
     collection_length = lineup_length + int(request.args.get('rl', 5))
     settings = request.args.get('settings')
-    if collection_length > 50:
+    slogan = request.args.get('say', random.choice([
+        'A collection of chosen...',
+        'Your hand...',
+        'A drawing of pages...',
+    ]))
+    if collection_length > 50 or len(slogan) > 240:
         res = redirect(url_for('collect'))
         res.set_cookie('anim', json.dumps({'type': 'burn_all', 'who': None}), max_age=10)
         return res
@@ -527,6 +532,7 @@ def collect():
         collection_length = lineup_length + int(request.form.get('rotation_length', 5))
         cname = 'Collection'
         anim = {}
+        slogan = request.form.get('say', slogan)
         if request.form.get('cname'):
             try:
                 cname = ' '.join([
@@ -585,6 +591,7 @@ def collect():
             cname=cname,
             ll=lineup_length,
             rl=collection_length - lineup_length,
+            say=slogan,
         ))
         res.set_cookie('anim', json.dumps(anim), max_age=10)
         return res
@@ -622,6 +629,7 @@ def collect():
         cname = loaded[1]
         lineup_length = loaded[2]
         collection_length = lineup_length + loaded[3]
+        slogan = loaded[4] or 'What do they say?'
     else:
         collection = _load_collection(request.args['f'], anim)
 
@@ -642,11 +650,7 @@ def collect():
         'collect.html',
         lineup=collection[:lineup_length],
         rotation=collection[lineup_length:],
-        message=random.choice([
-            'A collection of chosen...',
-            'Your hand...',
-            'A drawing of pages...',
-        ]),
+        slogan=slogan,
         token=token * 10,
         collection=json.dumps([super_secret(n, token * 10) for n in friends]),
         friends=friend_code,
@@ -662,6 +666,7 @@ def collect():
             cname,
             str(lineup_length),
             str(collection_length - lineup_length),
+            slogan,
         ])
         res.set_cookie(request.args['save'], value=val, max_age=100000000)
     if request.args.get('clear'):
@@ -672,13 +677,13 @@ def collect():
 def _parse_collection_cookie(cookie_name):
     cookie = request.cookies.get(cookie_name)
     if not cookie:
-        return (None, None, 9, 5)
+        return (None, None, 9, 5, None)
     tokens = cookie.split(':')
     if len(tokens) == 2:
-        return (tokens[0], tokens[1], 9, 5)
-    if len(tokens) == 4:
-        return (tokens[0], tokens[1], int(tokens[2]), int(tokens[3]))
-    return (cookie, None, 9, 5)
+        return (tokens[0], tokens[1], 9, 5, None)
+    if len(tokens) == 5:
+        return (tokens[0], tokens[1], int(tokens[2]), int(tokens[3]), tokens[4])
+    return (cookie, None, 9, 5, None)
 
 
 def _get_animation(name, anim):
@@ -1135,15 +1140,17 @@ def shareCollection(friends):
     collection = _load_collection(friends)
     img_url = database.get_collection_image_url(*collection)
     lineup_length = int(request.args.get('ll', 9))
+    slogan = request.args.get('say', 'Distill the Ultimate Blaseball Name.')
     return make_response(render_template(
         'shareCollection.html',
         lineup=collection[:lineup_length],
         rotation=collection[lineup_length:],
-        message='Gathered and sowed...',
+        message=slogan,
         share_image=img_url,
         share_url=f'https://onomancer.sibr.dev/shareCollection/{friends}',
         cname=request.args.get('cname', 'Collection'),
         share_title=request.args.get('cname', 'Collection'),
+        share_desc=slogan,
     ))
 
 
