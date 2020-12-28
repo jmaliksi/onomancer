@@ -370,7 +370,7 @@ a {
 }
 
 .unsaved {
-    color: #444;
+    color: #444 !important;
     cursor: default;
 }
 
