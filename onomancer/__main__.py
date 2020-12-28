@@ -507,6 +507,11 @@ def admin_eggs(key):
     ))
 
 
+@app.route('/collectSimsim', methods=['GET'])
+def collectSimsim():
+    return redirect(url_for('collect', ll=12, rl=1))
+
+
 @app.route('/collect', methods=['GET', 'POST'])
 def collect():
     lineup_length = int(request.args.get('ll', 9))
