@@ -45,5 +45,8 @@
     </div>
     {% endfor %}
 </div>
-<div><p><small><a href="/collect">Collect...</a></small></p></div>
+<div class="shareDiv">
+    <small><a href="/collect">Collect...</a></small>
+    <small><a href="/collect?token={{friends[-8:]}}&f={{friends}}&cname={{cname}}&ll={{len(lineup)}}&rl={{len(rotation)}}&slogan={{slogan}}">Edit...</a></small>
+</div>
 {% endblock %}

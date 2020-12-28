@@ -1158,6 +1158,8 @@ def shareCollection(friends):
         cname=request.args.get('cname', 'Collection'),
         share_title=request.args.get('cname', 'Collection'),
         share_desc=slogan,
+        len=len,
+        friends=friends,
     ))
 
 
