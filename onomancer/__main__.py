@@ -608,6 +608,23 @@ def collect():
         'save1': _parse_collection_cookie('save1'),
         'save2': _parse_collection_cookie('save2'),
         'save3': _parse_collection_cookie('save3'),
+        'save4': _parse_collection_cookie('save4'),
+        'save5': _parse_collection_cookie('save5'),
+        'save6': _parse_collection_cookie('save6'),
+        'save7': _parse_collection_cookie('save7'),
+        'save8': _parse_collection_cookie('save8'),
+        'save9': _parse_collection_cookie('save9'),
+        'save10': _parse_collection_cookie('save10'),
+        'save11': _parse_collection_cookie('save11'),
+        'save12': _parse_collection_cookie('save12'),
+        'save13': _parse_collection_cookie('save13'),
+        'save14': _parse_collection_cookie('save14'),
+        'save16': _parse_collection_cookie('save15'),
+        'save17': _parse_collection_cookie('save16'),
+        'save17': _parse_collection_cookie('save17'),
+        'save18': _parse_collection_cookie('save18'),
+        'save19': _parse_collection_cookie('save19'),
+        'save20': _parse_collection_cookie('save20'),
     }
     # f is for friends
     if request.args.get('load'):

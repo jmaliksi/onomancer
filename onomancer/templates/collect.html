@@ -120,10 +120,10 @@
         <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
         <input type="hidden" name="ll" value="{{lineup_length}}"/>
         <input type="hidden" name="rl" value="{{rotation_length}}"/>
-        <button type="submit" name="save" alt="save collection" title="Save collection" value="{{save_name}}" class="saveButton">save</button>
-        <button type="submit" name="load" alt="load collection" title="Load collection" value="{{save_name}}" class="saveButton {% if not info[0] %}unsaved{% endif %}" {% if not info[0] %}disabled{% endif %}>load</button>
-        <button type="submit" name="clear" alt="delete collection" title="Delete collection" value="{{save_name}}" class="saveButton {% if not info[0] %}unsaved{% endif %}" {% if not info[0] %}disabled{% endif %}>clear</button>
-        <label>{{info[1] if info[1] else ''}}</label>
+        <label class="flex1">{{info[1] if info[1] else '-Empty-'}}</label>
+        <button type="submit" name="save" alt="save collection" title="Save collection" value="{{save_name}}" class="saveButton flex1">save</button>
+        <button type="submit" name="load" alt="load collection" title="Load collection" value="{{save_name}}" class="flex1 saveButton {% if not info[0] %}unsaved{% endif %}" {% if not info[0] %}disabled{% endif %}>load</button>
+        <button type="submit" name="clear" alt="delete collection" title="Delete collection" value="{{save_name}}" class="flex1 saveButton {% if not info[0] %}unsaved{% endif %}" {% if not info[0] %}disabled{% endif %}>clear</button>
     </form>
     {% endfor %}
 </div>
