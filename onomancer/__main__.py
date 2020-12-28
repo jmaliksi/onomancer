@@ -975,6 +975,7 @@ def getCollection():
     parsed = urllib.parse.urlparse(token)
     qs = urllib.parse.parse_qs(parsed.query)
     lineup_length = int(qs.get('ll', [9])[0])
+    slogan = qs.get('say', ['what'])[0]
 
     token = parsed.path
     if 'shareCollection/' in token:
@@ -987,6 +988,7 @@ def getCollection():
         collection.append(_make_player_json(name))
     return {
         'fullName': team_name,
+        'slogan': slogan,
         'lineup': collection[:lineup_length],
         'rotation': collection[lineup_length:],
     }

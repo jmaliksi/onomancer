@@ -135,4 +135,4 @@ Given the entire share URL or just share code of a Collection, return a JSON blo
 Rate limit: 5/s
 
 Parameters:
-* `token` - Required. Either the full share URL or just the token (ie everything that comes after `shareCollection/` in the share URL)
+* `token` - Required. Either the full share URL or just the token (ie everything that comes after `shareCollection/` in the share URL). Must be URL encoded.
