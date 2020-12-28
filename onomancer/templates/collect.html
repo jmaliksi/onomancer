@@ -14,6 +14,8 @@
         <input type="hidden" name="collection" value="{{collection}}"/>
         <input type="hidden" name="token" value="{{token}}"/>
         <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
+        <input type="hidden" name="lineup_length" value="{{lineup_length}}"/>
+        <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
         <button type="button" alt="undo" title="Undo" value="back" onclick="history.back()">&#9194</button>
         <button type="submit" alt="shuffle roster" title="Shuffle roster" name="command" value="reverb">&#127754</button>
         <button type="submit" alt="new collection" title="New collection" name="command" value="fireworks">&#129512</button>
@@ -31,11 +33,13 @@
                 <input type="hidden" name="collection" value="{{collection}}"/>
                 <input type="hidden" name="token" value="{{token}}"/>
                 <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
+                <input type="hidden" name="lineup_length" value="{{lineup_length}}"/>
+                <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
                 <button type="submit" alt="incinerate" title="Incinerate" name="command" value="fire">&#128293</button>
                 <button type="submit" alt="feedback" title="Feedback from stash" name="command" value="feedback">&#127908</button>
                 <button type="submit" alt="reverse name" title="Reverse name" name="command" value="flip">&#128257</button>
             </form>
-            <a href="/shareName/{{name}}" target="_blank">{{name}}</a>
+            <a href="/shareName/{{name}}?interview=1" target="_blank">{{name}}</a>
         </div>
         <div class="collectColumn stars">
             {% for star in stars %}
@@ -64,11 +68,13 @@
                 <input type="hidden" name="collection" value="{{collection}}"/>
                 <input type="hidden" name="token" value="{{token}}"/>
                 <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
+                <input type="hidden" name="lineup_length" value="{{lineup_length}}"/>
+                <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
                 <button type="submit" alt="incinerate" title="Incinerate" name="command" value="fire">&#128293</button>
                 <button type="submit" alt="feedback" title="Feedback from stash" name="command" value="feedback">&#127908</button>
                 <button type="submit" alt="reverse name" title="Reverse name" name="command" value="flip">&#128257</button>
             </form>
-            <a href="/shareName/{{name}}" target="_blank">{{name}}</a>
+            <a href="/shareName/{{name}}?interview=1" target="_blank">{{name}}</a>
         </div>
         <div class="collectColumn stars">
             {% for star in stars %}
@@ -85,9 +91,26 @@
     </div>
     {% endfor %}
 </div>
-<div>
-    <small><a href="/shareCollection/{{friends}}{% if cname%}?cname={{cname}}{%endif%}" target="_blank">share</a></small>
+<div class="shareDiv">
+    <small><a href="/shareCollection/{{friends}}?ll={{lineup_length}}{% if cname%}&cname={{cname}}{%endif%}" target="_blank">share</a></small>
+    <small><a href="/collect?token={{token[:8]}}&f={{friends}}{% if cname%}&cname={{cname}}{%endif%}&settings=1&ll={{lineup_length}}&rl={{rotation_length}}">settings</a></small>
 </div>
+{% if settings %}
+<form method="get" action="/collect" class="settingsForm">
+    <input type="hidden" name="t" value="{{token[:8]}}"/>
+    <input type="hidden" name="f" value="{{friends}}"/>
+    <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
+    <label for="ll">
+        <input id="ll" type="text" name="ll" value="{{lineup_length}}"/>
+        Lineup Length
+    </label>
+    <label for="rl">
+        <input id="rl" type="text" name="rl" value="{{rotation_length}}"/>
+        Rotation Length
+    </label>
+    <input type="submit" alt="Save Settings" value="Save" />
+</form>
+{% endif %}
 <div><p class="message">Your decks...</p></div>
 <div class="save">
     {% for save_name, info in saves.items() %}
@@ -95,6 +118,8 @@
         <input type="hidden" name="t" value="{{token[:8]}}"/>
         <input type="hidden" name="f" value="{{friends}}"/>
         <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
+        <input type="hidden" name="ll" value="{{lineup_length}}"/>
+        <input type="hidden" name="rl" value="{{rotation_length}}"/>
         <button type="submit" name="save" alt="save collection" title="Save collection" value="{{save_name}}" class="saveButton">save</button>
         <button type="submit" name="load" alt="load collection" title="Load collection" value="{{save_name}}" class="saveButton {% if not info[0] %}unsaved{% endif %}" {% if not info[0] %}disabled{% endif %}>load</button>
         <button type="submit" name="clear" alt="delete collection" title="Delete collection" value="{{save_name}}" class="saveButton {% if not info[0] %}unsaved{% endif %}" {% if not info[0] %}disabled{% endif %}>clear</button>

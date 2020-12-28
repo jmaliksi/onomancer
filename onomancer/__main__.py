@@ -509,12 +509,22 @@ def admin_eggs(key):
 
 @app.route('/collect', methods=['GET', 'POST'])
 def collect():
+    lineup_length = int(request.args.get('ll', 9))
+    collection_length = lineup_length + int(request.args.get('rl', 5))
+    settings = request.args.get('settings')
+    if collection_length > 50:
+        res = redirect(url_for('collect'))
+        res.set_cookie('anim', json.dumps({'type': 'burn_all', 'who': None}), max_age=10)
+        return res
+
     if request.method == 'POST':
         token = request.form['token']
         collection = [
             super_safe_decrypt(urllib.parse.unquote(name), token * 10)
             for name in json.loads(request.form['collection'])
         ]
+        lineup_length = int(request.form.get('lineup_length', 9))
+        collection_length = lineup_length + int(request.form.get('rotation_length', 5))
         cname = 'Collection'
         anim = {}
         if request.form.get('cname'):
@@ -573,6 +583,8 @@ def collect():
             t=token[:8],
             f=_curse_collection(*collection),
             cname=cname,
+            ll=lineup_length,
+            rl=collection_length - lineup_length,
         ))
         res.set_cookie('anim', json.dumps(anim), max_age=10)
         return res
@@ -582,7 +594,9 @@ def collect():
         return redirect(url_for(
             'collect',
             t=token,
-            f=_curse_collection(*database.collect()),
+            f=_curse_collection(*database.collect(friends=collection_length)),
+            ll=lineup_length,
+            rl=collection_length - lineup_length,
         ))
 
     anim = request.cookies.get('anim', {})
@@ -600,9 +614,19 @@ def collect():
         loaded = saves[request.args['load']]
         collection = _load_collection(loaded[0])
         cname = loaded[1]
+        lineup_length = loaded[2]
+        collection_length = lineup_length + loaded[3]
     else:
         collection = _load_collection(request.args['f'], anim)
+
+    if len(collection) < collection_length:
+        names = database.collect(friends=collection_length - len(collection))
+        collection.extend(_parse_collection_names(names))
+    elif len(collection) > collection_length:
+        collection = collection[:collection_length]
+
     friends = [n[0] for n in collection]
+
     friend_code = _curse_collection(*friends).decode()
     if request.args.get('save'):
         saves[request.args['save']] = (friend_code, cname)
@@ -610,8 +634,8 @@ def collect():
         saves[request.args['clear']] = None
     res = make_response(render_template(
         'collect.html',
-        lineup=collection[:9],
-        rotation=collection[9:],
+        lineup=collection[:lineup_length],
+        rotation=collection[lineup_length:],
         message=random.choice([
             'A collection of chosen...',
             'Your hand...',
@@ -622,10 +646,18 @@ def collect():
         friends=friend_code,
         saves=saves,
         cname=cname,
-        len=len,
+        rotation_length=collection_length - lineup_length,
+        lineup_length=lineup_length,
+        settings=settings,
     ))
     if request.args.get('save'):
-        res.set_cookie(request.args['save'], value=f'{friend_code}:{cname}', max_age=100000000)
+        val = ':'.join([
+            friend_code,
+            cname,
+            str(lineup_length),
+            str(collection_length - lineup_length),
+        ])
+        res.set_cookie(request.args['save'], value=val, max_age=100000000)
     if request.args.get('clear'):
         res.delete_cookie(request.args['clear'])
     return res
@@ -634,11 +666,13 @@ def collect():
 def _parse_collection_cookie(cookie_name):
     cookie = request.cookies.get(cookie_name)
     if not cookie:
-        return (None, None)
+        return (None, None, 9, 5)
     tokens = cookie.split(':')
     if len(tokens) == 2:
-        return (tokens[0], tokens[1])
-    return (cookie, None)
+        return (tokens[0], tokens[1], 9, 5)
+    if len(tokens) == 4:
+        return (tokens[0], tokens[1], int(tokens[2]), int(tokens[3]))
+    return (cookie, None, 9, 5)
 
 
 def _get_animation(name, anim):
@@ -655,6 +689,9 @@ def _get_animation(name, anim):
 
 def _load_collection(friends, anim=None):
     names = _uncurse_collection(friends)
+    return _parse_collection_names(names, anim=anim)
+
+def _parse_collection_names(names, anim=None):
     collection = []
     for i, name in enumerate(names):
         player = Player.make_random(seed=name)
@@ -912,9 +949,11 @@ def getStats():
         res[guid] = _make_player_json(name, id_=guid)
     return jsonify(res)
 
+
 @app.route('/api/getCollection')
 def getCollection():
     token = request.args.get('token')
+    lineup_length = int(request.args.get('ll', 9))
     if not token:
         return jsonify({'error': 'missing argument `token`'}), 400
     team_name = 'North Pole Placeholders'
@@ -928,8 +967,8 @@ def getCollection():
         collection.append(_make_player_json(name))
     return {
         'fullName': team_name,
-        'lineup': collection[:9],
-        'rotation': collection[9:],
+        'lineup': collection[:lineup_length],
+        'rotation': collection[lineup_length:],
     }
 
 @app.route('/shareName/<guid>')
@@ -1085,10 +1124,11 @@ def reflect():
 def shareCollection(friends):
     collection = _load_collection(friends)
     img_url = database.get_collection_image_url(*collection)
+    lineup_length = int(request.args.get('ll', 9))
     return make_response(render_template(
         'shareCollection.html',
-        lineup=collection[:9],
-        rotation=collection[9:],
+        lineup=collection[:lineup_length],
+        rotation=collection[lineup_length:],
         message='Gathered and sowed...',
         share_image=img_url,
         share_url=f'https://onomancer.sibr.dev/shareCollection/{friends}',

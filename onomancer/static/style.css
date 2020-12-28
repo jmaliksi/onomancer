@@ -314,6 +314,22 @@ a {
     flex: 2;
 }
 
+.settingsForm label {
+    display: inline-flex;
+    flex-direction: column;
+    font-size: .8em;
+    color: #ccc;
+    margin: 1em;
+}
+
+.shareDiv {
+    margin: 1em;
+}
+
+.settingsForm>label>input {
+    width: 5em;
+}
+
 .saveCol {
     flex-direction: column;
     display: flex;
