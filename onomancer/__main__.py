@@ -1198,7 +1198,7 @@ def stash():
         stashed = list(set(stashed))
         names = database.get_names_from_guids(stashed)
     if not names:
-        message = 'An empty stash'
+        message = 'An empty stash. You may save names you come across here.'
 
     res = make_response(render_template(
         'stash.html',
