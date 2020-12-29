@@ -664,6 +664,7 @@ def collect():
         rotation_length=collection_length - lineup_length,
         lineup_length=lineup_length,
         settings=settings,
+        help=request.args.get('help', False),
     ))
     if request.args.get('save'):
         val = ':'.join([

@@ -133,6 +133,7 @@
     <small><a href="/shareCollection/{{friends}}?ll={{lineup_length}}{% if cname%}&cname={{cname}}{%endif%}&say={{slogan}}" target="_blank">share</a></small>
     <small><a href="/collect?token={{token[:8]}}&f={{friends}}{% if cname%}&cname={{cname}}{%endif%}&settings=1&ll={{lineup_length}}&rl={{rotation_length}}">settings</a></small>
     <small><a href="/collectSimsim">simsim</a></small>
+    <small><a href="/collect?token={{token[:8]}}&f={{friends}}{% if cname%}&cname={{cname}}{%endif%}&help=1&ll={{lineup_length}}&rl={{rotation_length}}#help" id="help">help</a></small>
 </div>
 {% if settings %}
 <form method="get" action="/collect" class="settingsForm">
@@ -158,7 +159,27 @@
     <input type="submit" alt="Save Settings" value="Save" />
 </form>
 {% endif %}
-<div><p class="message">Your decks...</p></div>
+{% if help %}
+<div class="helpDiv">
+    <ul>
+    <li>&#9194 Undo the previous change. Your browser back button also works to undo changes.</li>
+    <li>&#127754 Reverb the team. Shuffles the roster.</li>
+    <li>&#129512 Create a new team.</li>
+    <li>&#10134 Reduce the length of the Lineup/Rotation. Also adjustable under "settings".</li>
+    <li>&#10133 Increase the length of the Lineup/Rotation. Also adjustable under "settings".</li>
+    <li>&#128293 Replace player with another random, upvoted name from the Pool.</li>
+    <li>&#127908 Feedback a player from your Stash into this roster position.</li>
+    <li>&#128257 Replace this player with another player with the reverse name.</li>
+    <li>Click on "Collection" to change the name of your team. Also adjustable under "settings".</li>
+    <li>Click on the text below "Collection" to change the slogan. Also adjustable under "settings".</li>
+    <li>Click on a player's name for detailed stats, to save them to your stash, and/or to share with others.</li>
+    <li>Click "share" to open up the shareable version of this team in another window. Share this page with your friends!</li>
+    <li>Click "simsim" for roster size presets to work with the simsim.</li>
+    <li>You can save your team to your computer. Note that uses cookies. If you want to transfer a team from one devide to another, open the "share" link on your other machine and click "Edit"</li>
+    </ul>
+</div>
+{% endif %}
+<div><p class="message">Your saved decks...</p></div>
 <div class="save">
     {% for save_name, info in saves.items() %}
     <form class="saveCol" action="collect" method="get">

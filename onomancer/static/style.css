@@ -445,3 +445,20 @@ a {
     font-size: .8em;
     font-style: italic;
 }
+
+.helpDiv {
+    text-align: left;
+    max-width: 30em;
+    margin: auto;
+    color: #bbb;
+    line-height: 1.2em;
+    font-size: .9em;
+}
+
+.helpDiv ul {
+    list-style-type: none;
+}
+
+.helpDiv>ul>li {
+    margin-bottom: 1em;
+}
