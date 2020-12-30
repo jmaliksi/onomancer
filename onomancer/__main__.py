@@ -981,6 +981,11 @@ def getCollection():
     token = parsed.path
     if 'shareCollection/' in token:
         token = token.split('shareCollection/')[1]
+    elif 'collect' in token:
+        token = qs.get('f', [None])[0]
+    if not token:
+        return jsonify({'error': 'Could not parse collection token from URL'})
+
     team_name = qs.get('cname', ['North Pole Placeholders'])[0]
 
     names = _uncurse_collection(token)
