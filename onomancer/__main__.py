@@ -582,7 +582,7 @@ def collect():
                 idx = collection.index(name_to_burn)
                 collection[idx] = rookie
                 anim = {'type': 'feedback', 'who': rookie}
-            if idx >= 9:
+            if idx >= lineup_length:
                 anchor = 'rotationAnchor'
             elif idx >= 0:
                 anchor = 'lineupAnchor'
@@ -630,17 +630,17 @@ def collect():
     # f is for friends
     if request.args.get('load'):
         loaded = saves[request.args['load']]
-        collection = _load_collection(loaded[0])
+        collection = _load_collection(loaded[0], lineup_length=lineup_length)
         cname = loaded[1]
         lineup_length = loaded[2]
         collection_length = lineup_length + loaded[3]
         slogan = loaded[4] or 'What do they say?'
     else:
-        collection = _load_collection(request.args['f'], anim)
+        collection = _load_collection(request.args['f'], anim=anim, lineup_length=lineup_length)
 
     if len(collection) < collection_length:
         names = database.collect(friends=collection_length - len(collection))
-        collection.extend(_parse_collection_names(names))
+        collection.extend(_parse_collection_names(names, lineup_length=lineup_length))
     elif len(collection) > collection_length:
         collection = collection[:collection_length]
 
@@ -704,16 +704,16 @@ def _get_animation(name, anim):
     return ''
 
 
-def _load_collection(friends, anim=None):
+def _load_collection(friends, anim=None, lineup_length=9):
     names = _uncurse_collection(friends)
-    return _parse_collection_names(names, anim=anim)
+    return _parse_collection_names(names, anim=anim, lineup_length=lineup_length)
 
-def _parse_collection_names(names, anim=None):
+def _parse_collection_names(names, anim=None, lineup_length=9):
     collection = []
     for i, name in enumerate(names):
         player = Player.make_random(seed=name)
         player = player.simulated_copy(buffs={'overall_rating': (player.total_fingers - 10) * .01})
-        if i < 9:
+        if i < lineup_length:
             rating = player.batting_stars
         else:
             rating = player.pitching_stars
@@ -1145,8 +1145,8 @@ def reflect():
 
 @app.route('/shareCollection/<friends>')
 def shareCollection(friends):
-    collection = _load_collection(friends)
     lineup_length = int(request.args.get('ll', 9))
+    collection = _load_collection(friends, lineup_length=lineup_length)
     img_url = database.get_collection_image_url(lineup_length=lineup_length, *collection)
     slogan = request.args.get('say', 'Distill the Ultimate Blaseball Name.')
     return make_response(render_template(
