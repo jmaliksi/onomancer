@@ -32,9 +32,9 @@
     <div id="container">
         <div class="nav">
             <ul>
-                <li><a href="/vote">Appraise</a></li>
-                <li><a href="/leaderboard">Regard</a></li>
-                <li><a href="/egg">Offer</a></li>
+                <li><a href="/vote" {% if hlAppraise %}class="highlight"{%endif%}>Appraise</a></li>
+                <li><a href="/leaderboard" {% if hlRegard %}class="highlight"{%endif%}>Regard</a></li>
+                <li><a href="/egg" {% if hlOffer %}class="highlight"{%endif%}>Offer</a></li>
             </ul>
         </div>
         <div class="subNav">{% block subNav %}{% endblock %}</div>

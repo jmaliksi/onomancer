@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% set hlRegard=True %}
 {% block subNav %}
-    <a href="/leaderboard">Leaderboard</a>
-    <a href="/pool">Pool</a>
-    <a href="/collect">Collect</a>
-    <a href="/stash">Stash</a>
+<a href="/leaderboard" {%if hlLeaderboard%}class="highlight"{%endif%}>Leaderboard</a>
+    <a href="/pool" {%if hlPool%}class="highlight"{%endif%}>Pool</a>
+    <a href="/collect" {%if hlCollect%}class="highlight"{%endif%}>Collect</a>
+    <a href="/stash" {%if hlStash%}class="highlight"{%endif%}>Stash</a>
 {% endblock %}
 {% block content %}
 <h1>{% block title %}{% endblock %}</h1>

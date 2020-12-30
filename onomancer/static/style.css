@@ -226,7 +226,7 @@ a {
 }
 
 .subNav a {
-    padding: 1em;
+    margin: 2em;
     font-size: .9em;
     text-decoration: overline;
 }
@@ -461,4 +461,11 @@ a {
 
 .helpDiv>ul>li {
     margin-bottom: 1em;
+}
+
+.highlight {
+    background: white;
+    border-radius: 3px;
+    color: black;
+    padding: 2px;
 }
