@@ -50,5 +50,7 @@
     <a href="/reflect?name={{name}}&fk={{not fk}}">{%if fk %}Close{%else%}Open{%endif%} Forbidden Knowledge</a>
     <p>&nbsp;</p>
 </div>
+{% else %}
+<p>Reflections are not committed to the Tome.</p>
 {% endif %}
 {% endblock %}
