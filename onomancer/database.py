@@ -12,6 +12,7 @@ from imagekitio import ImageKit
 DB_NAME = 'data/onomancer.db'
 VOTE_THRESHOLD = -4
 LEADER_THRESHOLD = -2
+ANNOTATE_THRESHOLD = 1
 
 
 try:
@@ -171,11 +172,11 @@ def get_random_name():
                 SELECT * FROM names
                 WHERE naughty=0
                     AND (downvotes>? OR upvotes+downvotes>=-2)
-                    AND first_votes>=second_votes
+                    AND first_votes+?>=second_votes
                 ORDER BY {order}
                 LIMIT ?
                 ''',
-                (VOTE_THRESHOLD, limit)
+                (VOTE_THRESHOLD, ANNOTATE_THRESHOLD, limit)
             ).fetchall())
 
             order = 'RANDOM()'
@@ -188,11 +189,12 @@ def get_random_name():
                 SELECT * FROM names
                 WHERE naughty=0
                     AND (downvotes>? OR upvotes+downvotes>=-2)
-                    AND first_votes<=second_votes
+                    AND first_votes<=second_votes+?
+                    AND name != ?
                 ORDER BY {order}
                 LIMIT ?
                 ''',
-                (VOTE_THRESHOLD, limit)
+                (VOTE_THRESHOLD, ANNOTATE_THRESHOLD, first_name and first_name['name'], limit)
             ).fetchall())
             if first_name and second_name:
                 name = f'{first_name["name"]} {second_name["name"]}'
