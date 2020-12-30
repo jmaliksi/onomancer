@@ -1146,8 +1146,9 @@ def reflect():
 @app.route('/shareCollection/<friends>')
 def shareCollection(friends):
     collection = _load_collection(friends)
-    img_url = database.get_collection_image_url(*collection)
     lineup_length = int(request.args.get('ll', 9))
+    img_url = database.get_collection_image_url(lineup_length=lineup_length, *collection)
+    print(img_url)
     slogan = request.args.get('say', 'Distill the Ultimate Blaseball Name.')
     return make_response(render_template(
         'shareCollection.html',

@@ -538,7 +538,8 @@ def get_image_url(name=None, guid=None):
 
 
 @functools.lru_cache(1024)
-def get_collection_image_url(*names):
+def get_collection_image_url(*names, **kwargs):
+    lineup_length = kwargs.get('lineup_length', 9)
     if not imagekit:
         raise Exception('Imagekit not initialized')
     transforms = []
@@ -551,7 +552,7 @@ def get_collection_image_url(*names):
         'overlay_y': 50,
         'overlay_x': 400,
     })
-    for i, name in enumerate(names[:9]):
+    for i, name in enumerate(names[:lineup_length]):
         transforms.append({
             'ote': quote(base64.b64encode(name[0].encode('utf8')).decode('ascii')),
             'overlay_text_font_family': 'Lora',
@@ -568,29 +569,31 @@ def get_collection_image_url(*names):
             'overlay_x': 580,
         })
 
+    rotation_start_y = 90 + (26 * lineup_length) + 50
+
     transforms.append({
         'overlay_text': 'Rotation',
         'overlay_text_typography': 'bold',
         'overlay_text_font_family': 'Lora',
         'overlay_text_font_size': 30,
         'overlay_text_color': 'FFFFFF',
-        'overlay_y': 350,
+        'overlay_y': rotation_start_y,
         'overlay_x': 400,
     })
-    for i, name in enumerate(names[9:]):
+    for i, name in enumerate(names[lineup_length:]):
         transforms.append({
             'ote': quote(base64.b64encode(name[0].encode('utf8')).decode('ascii')),
             'overlay_text_font_family': 'Lora',
             'overlay_text_font_size': 21,
             'overlay_text_color': 'FFFFFF',
-            'overlay_y': 390 + (i * 26),
+            'overlay_y': rotation_start_y + 40 + (i * 26),
             'overlay_x': 250,
         })
         transforms.append({
             'ote': quote(base64.b64encode((('•' * len(name[1])) + ('·' if name[2] else '')).encode('utf8')).decode('ascii')),
             'overlay_text_font_size': 40,
             'overlay_text_color': 'FFFFFF',
-            'overlay_y': 375 + (i * 27),
+            'overlay_y': rotation_start_y + 25 + (i * 27),
             'overlay_x': 580,
         })
 
