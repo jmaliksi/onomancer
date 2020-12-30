@@ -469,3 +469,9 @@ a {
     color: black;
     padding: 2px;
 }
+
+a:hover {
+    background: white;
+    border-radius: 3px;
+    color: black;
+}
