@@ -195,11 +195,18 @@ a {
         animation-duration: 0.5s;
         animation-name: poolIn;
         color: white;
+        background-color: black;
     }
 
     @keyframes poolIn {
-        from {color: black;}
-        to {color: white;}
+        from {
+            color: black;
+            background-color: white;
+        }
+        to {
+            color: white;
+            background-color: black;
+        }
     }
 
     @keyframes poolFade {
@@ -474,4 +481,9 @@ a:hover {
     background: white;
     border-radius: 3px;
     color: black;
+}
+
+#titleAnchor, #lineupAnchor, #rotationAnchor {
+    background: none;
+    color: white;
 }
