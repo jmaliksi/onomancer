@@ -319,6 +319,7 @@ a {
 
 .stars {
     flex: 2;
+    align-items: center;
 }
 
 .settingsForm {
