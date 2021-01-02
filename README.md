@@ -1,5 +1,9 @@
 # onomancer
-The name alembic https://onomancer.sibr.dev
+Distill the ultimate Blaseball name: https://onomancer.sibr.dev
+
+Onomancer lets people submit blaseball names and rate these combinations to distill the ultimate blaseball name. Names are fed through a proprietary\* algorithm to generate a full Blaseball player, and can be used to create your own teams to share with friends.
+
+\*it's just a seeded RNG
 
 # Development
 All commands run at project root
