@@ -255,6 +255,12 @@ def get_random_name():
                 return name
 
         # no good name gen, just pick something good from the leaderboard
+        if random.random() < .001:
+            lookback = None or datetime.timedelta(days=7)
+            after = datetime.datetime.utcnow() - lookback
+            name = conn.execute('SELECT name FROM weekly WHERE dt >= ? ORDER BY RANDOM() LIMIT 1', (after,)).fetchone()
+            if name:
+                return name['name']
         if random.random() < .1:
             # pull something from the bottom of the board to differentiate it faster
             rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes ASC, RANDOM() LIMIT 200').fetchall()
