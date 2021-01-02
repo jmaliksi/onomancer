@@ -176,7 +176,7 @@ def get_weekly(top=50, lookback=None):
                 leaders.naughty = 0 AND
                 weekly.votes >= 0 AND
                 weekly.dt >= ?
-            ORDER BY weekly.votes DESC
+            ORDER BY weekly.votes DESC, RANDOM()
             LIMIT ?
             ''',
             (after, top)
