@@ -1,4 +1,5 @@
 import base64
+import datetime
 import functools
 import random
 import sqlite3
@@ -62,6 +63,13 @@ def bootstrap():
         except Exception:
             pass
 
+        try:
+            conn.execute('CREATE TABLE weekly (name TEXT NOT NULL, votes INTEGER, dt datetime default current_timestamp)')
+            conn.execute('CREATE UNIQUE INDEX idx_weekly_name ON weekly (name)')
+        except Exception:
+            pass
+
+
 
 def clear():
     conn = connect()
@@ -74,15 +82,17 @@ def clear():
             conn.execute('DROP TABLE leaders')
         except Exception:
             pass
+        try:
+            conn.execute('DROP TABLE weekly')
+        except Exception:
+            pass
 
 
 def migrate():
     conn = connect()
     with conn:
-        conn.execute('ALTER TABLE names ADD COLUMN guid TEXT')
-        conn.execute('CREATE UNIQUE INDEX idx_names_guid ON names (guid)')
-        conn.execute('ALTER TABLE leaders ADD COLUMN guid TEXT')
-        conn.execute('CREATE UNIQUE INDEX idx_leaders_guid ON names (guid)')
+        conn.execute('CREATE TABLE weekly (name TEXT NOT NULL, votes INTEGER, dt datetime default current_timestamp)')
+        conn.execute('CREATE UNIQUE INDEX idx_weekly_name ON weekly (name)')
 
 
 def add_name(name):
@@ -98,7 +108,6 @@ def upvote_name(name, thumbs=1, hit_eggs=True):
     with conn:
         eggs = [e.replace(' ', u'\u00A0') for e in name.split(' ', 1)]
         name = ' '.join(eggs)
-
 
         existing = conn.execute('SELECT * FROM leaders WHERE name = ?', (name,)).fetchone()
         naughty = 0
@@ -130,10 +139,48 @@ def upvote_name(name, thumbs=1, hit_eggs=True):
                         (thumbs, egg))
 
         mult = 1
-        if thumbs < 0 and check_egg_threshold(name):
+        if thumbs < 0 and check_egg_threshold(name, c=conn):
             mult = 2
 
         conn.execute('INSERT INTO leaders (name, votes, naughty, guid) VALUES (?, 1, ?, ?) ON CONFLICT (name) DO UPDATE SET votes = votes + ?', (name, naughty, str(uuid.uuid4()), thumbs * mult))
+
+        try:
+            conn.execute(
+                '''
+                INSERT INTO weekly (name, votes)
+                    VALUES (?, ?) 
+                ON CONFLICT (name)
+                    DO UPDATE SET votes = votes + ?
+                ''',
+                (name, thumbs, thumbs)
+            )
+        except Exception:
+            pass
+
+
+def get_weekly(top=50, lookback=None):
+    lookback = None or datetime.timedelta(days=7)
+    after = datetime.datetime.utcnow() - lookback
+    with connect() as c:
+        rows = c.execute(
+            '''
+            SELECT
+                weekly.name as name,
+                weekly.votes as votes,
+                leaders.guid as guid,
+                weekly.dt as dt
+            FROM weekly
+            JOIN leaders
+                ON weekly.name = leaders.name
+            WHERE
+                leaders.naughty = 0 AND
+                weekly.votes >= 0 AND
+                weekly.dt >= ?
+            LIMIT ?
+            ''',
+            (after, top)
+        )
+        return [dict(row) for row in rows]
 
 
 def flip_leader(name):
@@ -216,13 +263,11 @@ def get_random_name():
         return name
 
 
-def check_egg_threshold(fullname, threshold=VOTE_THRESHOLD):
+def check_egg_threshold(fullname, threshold=VOTE_THRESHOLD, c=None):
     names = fullname.split(' ', 1)
-    conn = connect()
-    with conn:
-        rows = conn.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND upvotes+downvotes<-2)', names)
-        if rows.fetchone():
-            return True
+    rows = c.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND upvotes+downvotes<-2)', names)
+    if rows.fetchone():
+        return True
     return False
 
 

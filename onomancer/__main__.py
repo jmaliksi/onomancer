@@ -266,6 +266,12 @@ def leaderboard(message=None):
     return res
 
 
+@app.route('/weekly')
+def weekly():
+    names = database.get_weekly(top=50)
+    return jsonify(names)
+
+
 @app.route('/downLeader', methods=['POST'])
 @require_csrf
 @limiter.limit('1/second')
