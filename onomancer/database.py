@@ -177,6 +177,7 @@ def get_weekly(top=50, lookback=None):
                 weekly.votes >= 0 AND
                 weekly.dt >= ?
             LIMIT ?
+            ORDER BY weekly.votes DESC
             ''',
             (after, top)
         )
