@@ -255,7 +255,7 @@ def get_random_name():
                 return name
 
         # no good name gen, just pick something good from the leaderboard
-        if random.random() < .001:
+        if random.random() < .01:
             lookback = None or datetime.timedelta(days=7)
             after = datetime.datetime.utcnow() - lookback
             name = conn.execute('SELECT name FROM weekly WHERE dt >= ? ORDER BY RANDOM() LIMIT 1', (after,)).fetchone()
