@@ -488,3 +488,11 @@ a:hover {
     background: none;
     color: white;
 }
+
+.board {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 3em;
+    margin-right: 3em;
+    text-align: center;
+}

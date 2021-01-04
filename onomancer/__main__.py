@@ -257,9 +257,11 @@ def annotate():
 @app.route('/leaderboard')
 def leaderboard(message=None):
     names = database.get_leaders(top=50)
+    weekly = database.get_weekly()
     res = make_response(render_template(
         'leaderboard.html',
         names=names,
+        weekly=weekly,
         message=message,
         rotkey=session['USER_CSRF'] + session['rotkey'],
     ))
