@@ -24,6 +24,7 @@ from flask_simple_csrf import CSRF
 from profanity import profanity
 from flask_limiter import Limiter
 from flask_limiter.util import get_ipaddr
+from flask_minify import minify
 from pylru import lrucache
 from blaseball_mike.models import Player
 
@@ -56,6 +57,9 @@ limiter = Limiter(
     key_func=get_ipaddr,
     default_limits=['5/second'],
 )
+
+minify(app=app, html=True, js=True, cssless=True, static=True)
+
 
 class HttpsProxy(object):
     def __init__(self, app):
