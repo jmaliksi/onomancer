@@ -929,7 +929,7 @@ def generateStats(name):
 
 
 @app.route('/api/getOrGenerateStats')
-@limiter.limit('10/second')
+@limiter.limit('25/second')
 def getOrGenerateStats():
     name = request.args.get('name')
     if not name:
@@ -939,6 +939,7 @@ def getOrGenerateStats():
     return jsonify(_get_or_generate_player(name))
 
 
+@functools.lru_cache(512)
 def _get_or_generate_player(name):
     try:
         p = Player.find_by_name(name)
