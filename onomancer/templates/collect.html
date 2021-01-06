@@ -131,7 +131,6 @@
 <div class="shareDiv">
     <small><a href="/shareCollection/{{friends}}?ll={{lineup_length}}{% if cname%}&cname={{cname}}{%endif%}&say={{slogan}}" target="_blank">share</a></small>
     <small><a href="/collect?token={{token[:8]}}&f={{friends}}{% if cname%}&cname={{cname}}{%endif%}&settings=1&ll={{lineup_length}}&rl={{rotation_length}}">settings</a></small>
-    <small><a href="/collectSimsim">simsim</a></small>
     <small><a href="/collect?token={{token[:8]}}&f={{friends}}{% if cname%}&cname={{cname}}{%endif%}&help=1&ll={{lineup_length}}&rl={{rotation_length}}#help" id="help">help</a></small>
 </div>
 {% if settings %}
@@ -173,7 +172,6 @@
     <li>Click on the text below "Collection" to change the slogan. Also adjustable under "settings".</li>
     <li>Click on a player's name for detailed stats, to save them to your stash, and/or to share with others.</li>
     <li>Click "share" to open up the shareable version of this team in another window. Share this page with your friends!</li>
-    <li>Click "simsim" for roster size presets to work with the simsim.</li>
     <li>You can save your team to your computer. Note that uses cookies. If you want to transfer a team from one devide to another, open the "share" link on your other machine and click "Edit"</li>
     </ul>
 </div>
@@ -181,12 +179,14 @@
 <div><p class="message">Your saved decks...</p></div>
 <div class="save">
     {% for save_name, info in saves.items() %}
-    <form class="saveCol" action="collect" method="get">
+    <form class="saveCol" action="collect" method="post">
+        <input type="hidden" name="token" value="{{token}}"/>
+        <input type="hidden" name="collection" value="{{collection}}"/>
         <input type="hidden" name="t" value="{{token[:8]}}"/>
         <input type="hidden" name="f" value="{{friends}}"/>
         <input type="hidden" name="cname" value="{{cname or 'Collection'}}"/>
-        <input type="hidden" name="ll" value="{{lineup_length}}"/>
-        <input type="hidden" name="rl" value="{{rotation_length}}"/>
+        <input type="hidden" name="lineup_length" value="{{lineup_length}}"/>
+        <input type="hidden" name="rotation_length" value="{{rotation_length}}"/>
         <input type="hidden" name="say" value="{{slogan}}"/>
         <label class="flex1 {%if not info[0]%}unsaved{%endif%}">{{info[1] if info[1] else '-Empty-'}}</label>
         <button type="submit" name="save" alt="save collection" title="Save collection" value="{{save_name}}" class="saveButton flex1">save</button>

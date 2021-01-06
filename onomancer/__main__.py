@@ -538,25 +538,44 @@ def collect():
         res = redirect(url_for('collect'))
         res.set_cookie('anim', json.dumps({'type': 'burn_all', 'who': None}), max_age=10)
         return res
+    saves = {
+        'save1': _parse_collection_cookie('save1'),
+        'save2': _parse_collection_cookie('save2'),
+        'save3': _parse_collection_cookie('save3'),
+        'save4': _parse_collection_cookie('save4'),
+        'save5': _parse_collection_cookie('save5'),
+        'save6': _parse_collection_cookie('save6'),
+        'save7': _parse_collection_cookie('save7'),
+        'save8': _parse_collection_cookie('save8'),
+        'save9': _parse_collection_cookie('save9'),
+    }
 
     if request.method == 'POST':
         token = request.form['token']
-        collection = [
-            super_safe_decrypt(urllib.parse.unquote(name), token * 10)
-            for name in json.loads(request.form['collection'])
-        ]
-        lineup_length = int(request.form.get('lineup_length', 9))
-        collection_length = lineup_length + int(request.form.get('rotation_length', 5))
-        cname = 'Collection'
+        if request.form.get('load'):
+            loaded = saves[request.form['load']]
+            collection = _uncurse_collection(loaded[0])
+            cname = loaded[1]
+            lineup_length = loaded[2]
+            collection_length = lineup_length + loaded[3]
+            slogan = loaded[4] or 'What do they say?'
+        else:
+            collection = [
+                super_safe_decrypt(urllib.parse.unquote(name), token * 10)
+                for name in json.loads(request.form['collection'])
+            ]
+            slogan = request.form.get('say', slogan)
+            lineup_length = int(request.form.get('lineup_length', 9))
+            collection_length = lineup_length + int(request.form.get('rotation_length', 5))
+            cname = 'Collection'
+            if request.form.get('cname'):
+                try:
+                    cname = ' '.join([
+                        _process_name(n) for n in request.form['cname'].split(' ')
+                    ])
+                except ValueError:
+                    cname = 'Collection'
         anim = {}
-        slogan = request.form.get('say', slogan)
-        if request.form.get('cname'):
-            try:
-                cname = ' '.join([
-                    _process_name(n) for n in request.form['cname'].split(' ')
-                ])
-            except ValueError:
-                cname = 'Collection'
         anchor = 'titleAnchor'
         if request.form.get('command'):
             command = request.form.get('command')
@@ -600,6 +619,12 @@ def collect():
                 anchor = 'lineupAnchor'
             else:
                 anchor = 'titleAnchor'
+
+        friend_code = _curse_collection(*collection).decode()
+        if request.form.get('clear'):
+            saves[request.form['clear']] = None
+        if request.form.get('save'):
+            saves[request.form['save']] = (friend_code, cname)
         res = redirect(url_for(
             'collect',
             _anchor=anchor,
@@ -611,7 +636,19 @@ def collect():
             say=slogan,
         ))
         res.set_cookie('anim', json.dumps(anim), max_age=10)
+        if request.form.get('save'):
+            val = ':'.join([
+                friend_code,
+                cname,
+                str(lineup_length),
+                str(collection_length - lineup_length),
+                slogan,
+            ])
+            res.set_cookie(request.form['save'], value=val, max_age=100000000)
+        if request.form.get('clear'):
+            res.delete_cookie(request.form['clear'])
         return res
+
     token = request.args.get('token') or request.args.get('t')
     if not token:
         token = secrets.token_hex(4)
@@ -628,27 +665,8 @@ def collect():
         anim = json.loads(anim)
     cname = request.args.get('cname', '')
 
-    saves = {
-        'save1': _parse_collection_cookie('save1'),
-        'save2': _parse_collection_cookie('save2'),
-        'save3': _parse_collection_cookie('save3'),
-        'save4': _parse_collection_cookie('save4'),
-        'save5': _parse_collection_cookie('save5'),
-        'save6': _parse_collection_cookie('save6'),
-        'save7': _parse_collection_cookie('save7'),
-        'save8': _parse_collection_cookie('save8'),
-        'save9': _parse_collection_cookie('save9'),
-    }
     # f is for friends
-    if request.args.get('load'):
-        loaded = saves[request.args['load']]
-        collection = _load_collection(loaded[0], lineup_length=lineup_length)
-        cname = loaded[1]
-        lineup_length = loaded[2]
-        collection_length = lineup_length + loaded[3]
-        slogan = loaded[4] or 'What do they say?'
-    else:
-        collection = _load_collection(request.args['f'], anim=anim, lineup_length=lineup_length)
+    collection = _load_collection(request.args['f'], anim=anim, lineup_length=lineup_length)
 
     if len(collection) < collection_length:
         names = database.collect(friends=collection_length - len(collection))
@@ -659,10 +677,6 @@ def collect():
     friends = [n[0] for n in collection]
 
     friend_code = _curse_collection(*friends).decode()
-    if request.args.get('save'):
-        saves[request.args['save']] = (friend_code, cname)
-    if request.args.get('clear'):
-        saves[request.args['clear']] = None
     res = make_response(render_template(
         'collect.html',
         lineup=collection[:lineup_length],
@@ -678,17 +692,6 @@ def collect():
         settings=settings,
         help=request.args.get('help', False),
     ))
-    if request.args.get('save'):
-        val = ':'.join([
-            friend_code,
-            cname,
-            str(lineup_length),
-            str(collection_length - lineup_length),
-            slogan,
-        ])
-        res.set_cookie(request.args['save'], value=val, max_age=100000000)
-    if request.args.get('clear'):
-        res.delete_cookie(request.args['clear'])
     return res
 
 
