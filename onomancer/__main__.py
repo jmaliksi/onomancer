@@ -381,7 +381,7 @@ def rate():
                 pass
         message += ' The Onomancer nods...'
     elif judgement == 128154:  # love
-        database.upvote_name(name, thumbs=3)
+        database.upvote_name(name, thumbs=2)
         try:
             eggs = name.split(' ', 1)
             database.annotate_egg(eggs[0], first=1)
