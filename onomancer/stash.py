@@ -27,7 +27,7 @@ class Stash:
         if self._history_names:
             return self._history_names
         names = database.get_names_from_guids(self._history_guids)
-        self._history_names = list(map(lambda g: (g, names[g]), self._history_guids))
+        self._history_names = list(map(lambda g: (g, names[g]), self._history_guids))[::-1]
         return self._history_names
 
     def stash_name(self, guid):
