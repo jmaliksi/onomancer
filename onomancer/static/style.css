@@ -61,6 +61,10 @@ p {
     margin: 1em;
 }
 
+ol {
+    padding: 0;
+}
+
 ul {
     padding: 0;
 }
@@ -145,13 +149,10 @@ a {
 }
 
 .undecoratedList {
-    max-width: 40em;
 }
 
 .undecoratedList li {
     list-style-type: none;
-    display: inline-block;
-    width: 10em;
 }
 
 .history {
