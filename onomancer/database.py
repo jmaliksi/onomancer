@@ -316,7 +316,7 @@ def purge(name):
             conn.execute('DELETE FROM leaders WHERE id = ?', (name,))
 
 
-def lookup(name, only_good=False):
+def lookup(name, only_good=False, with_threshold=False):
     conn = connect()
     with conn:
         egg_query = 'SELECT * FROM names WHERE name LIKE ?'
@@ -324,6 +324,8 @@ def lookup(name, only_good=False):
         if only_good:
             egg_query += ' AND naughty = 0'
             name_query += ' AND naughty = 0'
+        if with_threshold:
+            name_query += f' AND votes > {LEADER_THRESHOLD}'
         res = {
             'eggs': [
                 dict(r) for r in conn.execute(egg_query, (f'%{name}%',))

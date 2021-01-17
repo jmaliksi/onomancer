@@ -1097,7 +1097,7 @@ def search():
     if name and len(name) <= 3:
         message = 'More letters needed'
     if name:
-        lookup = sorted(database.lookup(name, only_good=True)['names'], key=lambda n: n['name'])
+        lookup = sorted(database.lookup(name, only_good=True, with_threshold=True)['names'], key=lambda n: n['name'])
         names = {n['guid']: n['name'] for n in lookup}
         if not names:
             message = 'A blank...'
