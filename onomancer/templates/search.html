@@ -1,0 +1,19 @@
+{% extends "offer.html" %}
+{% set hlIndex=True %}
+{% block content %}
+<h1>Search the Tome</h1>
+<form method="get" action="/search">
+    <input type="text" name="name" value="{{name or ''}}" autofocus/>
+    <input type="submit" value="Search"/>
+</form>
+{% if message %}
+<p class="message">{{message}}</p>
+{% endif %}
+<ul class="undecoratedList">
+    {% for guid, name in names.items() %}
+    <li class="leaderItem" key="{{name}}">
+        <span><a href="/shareName/{{guid}}" target="_blank">{{name}}</a></span>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

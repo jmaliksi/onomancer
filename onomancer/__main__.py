@@ -1089,6 +1089,28 @@ def shareName(guid, message='The token shared...'):
     ))
 
 
+@app.route('/search')
+def search():
+    name = request.args.get('name')
+    names = {}
+    message = 'A name?'
+    if len(name) <= 3:
+        message = 'More letters needed'
+    elif name:
+        lookup = sorted(database.lookup(name, only_good=True)['names'], key=lambda n: n['name'])
+        names = {n['guid']: n['name'] for n in lookup}
+        if not names:
+            message = 'A blank...'
+        else:
+            message = 'That which was found...'
+    return make_response(render_template(
+        'search.html',
+        name=name,
+        names=names,
+        message=message,
+    ))
+
+
 @app.route('/reflect')
 def reflect():
     name = request.args.get('name')
