@@ -153,7 +153,7 @@ def what():
 
 
 @app.route('/vote', strict_slashes=False)
-def vote(message='', guid=None):
+def vote(message='', guid=None, stashed=None):
     name = request.args.get('name', None)
     if not name:
         if not message:
@@ -181,7 +181,7 @@ def vote(message='', guid=None):
     if flag:
         message = 'What is your reason for flagging this name?'
     share_guid = database.share_guid(name)
-    stashed = Stash()
+    stashed = stashed or Stash()
     stashed.stash_history(share_guid)
     rotkey = secrets.token_urlsafe(100)
     res = make_response(render_template(
@@ -416,7 +416,7 @@ def rate():
         message += ' The Onomancer stares...'
         stashed.increment_stat('👎')
 
-    res = vote(message=message)
+    res = vote(message=message, stashed=stashed)
     stashed.save(res)
     return res
 
