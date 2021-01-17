@@ -1094,9 +1094,9 @@ def search():
     name = request.args.get('name')
     names = {}
     message = 'A name?'
-    if len(name) <= 3:
+    if name and len(name) <= 3:
         message = 'More letters needed'
-    elif name:
+    if name:
         lookup = sorted(database.lookup(name, only_good=True)['names'], key=lambda n: n['name'])
         names = {n['guid']: n['name'] for n in lookup}
         if not names:
