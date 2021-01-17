@@ -144,7 +144,21 @@ a {
     margin: 0;
 }
 
+.undecoratedList {
+    max-width: 40em;
+}
+
 .undecoratedList li {
+    list-style-type: none;
+    display: inline-block;
+    width: 10em;
+}
+
+.history {
+    display: inline;
+}
+
+.history li {
     list-style-type: none;
 }
 
@@ -495,4 +509,8 @@ a:hover {
     margin-left: 3em;
     margin-right: 3em;
     text-align: center;
+}
+
+.inline {
+    display: inline-block;
 }

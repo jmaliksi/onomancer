@@ -29,6 +29,7 @@ from pylru import lrucache
 from blaseball_mike.models import Player
 
 from onomancer import database
+from onomancer.stash import Stash
 
 # why use many file when one file do
 app = Flask(__name__)
@@ -180,6 +181,8 @@ def vote(message='', guid=None):
     if flag:
         message = 'What is your reason for flagging this name?'
     share_guid = database.share_guid(name)
+    stashed = Stash()
+    stashed.stash_history(share_guid)
     rotkey = secrets.token_urlsafe(100)
     res = make_response(render_template(
         'vote.html',
@@ -190,6 +193,7 @@ def vote(message='', guid=None):
         share_guid=share_guid,
         reverse=request.args.get('reverse', False),
     ))
+    stashed.save(res)
     session['rotkey'] = rotkey
     return res
 
@@ -198,6 +202,7 @@ def vote(message='', guid=None):
 @require_csrf
 def annotate():
     message = 'The margins stained...'
+    stashed = Stash()
 
     if request.method == 'POST':
         name = request.form['name']
@@ -211,18 +216,22 @@ def annotate():
         if judgement == 128072:  # left
             database.annotate_egg(name, first=2)
             message += 'The ink shifts left...'
+            stashed.increment_stat('👈')
         elif judgement == 128073:  # right
             database.annotate_egg(name, second=2)
             message += 'The ink shifts right...'
+            stashed.increment_stat('👉')
         elif judgement == 128588:
             database.annotate_egg(name, both=True)
             message += random.choice([
                 'The ink swirls...',
                 'The ink settles...',
             ])
+            stashed.increment_stat('🙌')
         elif judgement == 128078:
             database.upvote_name(name, thumbs=-1)
             message += 'The ink fades...'
+            stashed.increment_stat('👎👎')
         elif judgement == 129335:
             message = 'The next line...'
 
@@ -248,7 +257,7 @@ def annotate():
     examples = {}
     examples = database.get_annotate_examples(name)
     # rotkey already set by posts
-    return make_response(render_template(
+    res = make_response(render_template(
         'annotate.html',
         name=name,
         flag_form=flag,
@@ -256,6 +265,8 @@ def annotate():
         rotkey=session['USER_CSRF'] + session['rotkey'],
         examples=examples,
     ))
+    stashed.save(res)
+    return res
 
 
 @app.route('/leaderboard')
@@ -370,6 +381,7 @@ def rate():
     judgement = ord(request.form['judgement'])
 
     message = f'Your judgement is rendered.'
+    stashed = Stash()
     if judgement == 128077:  # upvote
         database.upvote_name(name, thumbs=1)
         if request.form['reverse']:
@@ -380,6 +392,7 @@ def rate():
             except KeyError:
                 pass
         message += ' The Onomancer nods...'
+        stashed.increment_stat('👍')
     elif judgement == 128154:  # love
         database.upvote_name(name, thumbs=2)
         try:
@@ -389,18 +402,23 @@ def rate():
         except KeyError:
             pass
         message += ' The Onomancer smiles...'
+        stashed.increment_stat('💚')
     elif judgement == 128148:  # hate
         database.upvote_name(name, thumbs=-2)
         flipped = ' '.join(name.split(' ')[::-1])
         database.upvote_name(flipped, thumbs=-2, hit_eggs=False)
         message += ' The Onomancer frowns...'
+        stashed.increment_stat('💔')
     elif judgement == 128078:  # thumbs down
         flipped = ' '.join(name.split(' ')[::-1])
         database.upvote_name(flipped, thumbs=-1, hit_eggs=False)
         database.upvote_name(name, thumbs=-1)
         message += ' The Onomancer stares...'
+        stashed.increment_stat('👎')
 
-    return vote(message=message)
+    res = vote(message=message)
+    stashed.save(res)
+    return res
 
 
 @app.route('/moderate/<key>', methods=['GET'])
@@ -604,8 +622,7 @@ def collect():
                 res.set_cookie('anim', json.dumps(anim), max_age=10)
                 return res
             elif command == 'feedback':
-                stashed = json.loads(request.cookies.get('stash', '[]'))
-                stashed = [s for s in stashed if s]
+                stashed = Stash().bookmarked_guids()
                 if not stashed:
                     rookie = database.collect(1)[0]
                 else:
@@ -1188,8 +1205,7 @@ def shareCollection(friends):
 @app.route('/stash', methods=['GET', 'POST'])
 @require_csrf
 def stash():
-    stashed = json.loads(request.cookies.get('stash', '[]'))
-    stashed = [s for s in stashed if s]
+    stashed = Stash()
 
     message = ''
     if request.method == 'POST':
@@ -1197,40 +1213,32 @@ def stash():
         guid = request.form['guid']
         redirect = request.form.get('redirect', 'share')
         if command == 'eject':
-            stashed.remove(guid)
+            stashed.remove_name(guid)
             message = 'The monicker expunged.'
         if command == 'stash':
-            stashed.append(guid)
+            stashed.stash_name(guid)
             if redirect == 'vote':
                 res = vote(
                     message='The name stashed.',
                     guid=guid,
                 )
-                res.set_cookie(
-                    'stash',
-                    value=json.dumps(stashed),
-                    max_age=1000000000,
-                )
+                stashed.save(res)
                 return res
             message = 'An appelation stashed.'
 
     names = {}
-    if stashed:
-        stashed = list(set(stashed))
-        names = database.get_names_from_guids(stashed)
+    if stashed.bookmarked_guids():
+        names = stashed.bookmarked_names()
     if not names:
         message = 'An empty stash. You may save names you come across here.'
 
     res = make_response(render_template(
         'stash.html',
         names=names,
+        stash=stashed,
         message=message,
     ))
-    res.set_cookie(
-        'stash',
-        value=json.dumps(stashed),
-        max_age=1000000000,
-    )
+    stashed.save(res)
     return res
 
 

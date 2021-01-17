@@ -2,7 +2,38 @@
 {% set hlStash=True %}
 {% block title %}Stash{% endblock %}
 {% block names %}
-<ul, class="undecoratedList">
+<h2>Pages Turned</h2>
+<div class="board">
+    <h3>Appraisals</h3>
+    <div>Total: {{stash.get_total_appraisal()}}</div>
+    <div>💚: {{stash.get_stat('💚')}}</div>
+    <div>👍: {{stash.get_stat('👍')}}</div>
+    <div>👎: {{stash.get_stat('👎')}}</div>
+    <div>💔: {{stash.get_stat('💔')}}</div>
+</div>
+<div class="board">
+    <h3>Annotations</h3>
+    <div>Total: {{stash.get_total_annotation()}}</div>
+    <div>👈: {{stash.get_stat('👈')}}</div>
+    <div>👉: {{stash.get_stat('👉')}}</div>
+    <div>🙌: {{stash.get_stat('🙌')}}</div>
+    <div>👎: {{stash.get_stat('👎👎')}}</div>
+</div>
+<p>&nbsp;</p>
+<h2>History</h2>
+<ol class="history">
+    {% for guid, name in stash.history_names() %}
+    <li class="leaderItem" key="{{name}}">
+        <span><a href="/shareName/{{guid}}" target="_blank">{{name}}</a></span>
+    </li>
+    {% endfor %}
+</ol>
+<p>&nbsp;</p>
+<h2>Bookmarks</h2>
+<ul class="undecoratedList">
+    {% if not names %}
+    <p>Nothing bookmarked. Stashed names you come across can be found here.</p>
+    {% endif %}
     {% for guid, name in names.items() %}
     <li class="leaderItem" key="{{name}}">
         <span><a href="/shareName/{{guid}}" target="_blank">{{name}}</a></span>

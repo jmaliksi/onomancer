@@ -423,7 +423,7 @@ def get_names_from_ids(ids):
 
 def get_names_from_guids(guids):
     with connect() as conn:
-        rows = conn.execute(f'SELECT * FROM leaders WHERE guid IN ({",".join(["?"] * len(guids))}) ORDER BY name', guids)
+        rows = conn.execute(f'SELECT * FROM leaders WHERE guid IN ({",".join(["?"] * len(guids))}) AND naughty=0 ORDER BY name', guids)
         return {r['guid']: r['name'] for r in rows}
 
 
