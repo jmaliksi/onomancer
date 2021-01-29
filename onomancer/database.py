@@ -258,7 +258,7 @@ def get_random_name():
         if random.random() < .02:
             lookback = None or datetime.timedelta(days=7)
             after = datetime.datetime.utcnow() - lookback
-            name = conn.execute('SELECT name FROM weekly WHERE dt >= ? ORDER BY RANDOM() LIMIT 1', (after,)).fetchone()
+            name = conn.execute('SELECT name FROM weekly WHERE dt >= ? AND votes > 0 ORDER BY RANDOM() LIMIT 1', (after,)).fetchone()
             if name:
                 return name['name']
         """
