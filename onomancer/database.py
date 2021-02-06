@@ -570,10 +570,15 @@ def share_guid(name):
         if r:
             return r['guid']
         guid = str(uuid.uuid4())
-        # TODO check naughtiness
+        is_naughty = 1
+        tokens = name.split(' ', 1)
+        if len(tokens) == 2:
+            naughty_eggs = c.execute('SELECT naughty FROM names WHERE name in (?, ?) AND naughty = 0', (tokens[0], tokens[1])).fetchall()
+            if len(naughty_eggs) == 2:
+                is_naughty = 0
         c.execute(
             'INSERT INTO leaders (name, votes, naughty, guid) VALUES (?, 0, ?, ?) ON CONFLICT (name) DO UPDATE SET votes=votes',
-            (name, 0, guid))
+            (name, is_naughty, guid))
         return guid
 
 
