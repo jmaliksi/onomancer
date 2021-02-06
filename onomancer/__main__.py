@@ -182,7 +182,8 @@ def vote(message='', guid=None, stashed=None):
         message = 'What is your reason for flagging this name?'
     share_guid = database.share_guid(name)
     stashed = stashed or Stash()
-    stashed.stash_history(share_guid)
+    if share_guid:
+        stashed.stash_history(share_guid)
     rotkey = secrets.token_urlsafe(100)
     res = make_response(render_template(
         'vote.html',

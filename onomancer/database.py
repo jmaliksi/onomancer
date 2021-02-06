@@ -576,6 +576,8 @@ def share_guid(name):
             naughty_eggs = c.execute('SELECT naughty FROM names WHERE name in (?, ?) AND naughty = 0', (tokens[0], tokens[1])).fetchall()
             if len(naughty_eggs) == 2:
                 is_naughty = 0
+        if is_naughty == 1:
+            return ''  # probably garbage, don't pollute DB
         c.execute(
             'INSERT INTO leaders (name, votes, naughty, guid) VALUES (?, 0, ?, ?) ON CONFLICT (name) DO UPDATE SET votes=votes',
             (name, is_naughty, guid))
