@@ -2,6 +2,7 @@ import base64
 import datetime
 import functools
 import json
+import logging
 import random
 import math
 import secrets
@@ -30,6 +31,8 @@ from blaseball_mike.models import Player
 
 from onomancer import database
 from onomancer.stash import Stash
+
+logging.basicConfig(level=logging.DEBUG)
 
 # why use many file when one file do
 app = Flask(__name__)

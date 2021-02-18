@@ -1,6 +1,7 @@
 import base64
 import datetime
 import functools
+import logging
 import random
 import sqlite3
 import sys
@@ -17,6 +18,9 @@ LEADER_THRESHOLD = -2
 ANNOTATE_THRESHOLD = 1
 
 
+logger = logging.getLogger(__name__)
+
+
 try:
     with open('data/imagekit.key', 'r') as f:
         imagekit_key = f.read()
@@ -28,7 +32,7 @@ try:
     )
 except Exception as e:
     imagekit = None
-    print(e)
+    logger.debug(e)
 
 
 @contextmanager
@@ -37,7 +41,7 @@ def debug_log():
     try:
         yield log
     finally:
-        print(log)
+        logger.debug(log)
 
 
 def connect():
