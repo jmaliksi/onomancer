@@ -332,6 +332,8 @@ def purge(name):
 
 
 def lookup(name, only_good=False, with_threshold=False):
+    if name in ('%', '_'):
+        return {'names': [], 'eggs': []}
     conn = connect()
     with conn:
         egg_query = 'SELECT * FROM names WHERE name LIKE ?'
