@@ -210,39 +210,56 @@ def get_random_name():
     conn = connect()
     with conn:
         if random.random() > .3:
+            median_third = conn.execute(
+                '''
+                SELECT upvotes+downvotes as r
+                FROM names
+                WHERE
+                    (downvotes>-4 OR upvotes+downvotes>-2)
+                ORDER BY upvotes+downvotes
+                LIMIT 1
+                OFFSET (SELECT COUNT(*) FROM names)/3
+                '''
+            ).fetchone()['r']
             order = 'RANDOM()'
             limit = 1
+            min_ = -2
             if random.random() < .05:
                 order = 'upvotes+downvotes AND RANDOM()'
                 limit = 200
+            if random.random() < 0.3:
+                min_ = median_third
             first_name = random.choice(conn.execute(
                 f'''
                 SELECT * FROM names
                 WHERE naughty=0
-                    AND (downvotes>? OR upvotes+downvotes>=-2)
+                    AND (downvotes>? OR upvotes+downvotes>=?)
                     AND first_votes+?>=second_votes
                 ORDER BY {order}
                 LIMIT ?
                 ''',
-                (VOTE_THRESHOLD, ANNOTATE_THRESHOLD, limit)
+                (VOTE_THRESHOLD, min_, ANNOTATE_THRESHOLD, limit)
             ).fetchall())
 
             order = 'RANDOM()'
             limit = 1
+            min_ = -2
             if random.random() < .05:
                 order = 'upvotes+downvotes AND RANDOM()'
                 limit = 200
+            if random.random() < 0.3:
+                min_ = median_third
             second_name = random.choice(conn.execute(
                 f'''
                 SELECT * FROM names
                 WHERE naughty=0
-                    AND (downvotes>? OR upvotes+downvotes>=-2)
+                    AND (downvotes>? OR upvotes+downvotes>=?)
                     AND first_votes<=second_votes+?
                     AND name != ?
                 ORDER BY {order}
                 LIMIT ?
                 ''',
-                (VOTE_THRESHOLD, ANNOTATE_THRESHOLD, first_name and first_name['name'], limit)
+                (VOTE_THRESHOLD, min_, ANNOTATE_THRESHOLD, first_name and first_name['name'], limit)
             ).fetchall())
             if first_name and second_name:
                 name = f'{first_name["name"]} {second_name["name"]}'
