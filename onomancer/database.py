@@ -7,6 +7,7 @@ import sys
 from urllib.parse import quote
 import uuid
 from collections import namedtuple
+from contextlib import contextmanager
 
 from imagekitio import ImageKit
 
@@ -28,6 +29,16 @@ try:
 except Exception as e:
     imagekit = None
     print(e)
+
+
+@contextmanager
+def debug_log():
+    log = {}
+    try:
+        yield log
+    finally:
+        print(log)
+
 
 def connect():
     conn = sqlite3.connect(DB_NAME)
@@ -208,8 +219,9 @@ def get_leaders(top=20):
 
 def get_random_name():
     conn = connect()
-    with conn:
+    with connect() as conn, debug_log() as log:
         if random.random() > .3:
+            log['mode'] = 'eggs'
             median_third = conn.execute(
                 '''
                 SELECT upvotes+downvotes as r
@@ -221,6 +233,7 @@ def get_random_name():
                 OFFSET (SELECT COUNT(*) FROM names)/3
                 '''
             ).fetchone()['r']
+
             order = 'RANDOM()'
             limit = 1
             min_ = -2
@@ -229,6 +242,8 @@ def get_random_name():
                 limit = 200
             if random.random() < 0.3:
                 min_ = median_third
+
+
             first_name = random.choice(conn.execute(
                 f'''
                 SELECT * FROM names
@@ -240,6 +255,16 @@ def get_random_name():
                 ''',
                 (VOTE_THRESHOLD, min_, ANNOTATE_THRESHOLD, limit)
             ).fetchall())
+
+            log['first'] = {
+                'name': first_name['name'],
+                'upvotes': first_name['upvotes'],
+                'downvotes': first_name['downvotes'],
+                'first_votes': first_name['first_votes'],
+                'second_votes': first_name['second_votes'],
+                'order': order,
+                'min': min_,
+            }
 
             order = 'RANDOM()'
             limit = 1
@@ -261,18 +286,33 @@ def get_random_name():
                 ''',
                 (VOTE_THRESHOLD, min_, ANNOTATE_THRESHOLD, first_name and first_name['name'], limit)
             ).fetchall())
+
+            log['second'] = {
+                'name': second_name['name'],
+                'upvotes': second_name['upvotes'],
+                'downvotes': second_name['downvotes'],
+                'first_votes': second_name['first_votes'],
+                'second_votes': second_name['second_votes'],
+                'order': order,
+                'min': min_,
+            }
+
             if first_name and second_name:
                 name = f'{first_name["name"]} {second_name["name"]}'
             else:
+                log['what'] = True
                 names = conn.execute('SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR upvotes+downvotes>=-2) ORDER BY RANDOM() LIMIT 2').fetchall()
                 name = f'{names[0]["name"]} {names[1]["name"]}'
 
             votes = conn.execute(f'SELECT * FROM leaders WHERE name = ? AND votes <= {LEADER_THRESHOLD} LIMIT 1', (name,))
             if not votes.fetchone():
+                log['name'] = name
                 return name
+            log['fallthrough_egg'] = True
 
         # no good name gen, just pick something good from the leaderboard
         if random.random() < .02:
+            log['mode'] = 'weekly'
             lookback = None or datetime.timedelta(days=7)
             after = datetime.datetime.utcnow() - lookback
             name = conn.execute(
@@ -290,16 +330,20 @@ def get_random_name():
                 (after,)
             ).fetchone()
             if name:
+                log['name'] = name['name']
                 return name['name']
+            log['fallthrough_weekly'] = True
         """
         if random.random() < .1:
             # pull something from the bottom of the board to differentiate it faster
             rows = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY votes ASC, RANDOM() LIMIT 200').fetchall()
             return random.choice(rows)['name']
         """
-
-        name = conn.execute(f'SELECT name FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY RANDOM() LIMIT 1').fetchone()['name']
-        return name
+        log['mode'] = 'leaders'
+        name = conn.execute(f'SELECT * FROM leaders WHERE votes > {LEADER_THRESHOLD} AND naughty = 0 ORDER BY RANDOM() LIMIT 1').fetchone()
+        log['name'] = name['name']
+        log['votes'] = name['votes']
+        return name['name']
 
 
 def check_egg_threshold(fullname, threshold=VOTE_THRESHOLD, c=None):
