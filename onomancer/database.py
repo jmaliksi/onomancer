@@ -226,7 +226,7 @@ def get_random_name():
     with connect() as conn, debug_log() as log:
         if random.random() > .3:
             log['mode'] = 'eggs'
-            median_third = conn.execute(
+            lower = conn.execute(
                 '''
                 SELECT upvotes+downvotes as r
                 FROM names
@@ -234,7 +234,7 @@ def get_random_name():
                     (downvotes>-4 OR upvotes+downvotes>-2)
                 ORDER BY upvotes+downvotes
                 LIMIT 1
-                OFFSET (SELECT COUNT(*) FROM names)/3
+                OFFSET (SELECT COUNT(*) FROM names)/2
                 '''
             ).fetchone()['r']
 
@@ -245,7 +245,7 @@ def get_random_name():
                 order = 'upvotes+downvotes AND RANDOM()'
                 limit = 200
             if random.random() < 0.3:
-                min_ = median_third
+                min_ = lower
 
 
             first_name = random.choice(conn.execute(
@@ -277,7 +277,7 @@ def get_random_name():
                 order = 'upvotes+downvotes AND RANDOM()'
                 limit = 200
             if random.random() < 0.3:
-                min_ = median_third
+                min_ = lower
             second_name = random.choice(conn.execute(
                 f'''
                 SELECT * FROM names
