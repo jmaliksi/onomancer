@@ -32,7 +32,7 @@ from blaseball_mike.models import Player
 from onomancer import database
 from onomancer.stash import Stash
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARN)
 
 # why use many file when one file do
 app = Flask(__name__)
