@@ -18,18 +18,6 @@
             data: {
                 datasets: [
                     {
-                        label: 'Good eggs',
-                        data: [
-                            {% for egg in good_eggs %}
-                            {
-                                x: {{egg['x']}},
-                                y: {{egg['y']}}
-                            },
-                            {% endfor %}
-                        ],
-                        backgroundColor: "#00f"
-                    },
-                    {
                         label: 'Bad eggs',
                         data: [
                             {% for egg in bad_eggs %}
@@ -40,6 +28,18 @@
                             {% endfor %}
                         ],
                         backgroundColor: "#f00"
+                    },
+                    {
+                        label: 'Good eggs',
+                        data: [
+                            {% for egg in good_eggs %}
+                            {
+                                x: {{egg['x']}},
+                                y: {{egg['y']}}
+                            },
+                            {% endfor %}
+                        ],
+                        backgroundColor: "#00f"
                     }
                 ]
             }

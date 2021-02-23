@@ -35,6 +35,24 @@ except Exception as e:
     logger.debug(e)
 
 
+BAD_EGG_CLAUSE = '''
+(
+    (
+        upvotes-downvotes > 15 AND
+        (
+            upvotes = 0 OR
+            -1.0 * downvotes / upvotes > 0.5
+        )
+    )
+    OR
+    (
+        downvotes <= -4 AND
+        upvotes + downvotes <= -2
+    )
+)
+'''
+
+
 @contextmanager
 def debug_log():
     log = {}
@@ -227,11 +245,11 @@ def get_random_name():
         if random.random() > .3:
             log['mode'] = 'eggs'
             lower = conn.execute(
-                '''
+                f'''
                 SELECT upvotes+downvotes as r
                 FROM names
                 WHERE
-                    (downvotes>-4 OR upvotes+downvotes>-2)
+                    NOT {BAD_EGG_CLAUSE}
                 ORDER BY upvotes+downvotes
                 LIMIT 1
                 OFFSET (SELECT COUNT(*) FROM names)/2
@@ -252,12 +270,13 @@ def get_random_name():
                 f'''
                 SELECT * FROM names
                 WHERE naughty=0
-                    AND (downvotes>? OR upvotes+downvotes>=?)
+                    AND NOT {BAD_EGG_CLAUSE}
+                    AND upvotes+downvotes > ?
                     AND first_votes+?>=second_votes
                 ORDER BY {order}
                 LIMIT ?
                 ''',
-                (VOTE_THRESHOLD, min_, ANNOTATE_THRESHOLD, limit)
+                (min_, ANNOTATE_THRESHOLD, limit)
             ).fetchall())
 
             log['first'] = {
@@ -282,13 +301,14 @@ def get_random_name():
                 f'''
                 SELECT * FROM names
                 WHERE naughty=0
-                    AND (downvotes>? OR upvotes+downvotes>=?)
+                    AND NOT {BAD_EGG_CLAUSE}
+                    AND upvotes+downvotes > ?
                     AND first_votes<=second_votes+?
                     AND name != ?
                 ORDER BY {order}
                 LIMIT ?
                 ''',
-                (VOTE_THRESHOLD, min_, ANNOTATE_THRESHOLD, first_name and first_name['name'], limit)
+                (min_, ANNOTATE_THRESHOLD, first_name and first_name['name'], limit)
             ).fetchall())
 
             log['second'] = {
@@ -305,7 +325,14 @@ def get_random_name():
                 name = f'{first_name["name"]} {second_name["name"]}'
             else:
                 log['what'] = True
-                names = conn.execute('SELECT * FROM names WHERE naughty=0 AND (downvotes>? OR upvotes+downvotes>=-2) ORDER BY RANDOM() LIMIT 2').fetchall()
+                names = conn.execute(
+                    f'''
+                    SELECT * FROM names
+                    WHERE
+                        naughty=0 AND
+                        NOT {BAD_EGG_CLAUSE}
+                    ORDER BY RANDOM()
+                    LIMIT 2''').fetchall()
                 name = f'{names[0]["name"]} {names[1]["name"]}'
 
             votes = conn.execute(f'SELECT * FROM leaders WHERE name = ? AND votes <= {LEADER_THRESHOLD} LIMIT 1', (name,))
@@ -350,9 +377,15 @@ def get_random_name():
         return name['name']
 
 
-def check_egg_threshold(fullname, threshold=VOTE_THRESHOLD, c=None):
+def check_egg_threshold(fullname, c=None):
     names = fullname.split(' ', 1)
-    rows = c.execute(f'SELECT * FROM names WHERE name IN ({",".join("?" * len(names))}) AND (downvotes < {threshold} AND upvotes+downvotes<-2)', names)
+    rows = c.execute(
+        f'''
+        SELECT * FROM names
+        WHERE
+            name IN ({",".join("?" * len(names))}) AND
+            NOT {BAD_EGG_CLAUSE}
+        ''', names)
     if rows.fetchone():
         return True
     return False
@@ -459,7 +492,6 @@ def admin_eggs():
     with connect() as conn:
         return {
             'naughty': [dict(r) for r in conn.execute('SELECT * FROM names WHERE naughty = -1')],
-            'measured': [dict(r) for r in conn.execute(f'SELECT * FROM names WHERE downvotes <= -(upvotes * 2) AND downvotes <= {VOTE_THRESHOLD}')],
         }
 
 
@@ -543,11 +575,32 @@ def chart_eggs(start=1, end=None):
         if not end:
             end = conn.execute('SELECT MAX(id) as m FROM names').fetchone()['m']
         good = conn.execute(
-            'SELECT id as x, upvotes+downvotes as y FROM names WHERE naughty=0 AND id>=? AND id<=? AND (downvotes>=? OR upvotes+downvotes>=-2) ORDER BY id',
-            (start, end, VOTE_THRESHOLD))
+            f'''
+            SELECT
+                id as x,
+                upvotes+downvotes as y
+            FROM names
+            WHERE
+                naughty=0 AND
+                id>=? AND id<=? AND
+                NOT {BAD_EGG_CLAUSE}
+            ORDER BY id
+            ''',
+            (start, end,))
         bad = conn.execute(
-            'SELECT id as x, upvotes+downvotes as y FROM names WHERE naughty=0 AND id>=? AND id<=? AND (downvotes<? AND upvotes+downvotes<-2) ORDER BY id',
-            (start, end, VOTE_THRESHOLD))
+            f'''
+            SELECT
+                id as x,
+                upvotes+downvotes as y
+            FROM names
+            WHERE
+                naughty=0 AND
+                id>=? AND
+                id<=? AND
+                {BAD_EGG_CLAUSE}
+            ORDER BY id
+            ''',
+            (start, end,))
         return good, bad
 
 
@@ -583,7 +636,7 @@ def get_eggs(threshold=0, limit=100, offset=0, rand=0):
         order = 'RANDOM()' if rand else 'name'
         return [
             n['name'] for n in c.execute(
-                f'SELECT * FROM names WHERE naughty=0 AND upvotes+downvotes>=? ORDER BY {order} LIMIT ?,?',
+                f'SELECT * FROM names WHERE naughty=0 AND NOT {BAD_EGG_CLAUSE} ORDER BY {order} LIMIT ?,?',
                 (threshold, offset, limit),
             )
         ]
@@ -609,8 +662,14 @@ def get_annotate_examples(egg, limit=5, rand=0):
         if len(as_first) < limit:
             rem = limit - len(as_first)
             as_first.extend([{'name': f'{egg} {r["name"]}'} for r in c.execute(
-                'SELECT * FROM names WHERE naughty=0 AND (downvotes>=? OR downvotes+upvotes>=-2) ORDER BY RANDOM() LIMIT ?',
-                (VOTE_THRESHOLD, rem),
+                f'''
+                SELECT * FROM names
+                WHERE
+                    naughty=0
+                    AND NOT {BAD_EGG_CLAUSE}
+                ORDER BY RANDOM()
+                LIMIT ?''',
+                (rem,),
             )])
 
         as_second = c.execute(
@@ -620,8 +679,14 @@ def get_annotate_examples(egg, limit=5, rand=0):
         if len(as_second) < limit:
             rem = limit - len(as_second)
             as_second.extend([{'name': f'{r["name"]} {egg}'} for r in c.execute(
-                'SELECT * FROM names WHERE naughty=0 AND (downvotes>=? OR downvotes+upvotes>=-2) ORDER BY RANDOM() LIMIT ?',
-                (VOTE_THRESHOLD, rem),
+                f'''
+                SELECT * FROM names
+                WHERE
+                    naughty=0 AND
+                    NOT {BAD_EGG_CLAUSE}
+                ORDER BY RANDOM()
+                LIMIT ?''',
+                (rem,),
             )])
 
     return {
