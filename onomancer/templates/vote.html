@@ -27,7 +27,7 @@
     <a href="/vote?name={{super_secret(name, rotkey)}}&reverse=1">reverse</a>
     <a href="/vote">skip</a>
     <a href="/vote?name={{super_secret(name, rotkey)}}&flagForm=1">flag</a>
-    <a href="shareName/{{share_guid}}" target="_blank">share</a>
+    <a href="/shareName/{{share_guid}}" target="_blank">share</a>
     <form action="/stash" method="post" class="inlineForm">
         {{ csrf_html(session['USER_CSRF'])|safe }}
         <input type="hidden" name="guid" value="{{share_guid}}"/>
@@ -35,7 +35,7 @@
         <input type="hidden" name="redirect" value="vote"/>
         <button type="submit" alt="stash" title="Save to stash" value="stash" style="text-decoration:underline;margin:10px;">stash</button>
     </form>
-    <a href="shareName/{{share_guid}}?examine=1" target="_blank">interview</a>
+    <a href="/shareName/{{share_guid}}?examine=1" target="_blank">interview</a>
 </div>
 {% if flag_form %}
 <p>&nbsp;</p>
