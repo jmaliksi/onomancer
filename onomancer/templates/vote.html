@@ -48,7 +48,7 @@
 {% endif %}
 <script>
 window.onload = function() {
-    history.replaceState({guid: "{{share_guid}}"}, '', 'vote');
+    history.replaceState({guid: "{{share_guid}}"}, '', 'shareName/{{share_guid}}');
 }
 </script>
 {% endblock %}
