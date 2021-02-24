@@ -46,4 +46,9 @@
     <input type="submit" alt="flag" name="flag" value="Flag"/>
 </form>
 {% endif %}
+<script>
+window.onload = function() {
+    history.replaceState({guid: "{{share_guid}}"}, '', 'vote');
+}
+</script>
 {% endblock %}
