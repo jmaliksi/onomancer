@@ -636,7 +636,7 @@ def get_eggs(threshold=0, limit=100, offset=0, rand=0):
         order = 'RANDOM()' if rand else 'name'
         return [
             n['name'] for n in c.execute(
-                f'SELECT * FROM names WHERE naughty=0 AND NOT {BAD_EGG_CLAUSE} ORDER BY {order} LIMIT ?,?',
+                f'SELECT * FROM names WHERE naughty=0 AND NOT {BAD_EGG_CLAUSE} AND upvotes+downvotes > ? ORDER BY {order} LIMIT ?,?',
                 (threshold, offset, limit),
             )
         ]
