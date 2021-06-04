@@ -980,7 +980,7 @@ def _get_or_generate_player(name):
         player['soulscream'] = p.soulscream
         player['blood'] = p.blood
         player['coffee'] = p.coffee
-    except (AttributeError, KeyError):
+    except (AttributeError, KeyError, json.decoder.JSONDecodeError):
         player = _make_player_json(name)
     return player
 
