@@ -26,6 +26,7 @@ from profanity import profanity
 from flask_limiter import Limiter
 from flask_limiter.util import get_ipaddr
 from flask_minify import minify
+from flask_cors import CORS
 from pylru import lrucache
 from blaseball_mike.models import Player
 
@@ -55,6 +56,8 @@ except Exception as e:
 
 csrf = CSRF(config=CSRF_CONFIG)
 app = csrf.init_app(app)
+
+CORS(app, methods=["GET","OPTIONS"], max_age=86400)
 
 limiter = Limiter(
     app,
