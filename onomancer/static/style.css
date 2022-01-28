@@ -92,6 +92,13 @@ a {
     border: 0;
     cursor: pointer;
     flex-grow: 1;
+    background-color: black;
+    border: 1px solid white;
+    border-radius: 20px;
+}
+
+.judgeForm input:hover {
+    background-color: white;
 }
 
 .judgeForm label {
