@@ -4,6 +4,23 @@
 {% block names %}
 <div>
     <div class="board">
+        <h2>Weekly</h2>
+        <ol>
+            {% for name in weekly %}
+            <li class="leaderItem" key="{{name['name']}}">
+                <span><a href='/shareName/{{name['guid']}}' target='_blank'>{{name['name']}}</a> - {{name['votes']}} </span>
+                <form action="downLeader" method="post" class="inlineForm">
+                    {{ csrf_html(session['USER_CSRF'])|safe }}
+                    {% if not patience %}
+                    <input type="hidden" name="name" value="{{super_secret(name['name'], rotkey)}}"/>
+                    <button type="submit" alt="downvote" title="Downvote" name="command" value="down">&#128315</button>
+                    {% endif %}
+                </form>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+    <div class="board">
         <h2>All Time</h2>
         <ol>
             {% for name in names %}
@@ -14,23 +31,6 @@
                     {% if not patience %}
                     <input type="hidden" name="name" value="{{super_secret(name['name'], rotkey)}}"/>
                     <button type="submit" alt="reverse name" title="Reverse name" name="command" value="flip">&#128257</button>
-                    <button type="submit" alt="downvote" title="Downvote" name="command" value="down">&#128315</button>
-                    {% endif %}
-                </form>
-            </li>
-            {% endfor %}
-        </ol>
-    </div>
-    <div class="board">
-        <h2>Weekly</h2>
-        <ol>
-            {% for name in weekly %}
-            <li class="leaderItem" key="{{name['name']}}">
-                <span><a href='/shareName/{{name['guid']}}' target='_blank'>{{name['name']}}</a> - {{name['votes']}} </span>
-                <form action="downLeader" method="post" class="inlineForm">
-                    {{ csrf_html(session['USER_CSRF'])|safe }}
-                    {% if not patience %}
-                    <input type="hidden" name="name" value="{{super_secret(name['name'], rotkey)}}"/>
                     <button type="submit" alt="downvote" title="Downvote" name="command" value="down">&#128315</button>
                     {% endif %}
                 </form>
