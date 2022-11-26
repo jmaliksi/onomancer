@@ -45,6 +45,7 @@ Server will start up at 0.0.0.0:5001
 Icons
 * https://game-icons.net/1x1/lorc/crystal-ball.html
 * https://game-icons.net/1x1/delapouite/aquarium.html
+* https://game-icons.net/1x1/delapouite/acoustic-megaphone.html
 
 # API
 Onomancer has a public API if you want to use these voted names in your own project.
