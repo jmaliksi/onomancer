@@ -6,10 +6,10 @@ async function vocalize(words) {
     if (synth.speaking) {
         synth.cancel();
     }
-    let voice = synth.getVoices().filter((v) => v.default)[0];
+    let voice = getVoice();
     if (!voice) {
         await getPromiseFromEvent(synth, "voiceschanged")
-        voice = synth.getVoices().filter((v) => v.default)[0];
+        voice = getVoice();
     }
     let utterance = new SpeechSynthesisUtterance(words)
     utterance.voice = voice;
@@ -24,4 +24,8 @@ function getPromiseFromEvent(item, event) {
         }
         item.addEventListener(event, listener);
     });
+}
+
+function getVoice() {
+    return window.speechSynthesis.getVoices().filter((v) => v.default && v.lang.startsWith("en-"))[0];
 }
