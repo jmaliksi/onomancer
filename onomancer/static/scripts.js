@@ -8,7 +8,9 @@ async function vocalize(words) {
     }
     let voice = getVoice();
     if (!voice) {
-        await getPromiseFromEvent(synth, "voiceschanged")
+        const voiceChanged = getPromiseFromEvent(synth, "voiceschanged")
+        const timeout = timerPromise(100)
+        await Promise.any([voiceChanged, timeout])
         voice = getVoice();
     }
     let utterance = new SpeechSynthesisUtterance(words)
@@ -28,4 +30,8 @@ function getPromiseFromEvent(item, event) {
 
 function getVoice() {
     return window.speechSynthesis.getVoices().filter((v) => v.default && v.lang.startsWith("en-"))[0];
+}
+
+function timerPromise(timeout) {
+    return new Promise((resolve) => setTimeout(resolve, timeout));
 }
