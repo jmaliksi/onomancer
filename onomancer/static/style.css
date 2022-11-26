@@ -44,6 +44,11 @@ h1.name {
     display: none;
 }
 
+#megaphone {
+    fill-opacity: 1;
+    fill: #666;
+}
+
 @keyframes fadeInName {
     from {color: black;}
     to {color:inherit}
