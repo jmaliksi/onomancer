@@ -31,6 +31,15 @@ h1.name {
     animation-name: fadeInName;
 }
 
+#vocalizeicon {
+    font-size: .3em;
+    display: none;
+}
+
+#dictation {
+    display: none;
+}
+
 @keyframes fadeInName {
     from {color: black;}
     to {color:inherit}
@@ -77,6 +86,11 @@ ul {
 a {
     color: white;
     margin: 10px;
+}
+
+.vocalize:hover {
+    color: white;
+    cursor: pointer;
 }
 
 .judgeForm {

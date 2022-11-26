@@ -7,8 +7,16 @@
 {% block content %}
 <div class="center">
     <span>{% block cta %}{% endblock%}</span>
-    <h1 class="name">{{name}}</h1>
+    <a class="vocalize" onclick='vocalize("{{name}}");return false'><h1 class="name">{{name}}<sup id="vocalizeicon">🔊</sup></h1></a>
     {% block console %}{% endblock %}
     <p class="message">{{message}}</p>
 </div>
+<script>
+window.addEventListener("load", function() {
+    if (!('speechSynthesis' in window)) {
+        return;
+    }
+    document.getElementById("vocalizeicon").style.display = "inline";
+});
+</script>
 {% endblock %}

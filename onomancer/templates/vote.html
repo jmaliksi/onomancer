@@ -36,6 +36,7 @@
         <button type="submit" alt="stash" title="Save to stash" value="stash" style="text-decoration:underline;margin:10px;">stash</button>
     </form>
     <a href="/shareName/{{share_guid}}?examine=1" target="_blank">interview</a>
+    <a id="dictation" href="#" onclick="return toggleDictation()">dictation: <span id="dictationState">off</span></a>
 </div>
 {% if flag_form %}
 <p>&nbsp;</p>
@@ -47,8 +48,19 @@
 </form>
 {% endif %}
 <script>
-window.onload = function() {
+let dictationState = localStorage.getItem("dictationState") || "off";
+window.addEventListener("load", function() {
     history.replaceState({guid: "{{share_guid}}"}, '', 'shareName/{{share_guid}}');
+    document.getElementById("dictation").style.display = "inline";
+    document.getElementById("dictationState").innerText = dictationState;
+    if (dictationState === "on") {
+        vocalize("{{name}}");
+    }
+})
+function toggleDictation() {
+    dictationState = dictationState === "on" ? "off" : "on";
+    document.getElementById("dictationState").innerText = dictationState;
+    localStorage.setItem("dictationState", dictationState);
 }
 </script>
 {% endblock %}
