@@ -13,7 +13,9 @@ async function vocalize(words) {
         await Promise.any([voiceChanged, timeout])
         voice = getVoice();
     }
-    let utterance = new SpeechSynthesisUtterance(words)
+    let textarea = document.createElement("textarea");
+    textarea.innerHTML = words;
+    let utterance = new SpeechSynthesisUtterance(textarea.value)
     utterance.voice = voice;
     synth.speak(utterance);
 }
