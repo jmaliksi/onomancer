@@ -34,6 +34,7 @@ h1.name {
 #vocalizeicon {
     font-size: .3em;
     display: none;
+    margin-right: -1em;
 }
 
 #vocalizeicon:hover {
