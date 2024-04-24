@@ -90,6 +90,22 @@ Parameters:
 * `limit` - page size, default 100
 * `offset` - page offset, default 0
 * `random` - returns in random order if set to true, default 0
+* `first` - filter names annotated as first at or above this threshold, default empty
+* `second` - filter names annotated as second at or above this threshold, default empty
+
+
+## Crawl Names - experimental
+
+`/api/crawlNames/<name>`
+
+Given a name, find like names
+
+Rate limit: 1/s
+
+Parameters:
+* `threshold` - filter names with votes at or above this threshold, default 0
+* `limit` - page size, default 100
+* `fanout` - how many iterations to crawl out, default 2
 
 ## Generate Stats
 

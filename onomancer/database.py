@@ -631,6 +631,38 @@ def get_names(threshold=0, limit=100, offset=0, rand=0):
         ]
 
 
+def crawl_names(likeness, threshold=0, fanout=2, limit=100):
+    '''
+    welcome to tablescan city
+    '''
+    first, second = likeness.split(' ')
+    gensize = max(1, int(limit / fanout))
+    def likegen(firsts, seconds):
+        eggs = [f'{f} %' for f in firsts] + [f'% {s}' for s in seconds]
+        likes = f'({" OR ".join(["name LIKE ?"] * len(eggs))})'
+        return likes, eggs
+    with connect() as c:
+        firsts = {first}
+        seconds = {second}
+        names = {likeness}
+        for _ in range(fanout):
+            lc, e = likegen(firsts, seconds)
+            q = f'''
+                SELECT * FROM leaders
+                WHERE
+                    naughty=0 AND 
+                    votes >= ? AND
+                    {lc}
+                ORDER BY RANDOM()
+                LIMIT ?
+            '''
+            rows = c.execute(q, [threshold] + e + [gensize])
+            names = names | set([r['name'] for r in rows])
+            firsts = set([n.split(' ')[0] for n in names])
+            seconds = {n.split(' ')[-1] for n in names}
+    return sorted(list(names), key=lambda _: random.random())[:limit]
+
+
 def get_eggs(threshold=0, limit=100, offset=0, rand=0, first=float('-inf'), second=float('-inf')):
     with connect() as c:
         order = 'RANDOM()' if rand else 'name'

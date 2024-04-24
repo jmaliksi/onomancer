@@ -974,6 +974,15 @@ def getOrGenerateStats():
     return jsonify(_get_or_generate_player(name))
 
 
+@app.route('/api/crawlNames/<name>')
+@limiter.limit('1/second')
+def crawlNames(name):
+    threshold = int(request.args.get('threshold', 0))
+    fanout = int(request.args.get('fanout', 2))
+    limit = int(request.args.get('limit', 100))
+    return jsonify(database.crawl_names(name, threshold, fanout, limit))
+
+
 @functools.lru_cache(512)
 def _get_or_generate_player(name):
     # we don't need this anymore lmao
