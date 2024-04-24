@@ -636,6 +636,7 @@ def crawl_names(likeness, threshold=0, fanout=2, limit=100):
     welcome to tablescan city
     '''
     first, second = likeness.split(' ')
+    fanout = max(1, min(fanout, 10))
     gensize = max(1, int(limit / fanout))
     def likegen(firsts, seconds):
         eggs = [f'{f} %' for f in firsts] + [f'% {s}' for s in seconds]

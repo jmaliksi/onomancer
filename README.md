@@ -105,7 +105,7 @@ Rate limit: 1/s
 Parameters:
 * `threshold` - filter names with votes at or above this threshold, default 0
 * `limit` - page size, default 100
-* `fanout` - how many iterations to crawl out, default 2
+* `fanout` - how many iterations to crawl out, default 2, min 1, max 10
 
 ## Generate Stats
 
