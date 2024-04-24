@@ -631,13 +631,22 @@ def get_names(threshold=0, limit=100, offset=0, rand=0):
         ]
 
 
-def get_eggs(threshold=0, limit=100, offset=0, rand=0):
+def get_eggs(threshold=0, limit=100, offset=0, rand=0, first=float('-inf'), second=float('-inf')):
     with connect() as c:
         order = 'RANDOM()' if rand else 'name'
         return [
             n['name'] for n in c.execute(
-                f'SELECT * FROM names WHERE naughty=0 AND NOT {BAD_EGG_CLAUSE} AND upvotes+downvotes > ? ORDER BY {order} LIMIT ?,?',
-                (threshold, offset, limit),
+                f'''
+                    SELECT * FROM names
+                    WHERE
+                        naughty=0 AND
+                        NOT {BAD_EGG_CLAUSE}
+                        AND upvotes+downvotes > ?
+                        AND first_votes >= ?
+                        AND second_votes >= ?
+                    ORDER BY {order} LIMIT ?,?
+                ''',
+                (threshold, first, second, offset, limit),
             )
         ]
 

@@ -942,6 +942,8 @@ def get_eggs():
         'limit',
         'offset',
         'random',
+        'first',
+        'second',
     }
     for arg in request.args:
         if arg not in valid_args:
@@ -950,7 +952,9 @@ def get_eggs():
     limit = int(request.args.get('limit', 100))
     offset = int(request.args.get('offset', 0))
     rand = request.args.get('random', 0)
-    return jsonify(database.get_eggs(threshold, limit, offset, rand))
+    first = request.args.get('first', float('-inf'))
+    second = request.args.get('second', float('-inf'))
+    return jsonify(database.get_eggs(threshold, limit, offset, rand, first=first, second=second))
 
 
 @app.route('/api/generateStats/<name>')
@@ -972,19 +976,8 @@ def getOrGenerateStats():
 
 @functools.lru_cache(512)
 def _get_or_generate_player(name):
-    try:
-        p = Player.find_by_name(name)
-        player = p.json()
-        player['current_vibe'] = p.get_vibe(_current_day())
-        player['batting_stars'] = p.batting_stars
-        player['pitching_stars'] = p.pitching_stars
-        player['baserunning_stars'] = p.baserunning_stars
-        player['defense_stars'] = p.defense_stars
-        player['soulscream'] = p.soulscream
-        player['blood'] = p.blood
-        player['coffee'] = p.coffee
-    except (AttributeError, KeyError, json.decoder.JSONDecodeError):
-        player = _make_player_json(name)
+    # we don't need this anymore lmao
+    player = _make_player_json(name)
     return player
 
 
