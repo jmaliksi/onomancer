@@ -983,6 +983,17 @@ def crawlNames(name):
     return jsonify(database.crawl_names(name, threshold, fanout, limit))
 
 
+@app.route('/api/crawlEggs/')
+@limiter.limit('1/second')
+def crawlEggs():
+    threshold = int(request.args.get('threshold', 0))
+    fanout = int(request.args.get('fanout', 3))
+    limit = int(request.args.get('limit', 10))
+    egg_threshold = int(request.args.get('egg_threshold', 0))
+    likenesses = request.args.get('q', '').split(',')
+    return jsonify(database.crawl_eggs(likenesses, threshold, fanout, limit, egg_threshold))
+
+
 @functools.lru_cache(512)
 def _get_or_generate_player(name):
     # we don't need this anymore lmao

@@ -664,6 +664,47 @@ def crawl_names(likeness, threshold=0, fanout=2, limit=100):
     return sorted(list(names), key=lambda _: random.random())[:limit]
 
 
+def crawl_eggs(likenesses, threshold=0, fanout=3, limit=10, egg_threshold=0):
+    """
+    it's tablescan city (the remix)
+    """
+    fanout = max(1, min(fanout, 10))
+    gensize = max(int(limit / fanout), 10)
+    def likegen(eggs):
+        return f'({" OR ".join(["name LIKE ?"] * len(eggs))})', [f'%{e}%' for e in eggs]
+    with connect() as c:
+        eggs = set(likenesses)
+        names = set()
+        for _ in range(fanout):
+            eq = f'''
+                SELECT name FROM names
+                WHERE
+                    naughty=0 AND
+                    NOT {BAD_EGG_CLAUSE} AND
+                    upvotes+downvotes > ? AND
+                    name IN ({",".join(["?"] * len(eggs))})
+            '''
+            eggrows = c.execute(eq, [egg_threshold] + list(eggs))
+            eggs = eggs | set((r['name'] for r in eggrows))
+            if len(eggs) == 0:
+                break
+
+            lc, e = likegen(eggs)
+            q = f'''
+                SELECT name FROM leaders
+                WHERE
+                    naughty=0 AND
+                    votes >= ? AND
+                    {lc}
+                ORDER BY RANDOM()
+                LIMIT ?
+            '''
+            rows = c.execute(q, [threshold] + e + [gensize])
+            names = names | set([r['name'] for r in rows])
+            eggs = eggs | set(sum((n.split(' ') for n in names), []))
+    return sorted(list(names), key=lambda _: random.random())[:limit]
+
+
 def get_eggs(threshold=0, limit=100, offset=0, rand=0, first=float('-inf'), second=float('-inf')):
     with connect() as c:
         order = 'RANDOM()' if rand else 'name'

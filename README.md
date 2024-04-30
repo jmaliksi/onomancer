@@ -107,6 +107,21 @@ Parameters:
 * `limit` - page size, default 100
 * `fanout` - how many iterations to crawl out, default 2, min 1, max 10
 
+## Crawl Eggs - experimental
+
+`/api/crawlEggs/`
+
+Given a comma separated list of eggs, find names that are related to the vibe
+
+Rate limit: 1/s
+
+Parameters:
+* `q` - comma separated list of eggs
+* `threshold` - filter names with votes at or above this threshold, default 0
+* `fanout` - how many iterations to crawl out, default 3
+* `limit` - page size, default 10
+* `egg_threshold` - minimum votes an egg must have to be considered for the next iteration of fanout
+
 ## Generate Stats
 
 `/api/generateStats/<name>`
