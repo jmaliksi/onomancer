@@ -34,6 +34,7 @@ from onomancer import database
 from onomancer.stash import Stash
 
 logging.basicConfig(level=logging.WARN)
+CSRF_INVALIDATION = '::2::'
 
 # why use many file when one file do
 app = Flask(__name__)
@@ -81,16 +82,6 @@ app.wsgi_app = HttpsProxy(app.wsgi_app)
 
 
 profanity.load_words()
-profanity.load_words(profanity.words + [
-    'trump',
-    'pewdipie',
-    'rowling',
-    'bollocks',
-    'google',
-    'ch00beh',
-    ';--',
-    'homestuck',
-])
 
 nonsense = lrucache(10000)
 
@@ -114,8 +105,11 @@ app.jinja_env.globals.update(testing=lambda: app.debug)
 
 @app.before_request
 def before_request():
+    # invalidate old sessions and renew tokens
+    if 'USER_CSRF' in session and not session['USER_CSRF'].startswith(CSRF_INVALIDATION):
+        del session['USER_CSRF']
     if 'CSRF_TOKEN' not in session or 'USER_CSRF' not in session:
-        nonce = str(uuid.uuid4())
+        nonce = CSRF_INVALIDATION + str(uuid.uuid4())
         session['USER_CSRF'] = nonce
         session['CSRF_TOKEN'] = csrf.create(session['USER_CSRF'])
     if 'rotkey' not in session:
@@ -140,7 +134,7 @@ def require_csrf(f):
                 session.pop('CSRF_TOKEN', None)
                 return redirect(url_for('what'))
             session['PREV_NONCE'] = session['USER_CSRF']
-            session['USER_CSRF'] = str(uuid.uuid4())
+            session['USER_CSRF'] = CSRF_INVALIDATION + str(uuid.uuid4())
             session['CSRF_TOKEN'] = csrf.create(session['USER_CSRF'])
             return f(*args, **kwargs)
         else:

@@ -50,7 +50,7 @@
 <script>
 let dictationState = localStorage.getItem("dictationState") || "off";
 window.addEventListener("load", function() {
-    // history.replaceState({guid: "{{share_guid}}"}, '', 'shareName/{{share_guid}}');
+    history.replaceState({guid: "{{share_guid}}"}, '', 'shareName/{{share_guid}}');
     if ('speechSynthesis' in window) {
         document.getElementById("dictation").style.display = "inline";
         document.getElementById("dictationState").innerText = dictationState;
