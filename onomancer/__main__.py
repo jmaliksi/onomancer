@@ -34,7 +34,7 @@ from onomancer import database
 from onomancer.stash import Stash
 
 logging.basicConfig(level=logging.WARN)
-CSRF_INVALIDATION = '::2::'
+CSRF_INVALIDATION = '::3::'
 
 # why use many file when one file do
 app = Flask(__name__)
@@ -107,7 +107,7 @@ app.jinja_env.globals.update(testing=lambda: app.debug)
 def before_request():
     # invalidate old sessions and renew tokens
     if 'USER_CSRF' in session and not session['USER_CSRF'].startswith(CSRF_INVALIDATION):
-        del session['USER_CSRF']
+        session.clear()
     if 'CSRF_TOKEN' not in session or 'USER_CSRF' not in session:
         nonce = CSRF_INVALIDATION + str(uuid.uuid4())
         session['USER_CSRF'] = nonce
