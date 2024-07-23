@@ -8,14 +8,14 @@ Flask-Minify==0.29
 flask-simple-csrf==1.2.0
 flask-cors==3.0.10
 idna==2.8
-imagekitio==2.2.4
+imagekitio==4.0.0
 itsdangerous==1.1.0
 Jinja2==2.11.2
 limits==1.5.1
 MarkupSafe==1.1.1
 profanity==1.1
 pylru==1.2.0
-requests==2.22.0
+requests>=2.22.0
 six==1.15.0
-urllib3==1.25.11
+urllib3>=1.25.11,<2.0.0
 Werkzeug==0.16.0

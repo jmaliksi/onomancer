@@ -817,14 +817,20 @@ def get_image_url(name=None, guid=None):
         font_size = 50
     else:
         font_size = 75
+    # what a terrible API
+    transforms = [
+        'l-text',
+        f'ie-{quote(base64.b64encode(name.encode("utf8")).decode("ascii"))}',
+        'w-450',
+        f'fs-{font_size}',
+        'ff-Lora',
+        'co-FFFFFF',
+        'l-end',
+    ]
     img_url = imagekit.url({
         'path': '/onomancer/black_rectangle_90Zei2Nio.jpg',
         'transformation': [{
-            'ote': quote(base64.b64encode(name.encode('utf8')).decode('ascii')),
-            'overlay_text_font_family': 'Lora',
-            'overlay_text_font_size': font_size,
-            'overlay_text_color': 'FFFFFF',
-            'otw': 450,
+            'raw': ','.join(transforms),
         }],
     })
     return img_url
