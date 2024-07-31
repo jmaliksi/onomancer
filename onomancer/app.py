@@ -36,7 +36,7 @@ logging.basicConfig(level=logging.WARN)
 CSRF_INVALIDATION = '::3::'
 
 # why use many file when one file do
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='')
 try:
     with open('data/csrf.key', 'r') as f:
         _key = f.read()
