@@ -1,0 +1,3 @@
+Disallow: /vote
+Disallow: /annotate
+Crawl-delay: 10000
