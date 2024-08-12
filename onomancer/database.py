@@ -102,6 +102,11 @@ def bootstrap():
         except Exception:
             pass
 
+        try:
+            conn.execute('CREATE INDEX idx_weekly_dt ON weekly (dt)')
+        except Exception:
+            pass
+
 
 
 def clear():
