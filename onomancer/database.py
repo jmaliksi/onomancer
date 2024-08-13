@@ -710,9 +710,16 @@ def crawl_eggs(likenesses, threshold=0, fanout=3, limit=10, egg_threshold=0):
     return sorted(list(names), key=lambda _: random.random())[:limit]
 
 
-def get_eggs(threshold=0, limit=100, offset=0, rand=0, first=float('-inf'), second=float('-inf')):
+def get_eggs(threshold=0, limit=100, offset=0, rand=0, first=float('-inf'), second=float('-inf'), affinity=0):
     with connect() as c:
         order = 'RANDOM()' if rand else 'name'
+        affinity_clause = ''
+        if affinity < 0:
+            affinity_clause = 'first_votes / NULLIF(first_votes + second_votes, 0) >= -1 * '
+        elif affinity > 0:
+            affinity_clause = 'second_votes / NULLIF(first_votes + second_votes, 0) >='
+        else:
+            affinity_clause = '1 >'
         return [
             n['name'] for n in c.execute(
                 f'''
@@ -723,9 +730,10 @@ def get_eggs(threshold=0, limit=100, offset=0, rand=0, first=float('-inf'), seco
                         AND upvotes+downvotes > ?
                         AND first_votes >= ?
                         AND second_votes >= ?
+                        AND {affinity_clause} ?
                     ORDER BY {order} LIMIT ?,?
                 ''',
-                (threshold, first, second, offset, limit),
+                (threshold, first, second, affinity, offset, limit),
             )
         ]
 

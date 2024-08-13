@@ -92,6 +92,7 @@ Parameters:
 * `random` - returns in random order if set to true, default 0
 * `first` - filter names annotated as first at or above this threshold, default empty
 * `second` - filter names annotated as second at or above this threshold, default empty
+* `affinity` - value between -1.0 and 1.0. Negative prefers first annotations, positive for second annotations. Default 0.
 
 
 ## Crawl Names - experimental

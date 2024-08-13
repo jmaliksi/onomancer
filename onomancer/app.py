@@ -937,6 +937,7 @@ def get_eggs():
         'random',
         'first',
         'second',
+        'affinity',
     }
     for arg in request.args:
         if arg not in valid_args:
@@ -947,7 +948,8 @@ def get_eggs():
     rand = request.args.get('random', 0)
     first = request.args.get('first', float('-inf'))
     second = request.args.get('second', float('-inf'))
-    return jsonify(database.get_eggs(threshold, limit, offset, rand, first=first, second=second))
+    affinity = float(request.args.get('affinity', 0))
+    return jsonify(database.get_eggs(threshold, limit, offset, rand, first=first, second=second, affinity=affinity))
 
 
 @app.route('/api/generateStats/<name>')
