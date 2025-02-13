@@ -831,22 +831,33 @@ def get_image_url(name=None, guid=None):
     else:
         font_size = 75
     # what a terrible API
-    transforms = [
-        'l-text',
-        f'ie-{quote(base64.b64encode(name.encode("utf8")).decode("ascii"))}',
-        'w-450',
-        f'fs-{font_size}',
-        'ff-Lora',
-        'co-FFFFFF',
-        'l-end',
-    ]
+    transform = _imagekit_text_overlay(name, font_size, w=450)
     img_url = imagekit.url({
         'path': '/onomancer/black_rectangle_90Zei2Nio.jpg',
         'transformation': [{
-            'raw': ','.join(transforms),
+            'raw': transform,
         }],
     })
     return img_url
+
+def _imagekit_text_overlay(text, font_size, typography=None, x=None, y=None, w=None):
+    props = [
+        'l-text',
+        f'ie-{quote(base64.b64encode(text.encode("utf8")).decode("ascii"))}',
+        f'fs-{font_size}',
+        'co-white',
+        'ff-Lora',
+    ]
+    if typography is not None:
+        props.append(f'tg-{typography}')
+    if w is not None:
+        props.append(f'w-{w}')
+    if x is not None:
+        props.append(f'lx-{x}')
+    if y is not None:
+        props.append(f'ly-{y}')
+    props.append('l-end')
+    return ','.join(props)
 
 
 @functools.lru_cache(1024)
@@ -855,64 +866,22 @@ def get_collection_image_url(*names, **kwargs):
     if not imagekit:
         raise Exception('Imagekit not initialized')
     transforms = []
-    transforms.append({
-        'overlay_text': 'Lineup',
-        'overlay_text_typography': 'bold',
-        'overlay_text_font_family': 'Lora',
-        'overlay_text_font_size': 30,
-        'overlay_text_color': 'FFFFFF',
-        'overlay_y': 50,
-        'overlay_x': 400,
-    })
+    transforms.append(_imagekit_text_overlay('Lineup', 30, typography='bold', x=400, y=50))
     for i, name in enumerate(names[:lineup_length]):
-        transforms.append({
-            'ote': quote(base64.b64encode(name[0].encode('utf8')).decode('ascii')),
-            'overlay_text_font_family': 'Lora',
-            'overlay_text_font_size': 21,
-            'overlay_text_color': 'FFFFFF',
-            'overlay_y': 90 + (i * 26),
-            'overlay_x': 250,
-        })
-        transforms.append({
-            'ote': quote(base64.b64encode((('•' * len(name[1])) + ('·' if name[2] else '')).encode('utf8')).decode('ascii')),
-            'overlay_text_font_size': 40,
-            'overlay_text_color': 'FFFFFF',
-            'overlay_y': 75 + (i * 27),
-            'overlay_x': 580,
-        })
+        transforms.append(_imagekit_text_overlay(name[0], 21, x=250, y=85 + (i * 27)))
+        transforms.append(_imagekit_text_overlay(('•' * len(name[1])) + ('·' if name[2] else ''), 32, x=580, y=85 + (i * 27)))
 
     rotation_start_y = 90 + (26 * lineup_length) + 50
 
-    transforms.append({
-        'overlay_text': 'Rotation',
-        'overlay_text_typography': 'bold',
-        'overlay_text_font_family': 'Lora',
-        'overlay_text_font_size': 30,
-        'overlay_text_color': 'FFFFFF',
-        'overlay_y': rotation_start_y,
-        'overlay_x': 400,
-    })
+    transforms.append(_imagekit_text_overlay('Rotation', 30, typography='bold', x=400, y=rotation_start_y))
     for i, name in enumerate(names[lineup_length:]):
-        transforms.append({
-            'ote': quote(base64.b64encode(name[0].encode('utf8')).decode('ascii')),
-            'overlay_text_font_family': 'Lora',
-            'overlay_text_font_size': 21,
-            'overlay_text_color': 'FFFFFF',
-            'overlay_y': rotation_start_y + 40 + (i * 26),
-            'overlay_x': 250,
-        })
-        transforms.append({
-            'ote': quote(base64.b64encode((('•' * len(name[1])) + ('·' if name[2] else '')).encode('utf8')).decode('ascii')),
-            'overlay_text_font_size': 40,
-            'overlay_text_color': 'FFFFFF',
-            'overlay_y': rotation_start_y + 25 + (i * 27),
-            'overlay_x': 580,
-        })
+        transforms.append(_imagekit_text_overlay(name[0], 21, x=250, y=rotation_start_y + 40 + (i * 26)))
+        transforms.append(_imagekit_text_overlay(('•' * len(name[1])) + ('·' if name[2] else ''), 32, x=580, y=rotation_start_y + 40 + (i * 27)))
 
 
     img_url = imagekit.url({
         'path': '/onomancer/black_rectangle_7xapQJdUh.jpg',
-        'transformation': transforms,
+        'transformation': [{'raw': ':'.join(transforms)}],
     })
     return img_url
 
