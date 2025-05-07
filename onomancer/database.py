@@ -247,7 +247,7 @@ def get_leaders(top=20):
 def get_random_name():
     conn = connect()
     with connect() as conn, debug_log() as log:
-        if random.random() > .4:
+        if random.random() > .5:
             log['mode'] = 'eggs'
             lower = conn.execute(
                 f'''
@@ -347,7 +347,7 @@ def get_random_name():
             log['fallthrough_egg'] = True
 
         # no good name gen, just pick something good from the leaderboard
-        if random.random() < .02:
+        if random.random() < .03:
             log['mode'] = 'weekly'
             lookback = None or datetime.timedelta(days=7)
             after = datetime.datetime.utcnow() - lookback
