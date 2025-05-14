@@ -6,7 +6,6 @@ import logging
 import random
 import math
 import secrets
-import time
 import urllib.parse
 import uuid
 
@@ -1053,7 +1052,10 @@ def shareName(guid, message='The token shared...'):
         name = database.get_name_from_guid(guid)
     except TypeError:
         guid = database.get_guid_for_name(guid)
-        return redirect(url_for('shareName', guid=guid))
+        if guid:
+            return redirect(url_for('shareName', guid=guid))
+        else:
+            return redirect(url_for('what'))
     img_url = database.get_image_url(name=name)
     flag = 'flagForm' in request.args
     if flag:

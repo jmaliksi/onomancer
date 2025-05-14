@@ -550,7 +550,8 @@ def get_names_from_guids(guids):
 
 def get_guid_for_name(name):
     with connect() as conn:
-        return conn.execute('SELECT guid FROM leaders WHERE name=?', (name,)).fetchone()['guid']
+        row = conn.execute('SELECT guid FROM leaders WHERE name=?', (name,)).fetchone()['guid']
+        return row and row['guid']
 
 
 @functools.lru_cache(1024)
